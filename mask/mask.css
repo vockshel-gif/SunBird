@@ -31,9 +31,10 @@ button { font: inherit; }
 }
 .stage[data-mode="camera"], .stage[data-mode="photo"] { background: #000; }
 #view { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
-/* The camera video sits behind the canvas (which draws it, mirrored, with the mask).
-   It stays full size because some phones stop updating videos that are tiny or hidden. */
-#cam { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+/* The live camera shows behind the canvas, mirrored like a selfie camera; the canvas on
+   top draws only the mask, mirrored the same way (mask.js keeps the two lined up). */
+#cam { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; visibility: hidden; }
+.stage[data-mode="camera"] #cam { visibility: visible; transform: scaleX(-1); }
 #view { z-index: 1; }
 .intro, .live, .loading, .toast { z-index: 2; }
 

@@ -282,7 +282,9 @@ function jawFrom(res) {
 // ------------------------------------------------------------------ view
 // World units are image pixels (y up). The camera shows the part of the image
 // that fits the screen: "cover" for the live camera, "contain" for photos.
-const bg = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ depthTest: false, depthWrite: false }));
+// Photos are drawn on this background plane. The live camera is not: the <video>
+// element shows it (mirrored with CSS) and the canvas on top only draws the mask.
+const bg = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ depthTest: false, depthWrite: false, side: THREE.DoubleSide }));
 bg.renderOrder = -10;
 bg.visible = false;
 bg.frustumCulled = false;
@@ -297,7 +299,7 @@ function setBackground(tex, w, h) {
 }
 
 let world = { w: 1, h: 1, fit: 'cover', mirror: false };
-let viewK = 1, spot = { x: 0, y: 0, w: 1, h: 1 };
+let viewK = 1, spot = { x: 0, y: 0, w: 1, h: 1 }, crop = { x: 0, y: 0, w: 1, h: 1 };
 function setView(w, h, fit, mirror) { world = { w, h, fit, mirror }; layout(); }
 function layout() {
   const cw = stage.clientWidth || 1, ch = stage.clientHeight || 1;
@@ -312,6 +314,7 @@ function layout() {
   camera.bottom = h - y0 - vh;
   camera.updateProjectionMatrix();
   viewK = k;
+  crop = { x: x0, y: y0, w: vw, h: vh }; // visible part of the image (y down), same as CSS object-fit: cover
   pMat.uniforms.uScale.value = k * renderer.getPixelRatio();
   const r = $('maskSpot').getBoundingClientRect(), sr = stage.getBoundingClientRect();
   spot = { x: r.left - sr.left, y: r.top - sr.top, w: r.width, h: r.height };
@@ -407,9 +410,7 @@ async function startCamera() {
     video.srcObject = stream;
     await video.play();
     if (!video.videoWidth) await new Promise((r) => video.addEventListener('loadedmetadata', r, { once: true }));
-    const tex = new THREE.VideoTexture(video);
-    tex.colorSpace = THREE.SRGBColorSpace;
-    setBackground(tex, video.videoWidth, video.videoHeight);
+    setBackground(null);
     enterLive('camera');
     setView(video.videoWidth, video.videoHeight, 'cover', true);
     track('mask_camera_start');
@@ -423,7 +424,6 @@ async function startCamera() {
 // Phones can swap the camera's width and height when rotated.
 video.addEventListener('resize', () => {
   if (stage.dataset.mode !== 'camera' || !video.videoWidth) return;
-  setBackground(bg.material.map, video.videoWidth, video.videoHeight);
   setView(video.videoWidth, video.videoHeight, 'cover', true);
 });
 function stopCamera() {
@@ -544,8 +544,20 @@ function snapshot() {
     layout();
     return out;
   }
+  // Live camera: the video frame (mirrored, cropped like the screen) with the mask on top.
   renderer.render(scene, camera);
-  return copyCanvas(renderer.domElement);
+  const src = renderer.domElement;
+  const out = document.createElement('canvas');
+  out.width = src.width;
+  out.height = src.height;
+  const g = out.getContext('2d');
+  g.save();
+  g.translate(out.width, 0);
+  g.scale(-1, 1);
+  g.drawImage(video, crop.x, crop.y, crop.w, crop.h, 0, 0, out.width, out.height);
+  g.restore();
+  g.drawImage(src, 0, 0);
+  return out;
 }
 function brand(g, w, h) {
   const u = Math.min(w, h) / 100;
