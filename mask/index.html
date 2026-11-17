@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Try On the Gini Raksha Mask | Sunbird Lanka Tours</title>
+<meta name="description" content="Put on Sri Lanka's fire demon mask with your camera, open your mouth to breathe fire and share the photo. Free, right in your browser.">
+<meta name="theme-color" content="#0c2c34">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Try On the Gini Raksha Mask">
+<meta property="og:description" content="Put on Sri Lanka's fire demon mask with your camera, open your mouth to breathe fire and share the photo.">
+<link rel="icon" href="../favicon.png">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700;800&family=Montez&display=swap">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="mask.css">
+<!-- Same Google tag as the rest of the site (content/settings.txt → google_tag) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=GT-KV5H35VK"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag("js",new Date());gtag("config","GT-KV5H35VK");</script>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.min.js"}}</script>
+<script type="module" src="mask.js"></script>
+</head>
+<body>
+<main class="stage" id="stage" data-mode="intro">
+  <canvas id="view" aria-hidden="true"></canvas>
+  <video id="cam" playsinline muted></video>
+
+  <!-- Start screen -->
+  <section class="intro" id="intro">
+    <header class="bar">
+      <a class="logo" href="../"><img src="../img/logo-white.png" alt="Sunbird Lanka Tours" width="480" height="176"></a>
+      <a class="back" href="../">Back to website</a>
+    </header>
+    <div class="intro-text">
+      <p class="kicker">Sri Lanka's fire demon</p>
+      <h1>Wear the Gini Raksha mask</h1>
+      <p class="lead">Put the mask on with your camera, open your mouth to breathe fire, and share the photo.</p>
+    </div>
+    <div class="mask-spot" id="maskSpot"></div>
+    <div class="intro-actions">
+      <div class="btn-row">
+        <button class="btn fire" id="startCam" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-2.5h6L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"/><circle cx="12" cy="13" r="3.5"/></svg>
+          Try it on
+        </button>
+        <button class="btn ghost" id="pickPhoto" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></svg>
+          Use a photo
+        </button>
+      </div>
+      <input type="file" id="photoInput" accept="image/*" hidden>
+      <p class="note">Runs in your browser. Your camera and photos never leave your device.</p>
+      <button class="link" id="aboutBtn" type="button">About this mask</button>
+    </div>
+  </section>
+
+  <!-- Camera / photo controls -->
+  <section class="live" id="live" hidden>
+    <button class="round close" id="closeBtn" type="button" aria-label="Close">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+    <p class="hint" id="hint" role="status" aria-live="polite"></p>
+    <div class="controls">
+      <span class="spacer"></span>
+      <button class="shutter" id="shutter" type="button" aria-label="Take photo"><span></span></button>
+      <button class="round fire-btn" id="fireBtn" type="button" aria-label="Fire on or off" aria-pressed="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c1 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2 1-3.5 2-4.5.3 1.6 1.2 2.6 2.2 3C10.5 9 11 6 12 3Z"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <div class="loading" id="loading" hidden>
+    <div class="spinner" aria-hidden="true"></div>
+    <p id="loadingText">Loading…</p>
+  </div>
+
+  <div class="toast" id="toast" role="alert" hidden></div>
+
+  <!-- Finished photo -->
+  <dialog class="sheet" id="result" aria-labelledby="resultTitle">
+    <h2 id="resultTitle">Looking fierce!</h2>
+    <img id="resultImg" alt="Your photo wearing the Gini Raksha mask">
+    <div class="sheet-actions">
+      <button class="btn fire" id="shareBtn" type="button" hidden>Share</button>
+      <a class="btn ghost" id="saveBtn" download="sunbird-gini-raksha.jpg" href="#">Save photo</a>
+      <button class="btn ghost" id="againBtn" type="button">Take another</button>
+    </div>
+    <p class="note">Posting it? Tag us <a href="https://www.instagram.com/sunbirdtours.srilanka/" target="_blank" rel="noopener">@sunbirdtours.srilanka</a></p>
+  </dialog>
+
+  <!-- About -->
+  <dialog class="sheet about" id="about" aria-labelledby="aboutTitle">
+    <h2 id="aboutTitle">The Gini Raksha</h2>
+    <p>Raksha masks are one of Sri Lanka's three traditional mask families, alongside Kolam and Sanni masks. They are carved from light kaduru wood, mostly in Ambalangoda on the south coast, and worn in processions and folk dance.</p>
+    <p>The Gini Raksha is the fire demon, crowned with flames. This one is our own drawing, made for this page.</p>
+    <p>See masks carved by hand at the Ambalangoda mask museum on our <a href="../cultural-heritage-tour/">Cultural &amp; Heritage Tour</a>.</p>
+    <div class="sheet-actions">
+      <a class="btn fire" href="../contact-us/#plan">Plan your trip</a>
+      <button class="btn ghost" type="button" data-close>Close</button>
+    </div>
+  </dialog>
+
+  <noscript><p class="noscript">This page needs JavaScript to show the mask.</p></noscript>
+</main>
+</body>
+</html>
