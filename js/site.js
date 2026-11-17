@@ -30,6 +30,7 @@
   var header = d.querySelector(".site-header");
   function onScroll() { if (header) header.classList.toggle("scrolled", window.scrollY > 10); }
   window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("pageshow", onScroll);   // also when the page reopens part-way down
   onScroll();
 
   // ---- home slider
