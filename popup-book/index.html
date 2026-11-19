@@ -703,7 +703,9 @@ PopupBookData.load().then(function (BOOK) {
      pictures wait (data-src) until their day comes near (hydrate). */
   function makePanel(p, isFloat, lazy) {
     var el = document.createElement('div'), html = p.html;
-    if (lazy) html = html.replace(/<img([^>]*?) src="/SunBird/g, '<img$1 data-src="');
+    // (\s, not a space: the website's build puts its folder in front of anything shaped like a root
+    // link, a space + src= + quote + slash, even inside a script; see tools/publish_site.py)
+    if (lazy) html = html.replace(/<img([^>]*?)\ssrc="/g, '<img$1 data-src="');
     el.className = 'vp';
     el.style.width = p.w + 'px';
     el.style.height = p.h + 'px';
