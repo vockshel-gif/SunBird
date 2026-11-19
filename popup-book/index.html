@@ -303,7 +303,7 @@
   .desk button, .desk a { font:inherit; color:inherit; background:none; border:0; padding:0; margin:0; cursor:pointer; text-decoration:none; -webkit-tap-highlight-color:transparent; }
   .desk :focus { outline:none; }
   .desk :focus-visible { outline:2px solid var(--sun); outline-offset:5px; border-radius:16px; }
-  .dk > svg, .dk .art > svg { display:block; width:100%; height:100%; overflow:visible; }
+  .dk > svg, .dk .art > svg, .dk .art > img { display:block; width:100%; height:100%; overflow:visible; }
   .dk .art { position:absolute; inset:0; transform:rotate(var(--rot, 0deg)); transition:transform .3s cubic-bezier(.3,1.5,.5,1); }
   body:not(.lite) .dk .art { filter:drop-shadow(0 2px 2px rgba(2,10,28,.32)) drop-shadow(0 7px 12px rgba(2,10,28,.2)); }
   @media (hover:hover) { .dk.lift:hover .art { transform:rotate(var(--rot, 0deg)) translateY(-4px) scale(1.04); } }
@@ -312,6 +312,7 @@
   .dk .lbl { position:absolute; left:50%; top:100%; margin-top:10px; transform:translateX(-50%); padding:5px 11px; border-radius:999px; white-space:nowrap;
     background:rgba(4,16,36,.8); color:#fff; font-size:11.5px; font-weight:600; letter-spacing:.02em; line-height:1.2; opacity:0; pointer-events:none; transition:opacity .2s; }
   .dk.lbl-up .lbl { top:auto; bottom:100%; margin:0 0 10px; }
+  .dk.lbl-right .lbl { left:100%; top:50%; margin:0 0 0 14px; transform:translateY(-50%); }
   .dk:hover .lbl, .dk:focus-visible .lbl { opacity:1; }
   @media (hover:none) { .dk .lbl { display:none; } }
 
@@ -348,6 +349,8 @@
     background:radial-gradient(circle at 36% 30%, #3E8DD0, #2773B7 58%, #1D5C9B);
     box-shadow:inset 0 0 0 calc(var(--hw, 60px) * .07) #2773B7, inset 0 0 0 calc(var(--hw, 60px) * .1) var(--sun), 0 0 0 4px #fff, 0 0 0 5.4px rgba(75,91,107,.3), 0 6px 14px rgba(2,12,30,.42); }
   .dk.help .disc span { transform:translateY(.02em); text-shadow:0 .05em 0 #164A80; }
+  .dk.help .disc.real { background:none; box-shadow:0 2px 3px rgba(2,12,30,.3), 0 6px 14px rgba(2,12,30,.38); }   /* the enamel badge (desk/help-button.webp) */
+  .dk.help .disc.real img { display:block; width:100%; height:100%; }
   @media (hover:hover) and (pointer:fine) { .dk.help:hover .disc { animation:dk-wiggle .7s ease-in-out; } }
   .dk.help:active .disc { transform:scale(.93); }
   .dk.help:focus-visible { outline:none; }
@@ -369,14 +372,18 @@
   /* the passport stamp: a cream paper disc, and the day's place stamped on it in blue ink. The ink
      is its own layer: it thunks down (dk-thunk) when a day opens, and the disc gives a little. */
   .dk.passport { cursor:pointer; }
-  .dk.passport .ink { position:absolute; inset:0; opacity:.9; transform:rotate(var(--ink-rot, -10deg)); }
+  .dk.passport .ink { position:absolute; inset:0; opacity:.92; transform:rotate(var(--ink-rot, -10deg));
+    -webkit-mask:url(desk/stamp-ink.webp?v=1) center / 100% 100% no-repeat; mask:url(desk/stamp-ink.webp?v=1) center / 100% 100% no-repeat; }   /* patchy, like real ink */
   .dk.passport .ink svg { display:block; width:100%; height:100%; overflow:visible; }
   .dk.passport .ink.thunk { animation:dk-thunk .55s cubic-bezier(.4,0,.3,1) both; }
   .dk.passport.jolt .art { animation:dk-jolt .32s .24s ease-out; }
   @keyframes dk-thunk { 0% { opacity:0; transform:rotate(calc(var(--ink-rot, -10deg) - 12deg)) scale(1.8); } 50% { opacity:.95; transform:rotate(var(--ink-rot, -10deg)) scale(.92); }
     70% { transform:rotate(var(--ink-rot, -10deg)) scale(1.03); } 100% { opacity:.9; transform:rotate(var(--ink-rot, -10deg)) scale(1); } }
   @keyframes dk-jolt { 30% { transform:rotate(var(--rot, 0deg)) translateY(2px) scale(.97); } }
-  .dk.compass .rose { position:absolute; inset:0; transition:transform .7s cubic-bezier(.3,1.6,.5,1); }
+  /* the compass: the case's circle fills the box and its hanging ring sticks out above (the picture's
+     case is centred at x .498, y .598: tools/make_desk.py); the needle sits on the pivot and swings */
+  .dk.compass .case { position:absolute; left:0; top:-24.75%; width:100%; height:125%; }
+  .dk.compass .rose { position:absolute; left:44.95%; top:19%; width:10.1%; height:62%; transform-origin:50% 50%; transition:transform .7s cubic-bezier(.3,1.6,.5,1); }
   @media (hover:hover) { .dk.compass:hover .rose { transform:rotate(-24deg); } }
   .dk.compass[aria-expanded="true"] .rose { transform:rotate(200deg); }
 
@@ -427,7 +434,7 @@
   .ola-wrap[hidden] { display:none; }
   .ola-back { position:absolute; inset:0; background:rgba(3,12,28,.6); opacity:0; transition:opacity .35s; }
   .ola-wrap.st-in .ola-back { opacity:1; }
-  .ola { position:relative; width:min(660px, 100%); max-height:100%; overflow-x:hidden; overflow-y:auto; overscroll-behavior:contain; padding:8px 18px 40px 14px; scrollbar-width:thin; scrollbar-color:rgba(255,236,190,.35) transparent;
+  .ola { position:relative; width:min(700px, 100%); max-height:100%; overflow-x:hidden; overflow-y:auto; overscroll-behavior:contain; padding:8px 18px 40px 14px; scrollbar-width:thin; scrollbar-color:rgba(255,236,190,.35) transparent;
     opacity:0; transform:translateX(110px) rotate(6deg); transition:opacity .3s, transform .6s cubic-bezier(.2,1.12,.35,1); }
   .ola-wrap.st-in .ola { opacity:1; transform:none; }
   .ola:focus { outline:none; }
@@ -453,17 +460,21 @@
   .ola-board.bottom button:hover, .ola-board.bottom a:hover { background:rgba(255,236,190,.2); }
   /* the leaves: dried palm leaf, golden-tan, darker at the ends, fine fibres along it, the cord's hole */
   .ola-leaves { position:relative; z-index:1; list-style:none; margin:0; padding:7px 0; display:flex; flex-direction:column; gap:6px; }
-  .ola-leaf { position:relative; display:grid; grid-template-columns:96px 1fr; column-gap:16px; align-items:baseline; min-height:46px; padding:10px 30px 10px 60px;
-    border-radius:22px / 23px; color:#3A2210; text-shadow:0 1px 0 rgba(255,240,205,.55);
-    background:
-      linear-gradient(90deg, rgba(110,62,18,.45), rgba(110,62,18,0) 7%, rgba(110,62,18,0) 93%, rgba(110,62,18,.45)),
-      repeating-linear-gradient(180deg, rgba(255,240,205,0) 0 2px, rgba(255,240,205,.22) 2px 3px, rgba(120,76,28,0) 3px 5px, rgba(120,76,28,.12) 5px 6px),
-      linear-gradient(180deg, #E8CB8F 0%, #D9B574 48%, #C99F5E 100%);
-    box-shadow:inset 0 1px 0 rgba(255,244,214,.65), inset 0 -1px 0 rgba(90,50,12,.3), 0 2px 0 rgba(70,38,8,.4), 0 6px 10px rgba(2,10,28,.24);
+  .ola-leaf { position:relative; display:grid; grid-template-columns:96px 1fr; column-gap:16px; align-items:baseline; min-height:46px; padding:10px 50px 10px 60px;   /* (clear of both holes) */
+    border-radius:12px; color:#3A2210; text-shadow:0 1px 0 rgba(255,240,205,.55);
+    /* a real dried palm leaf (desk/ola-leaf*.webp, see tools/make_desk.py): its ends (150 px of the
+       picture) drawn 38 px wide, its middle stretched along the line; its punched holes are drawn below */
+    border:0 solid transparent; border-image:url(desk/ola-leaf.webp?v=1) 0 150 fill / 0 38px stretch;
     transform:translateY(var(--dy, 0px)); transition:transform .6s cubic-bezier(.22,1.25,.4,1) calc(var(--i, 0) * 45ms); }
   .ola-leaf::before { content:''; position:absolute; left:28px; top:50%; width:12px; height:12px; margin-top:-6px; border-radius:50%;
     background:linear-gradient(90deg, rgba(0,0,0,0) 4.5px, #8A5A2B 4.5px 7.5px, rgba(0,0,0,0) 7.5px), radial-gradient(circle, #2A1608 50%, #4A2A12);
     box-shadow:inset 0 1.5px 2px rgba(0,0,0,.55), 0 1px 0 rgba(255,244,214,.5); }
+  /* its shadow follows the leaf's ragged edge (a box shadow showed through it); the light book goes without */
+  body:not(.lite) .ola-leaf { filter:drop-shadow(0 4px 4px rgba(2,10,28,.32)); }
+  .ola-leaf:nth-child(3n+2) { border-image-source:url(desk/ola-leaf-2.webp?v=1); }
+  .ola-leaf:nth-child(3n) { border-image-source:url(desk/ola-leaf-3.webp?v=1); }
+  .ola-leaf::after { content:''; position:absolute; right:28px; top:50%; width:11px; height:11px; margin-top:-5.5px; border-radius:50%;   /* the second hole, the cord isn't through it */
+    background:radial-gradient(circle, #2A1608 52%, #4A2A12); box-shadow:inset 0 1.5px 2px rgba(0,0,0,.55), 0 1px 0 rgba(255,244,214,.5); }
   .ola-wrap.st-fan .ola-leaf { transform:translateX(var(--fx, 0px)) rotate(var(--fr, 0deg)); }
   .ola-wrap.st-fan .ola-board.bottom { transform:none; }
   .ola-wrap.st-closing .ola-leaf, .ola-wrap.st-closing .ola-board.bottom { transition-duration:.3s; transition-delay:0s; }
@@ -488,15 +499,15 @@
   .ola-tie { position:absolute; z-index:4; left:34%; width:50px; pointer-events:none; transition:opacity .3s, transform .45s cubic-bezier(.4,0,.6,1); }
   .ola-tie svg { display:block; width:100%; height:100%; overflow:visible; }
   .ola-wrap.st-loose .ola-tie { opacity:0; transform:translate(-30px, 18px) rotate(-16deg); }
-  .ola-tail { position:absolute; left:28px; top:50%; width:44px; height:62px; pointer-events:none; transform-origin:6px 3px; opacity:0; transform:rotate(-40deg);
+  .ola-tail { position:absolute; left:29px; top:50%; width:10px; height:64px; margin-top:-3px; pointer-events:none; transform-origin:50% 3px; opacity:0; transform:rotate(-40deg);
     transition:opacity .25s .1s, transform .7s cubic-bezier(.3,1.6,.5,1) .1s; }
-  .ola-tail svg { display:block; width:100%; height:100%; overflow:visible; }
-  .ola-wrap.st-loose .ola-tail { opacity:1; transform:none; }
+  .ola-tail img { display:block; width:100%; height:100%; }
+  .ola-wrap.st-loose .ola-tail { opacity:1; transform:rotate(22deg); }
   /* a phone held upright: a sheet from the bottom, the leaves straight, full width */
   .ola-wrap.sheet { align-items:flex-end; padding:0; }
   .ola-wrap.sheet .ola { width:100%; max-height:90%; padding:10px 10px max(54px, calc(env(safe-area-inset-bottom) + 44px)); transform:translateY(105%); }
   .ola-wrap.sheet.st-in .ola { transform:none; }
-  .ola-wrap.sheet .ola-leaf { grid-template-columns:76px 1fr; column-gap:10px; padding:11px 16px 11px 56px; border-radius:16px / 22px; }
+  .ola-wrap.sheet .ola-leaf { grid-template-columns:76px 1fr; column-gap:10px; padding:11px 46px 11px 56px; }
   .ola-wrap.sheet .ol-txt b { font-size:19px; }
   .ola-wrap.sheet .ola-board { padding-left:56px; }
   .ola-wrap.sheet .ola-board h2 { font-size:24px; }
@@ -2018,7 +2029,6 @@ PopupBookData.load().then(function (BOOK) {
     return '<path d="' + d + '" fill="#fff" stroke="#4B5B6B" stroke-opacity=".3" stroke-width="' + (2 * m + 2.2) + '" stroke-linejoin="round"/>' +
            '<path d="' + d + '" fill="#fff" stroke="#fff" stroke-width="' + 2 * m + '" stroke-linejoin="round"/>';
   }
-  function circlePath(r) { return 'M' + (-r) + ' 0A' + r + ' ' + r + ' 0 1 0 ' + r + ' 0A' + r + ' ' + r + ' 0 1 0 ' + (-r) + ' 0Z'; }
   function roundPoly(pts, r) {   // a polygon with its corners rounded off
     var n = pts.length, d = '';
     for (var i = 0; i < n; i++) {
@@ -2048,8 +2058,6 @@ PopupBookData.load().then(function (BOOK) {
   // the long arrow in the title, with a darker copy under it like the letters' own shadow
   var TITLE_ARROW = '<svg class="arr" viewBox="0 0 64 26" aria-hidden="true"><g fill="none" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">' +
     '<path d="M3 14.5H55M45 5.5L57 14.5L45 23.5" stroke="#A88600"/><path d="M3 12H55M45 3L57 12L45 21" stroke="currentColor"/></g></svg>';
-  var PASSPORT_PAPER = '<svg viewBox="-70 -70 140 140" aria-hidden="true">' + cutEdge(circlePath(60), 5) +
-    '<circle r="60" fill="#FFF7E6"/><circle r="57" fill="none" stroke="#EADCC0" stroke-width="1"/></svg>';
   // the ink: the place round the top, SRI LANKA round the bottom, a plane and the day (or a real date) in the middle
   function passportInk(top, bottom, mid, sub) {
     var ts = clampN(116 / (top.length * 0.78 + 1.2), 8, 14.5), bs = clampN(116 / (bottom.length * 0.78 + 1.2), 8, 11);
@@ -2064,29 +2072,6 @@ PopupBookData.load().then(function (BOOK) {
       '<text y="' + (sub ? 6.5 : 9) + '" font-family="Bricolage Grotesque, sans-serif" font-size="' + (mid.length > 7 ? 10.5 : 15) + '" letter-spacing=".4">' + esc(mid) + '</text>' +
       (sub ? '<text y="18.5" font-size="6.4" letter-spacing="1.5">' + esc(sub) + '</text>' : '') + '</g></svg>';
   }
-  // the Ceylon postage stamp: a perforated sheet, an elephant against the sun, and a postmark
-  var POSTAGE_SVG = (function () {
-    var holes = '', x, y;
-    for (x = 4; x <= 96.1; x += 8) holes += '<circle cx="' + x + '" cy="0" r="3.2"/><circle cx="' + x + '" cy="124" r="3.2"/>';
-    for (y = 6; y <= 118.1; y += 8) holes += '<circle cx="0" cy="' + y + '" r="3.2"/><circle cx="100" cy="' + y + '" r="3.2"/>';
-    return '<svg viewBox="-4 -4 108 132" aria-hidden="true"><defs><mask id="dk-perf" maskUnits="userSpaceOnUse" x="-4" y="-4" width="108" height="132">' +
-      '<rect width="100" height="124" fill="#fff"/><g fill="#000">' + holes + '</g></mask>' +
-      '<linearGradient id="dk-pg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9ED6F2"/><stop offset=".72" stop-color="#FFF3D2"/></linearGradient></defs>' +
-      '<rect width="100" height="124" fill="#FFFDF7" mask="url(#dk-perf)"/>' +
-      '<rect x="9" y="9" width="82" height="106" fill="#FBF2DC" stroke="#2773B7" stroke-width="1.3"/>' +
-      '<rect x="14" y="26" width="72" height="62" fill="url(#dk-pg)"/>' +
-      '<circle cx="64" cy="44" r="11" fill="#FEDD00"/>' +
-      '<path d="M14 72Q32 61 50 68T86 64V88H14Z" fill="#2BAAE2" fill-opacity=".5"/>' +
-      '<use href="#dk-palm" x="66" y="40" width="22" height="34" style="color:#1F5E99"/>' +
-      '<use href="#dk-elephant" x="17" y="46" width="52" height="36" style="color:#1F5E99"/>' +
-      '<path d="M14 83.5H86" stroke="#2773B7" stroke-width="1"/>' +
-      '<rect x="14" y="26" width="72" height="62" fill="none" stroke="#2773B7" stroke-width=".8"/>' +
-      '<text x="50" y="21" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-weight="800" font-size="10.5" letter-spacing="2.6" fill="#2773B7">CEYLON</text>' +
-      '<text x="50" y="103" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="8.2" letter-spacing="2.2" fill="#2773B7">SRI LANKA</text>' +
-      '<text x="84" y="111.5" text-anchor="end" font-family="Bricolage Grotesque, sans-serif" font-weight="800" font-size="7" fill="#E5603F">10c</text>' +
-      '<g fill="none" stroke="#173A63" stroke-opacity=".5" stroke-width="1.3"><circle cx="90" cy="100" r="16"/><circle cx="90" cy="100" r="12.5"/>' +
-      '<path d="M48 114q5-3.5 10 0t10 0 10 0 10 0 10 0 10 0M52 120q5-3.5 10 0t10 0 10 0 10 0 10 0M56 108q5-3.5 10 0t10 0"/></g></svg>';
-  })();
   // the Sri Lanka sticker: a hexagon, the sun over an elephant between two palms, the name on a band
   var STICKER_SVG = (function () {
     var hex = roundPoly([[30, 0], [90, 0], [120, 52], [90, 104], [30, 104], [0, 52]], 10);
@@ -2105,35 +2090,17 @@ PopupBookData.load().then(function (BOOK) {
       '<rect y="75.5" width="120" height="30" fill="#E9D3A4"/><path d="M14 86q8-3 16 0t16 0M70 92q8-3 16 0t16 0" fill="none" stroke="#C9AE78" stroke-width="1.2" stroke-linecap="round"/></g>' +
       '<path d="' + inner + '" fill="none" stroke="#FFF7E6" stroke-width="1.6"/></svg>';
   })();
-  // the compass: a paper card with a ring of ticks and N E S W; the rose turns on its own layer
-  var COMPASS_DISC = (function () {
-    var ticks = '';
-    for (var a = 0; a < 360; a += 15) {
-      var r0 = a % 90 ? 42.5 : 40, c = Math.cos(a * Math.PI / 180), s = Math.sin(a * Math.PI / 180);
-      ticks += '<path d="M' + (c * r0).toFixed(1) + ' ' + (s * r0).toFixed(1) + 'L' + (c * 45).toFixed(1) + ' ' + (s * 45).toFixed(1) + '"/>';
-    }
-    return '<svg viewBox="-60 -60 120 120" aria-hidden="true">' + cutEdge(circlePath(52), 5) + '<circle r="52" fill="#FFF7E6"/>' +
-      '<g fill="none" stroke="#2773B7"><circle r="45" stroke-width="1.4"/><circle r="38.5" stroke-width=".6"/><g stroke-width="1">' + ticks + '</g></g>' +
-      '<g font-family="Bricolage Grotesque, sans-serif" font-weight="800" font-size="8.5" fill="#2773B7" text-anchor="middle">' +
-      '<text y="-29">N</text><text x="32" y="3">E</text><text y="35">S</text><text x="-32" y="3">W</text></g></svg>';
-  })();
-  var COMPASS_ROSE = (function () {
-    function pt(a, L, w, c1, c2) {
-      return '<g transform="rotate(' + a + ')"><path d="M0 0L' + (-w) + ' ' + (-w) + 'L0 ' + (-L) + 'Z" fill="' + c1 + '"/><path d="M0 0L' + w + ' ' + (-w) + 'L0 ' + (-L) + 'Z" fill="' + c2 + '"/></g>';
-    }
-    return '<svg class="rose" viewBox="-60 -60 120 120" aria-hidden="true">' +
-      [45, 135, 225, 315].map(function (a) { return pt(a, 19, 4.5, '#BFE6F7', '#2BAAE2'); }).join('') +
-      [90, 180, 270].map(function (a) { return pt(a, 27, 6, '#5BA4DC', '#2773B7'); }).join('') + pt(0, 27, 6, '#F08263', '#D9472B') +
-      '<circle r="4.6" fill="#FEDD00" stroke="#2773B7" stroke-width="1.2"/></svg>';
-  })();
   // a pointing hand for the first-visit hints (the fingertip at 44%, 7%)
   var HAND_SVG = '<svg viewBox="0 0 40 48" aria-hidden="true"><path d="M14 22V7a3.5 3.5 0 0 1 7 0v12l.5-1a3.2 3.2 0 0 1 6 1.4V21a3.2 3.2 0 0 1 6 1v2a3 3 0 0 1 5.6 1.4V33c0 7-5 12-12 12h-4c-5 0-8-2.5-10.5-6.5L4.5 31a3.4 3.4 0 0 1 5.4-4L14 31Z" ' +
     'fill="#fff" stroke="#16365C" stroke-width="2.2" stroke-linejoin="round"/><path d="M21 19.5v5M27.5 21.4v3.6M33.6 24.4v3" stroke="#16365C" stroke-width="1.6" stroke-linecap="round"/></svg>';
   var TIE_SVG = '<svg viewBox="0 0 50 100" preserveAspectRatio="none" aria-hidden="true"><g fill="none" stroke-linecap="round" vector-effect="non-scaling-stroke">' +
     [6, 20, 34].map(function (x) { return '<path d="M' + x + ' -4L' + (x + 10) + ' 104" stroke="#6E4219" stroke-width="5" vector-effect="non-scaling-stroke"/><path d="M' + x + ' -4L' + (x + 10) + ' 104" stroke="#B9813F" stroke-width="2.2" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/>'; }).join('') + '</g></svg>';
-  var TAIL_SVG = '<svg viewBox="0 0 44 62" aria-hidden="true"><path d="M6 3C4 20 18 26 15 44" fill="none" stroke="#6E4219" stroke-width="3.4" stroke-linecap="round"/>' +
-    '<path d="M6 3C4 20 18 26 15 44" fill="none" stroke="#B9813F" stroke-width="1.6" stroke-dasharray="2.5 2.5" stroke-linecap="round"/><circle cx="6" cy="4" r="4.4" fill="#6E4219"/>' +
-    '<rect x="9" y="42" width="12" height="17" rx="5.5" fill="#B07A3C" stroke="#5C3510" stroke-width="1.2"/><path d="M11 47H19M11 52H19" stroke="#5C3510" stroke-width=".9"/></svg>';
+
+  /* the real-texture pictures (desk/, made by tools/make_desk.py from source/desk/): bump DESK_V after
+     re-running it, so browsers fetch the new ones */
+  var DESK_V = 1;
+  // (lazy: a phone, where the compass and the postage stamp are hidden, doesn't fetch them at all)
+  function deskImg(name, cls) { return '<img' + (cls ? ' class="' + cls + '"' : '') + ' src="desk/' + name + '.webp?v=' + DESK_V + '" alt="" draggable="false" loading="lazy" decoding="async">'; }
 
   /* ---------- building it ---------- */
   /* the flight path's two shapes: wide, across the cloth above the open book's sky (where there is
@@ -2147,16 +2114,16 @@ PopupBookData.load().then(function (BOOK) {
     deskEl.innerHTML =
       '<div class="dk flight" id="dk-flight" role="img"></div>' +
       '<div class="dk bubble tip" id="dk-tip" hidden></div>' +
-      '<div class="dk passport" id="dk-passport" role="img"><div class="art" style="--rot:0deg">' + PASSPORT_PAPER + '</div><div class="ink" id="dk-ink"></div></div>' +
+      '<div class="dk passport" id="dk-passport" role="img"><div class="art" style="--rot:0deg">' + deskImg('passport-paper') + '</div><div class="ink" id="dk-ink"></div></div>' +
       '<div class="dk title" id="dk-title"><span class="kick" id="dk-kick"></span><h2 id="dk-h"></h2></div>' +
       '<button class="dk arrow prev" id="dk-prev" type="button"><span class="disc"></span><span class="cap" aria-hidden="true"></span></button>' +
       '<button class="dk arrow next" id="dk-next" type="button"><span class="disc"></span><span class="cap" aria-hidden="true"></span></button>' +
       '<div class="dk bubble ask" id="dk-ask" aria-hidden="true" hidden><p>Wondering what you can do? <b>' + (FINE ? 'Click' : 'Tap') + ' me!</b></p></div>' +
-      '<button class="dk help" id="dk-help" type="button" aria-haspopup="dialog" aria-label="Today’s plan, and what you can do"><span class="disc"><span>?</span></span><span class="lbl">Today’s plan</span></button>' +
-      '<button class="dk compass lift lbl-up" id="dk-compass" type="button" aria-label="Jump to a day" aria-haspopup="true" aria-expanded="false" aria-controls="dk-picker">' +
-        '<span class="art">' + COMPASS_DISC + COMPASS_ROSE + '</span><span class="lbl">Jump to a day</span></button>' +
+      '<button class="dk help" id="dk-help" type="button" aria-haspopup="dialog" aria-label="Today’s plan, and what you can do"><span class="disc real">' + deskImg('help-button') + '</span><span class="lbl">Today’s plan</span></button>' +
+      '<button class="dk compass lift lbl-right" id="dk-compass" type="button" aria-label="Jump to a day" aria-haspopup="true" aria-expanded="false" aria-controls="dk-picker">' +
+        '<span class="art">' + deskImg('compass', 'case') + deskImg('compass-needle', 'rose') + '</span><span class="lbl">Jump to a day</span></button>' +
       '<div class="dk picker" id="dk-picker" role="group" aria-label="Jump to a day" hidden></div>' +
-      '<button class="dk postage lift" id="dk-postage" type="button" aria-label="Send this day as a postcard"><span class="art" style="--rot:7deg">' + POSTAGE_SVG + '</span><span class="lbl">Send this day as a postcard</span></button>' +
+      '<button class="dk postage lift" id="dk-postage" type="button" aria-label="Send this day as a postcard"><span class="art" style="--rot:7deg">' + deskImg('postage') + '</span><span class="lbl">Send this day as a postcard</span></button>' +
       '<a class="dk sticker lift lbl-up" id="dk-sticker" href="' + esc(enquireHref()) + '" aria-label="Enquire about this trip"><span class="art" style="--rot:-8deg">' + STICKER_SVG + '</span><span class="lbl">Enquire about this trip</span></a>' +
       '<div class="dk hand" id="dk-hand" aria-hidden="true" hidden><div class="fing">' + HAND_SVG + '</div><span class="tag"></span></div>';
     ['flight', 'tip', 'passport', 'ink', 'title', 'kick', 'h', 'prev', 'next', 'ask', 'help', 'compass', 'picker', 'postage', 'sticker', 'hand']
@@ -2282,7 +2249,7 @@ PopupBookData.load().then(function (BOOK) {
       var pd = clampN(cw * 0.56, 96, 132), pw = clampN(cw * 0.38, 72, 98);
       if (cw < pd * 0.86 + pw + 8) { put(DK.passport, W - pd - 16, 12, pd, pd); on.passport = 1; return; }
       put(DK.passport, W - pw - 20 - pd * 0.86, 12, pd, pd); on.passport = 1;
-      put(DK.postage, W - pw - 20, 22, pw, pw * 132 / 108); on.postage = 1;
+      put(DK.postage, W - pw - 20, 22, pw, pw * 380 / 334); on.postage = 1;
     }
     function help0() { return DL.help ? DL.help.y - 12 : Hh; }
     if (mode === 'desk' || mode === 'slim') {
@@ -2310,7 +2277,7 @@ PopupBookData.load().then(function (BOOK) {
       DL.askW = Math.min(MR - 30, 214 * sc); DL.askFs = 14 * Math.min(1.1, sc);
     } else if (mode === 'slim') {   // a big window the book fills edge to edge: the desk lives in the title's band
       bm = Hh - PAD_B / 2;
-      c = Math.min(PAD_B - 8, 66); put(DK.compass, 16, bm - c / 2, c, c); on.compass = 1;
+      c = Math.min(PAD_B - 22, 54); put(DK.compass, 16, bm - c / 2 + 4, c, c); on.compass = 1;
       hw = Math.min(PAD_B - 14, 56); helpAt(W - hw - 20, bm - hw / 2, hw); on.help = 1;
       DL.title = { cx: W / 2, cy: bm, max: W - 2 * (c + 44) };
       if (M >= 70) { aw = 44; ay = open[1] + 0.7 * oh - aw / 2; arrowAt(DK.prev, ML - aw - 12, ay, aw); arrowAt(DK.next, zone[2] + 12, ay, aw); }
@@ -2630,7 +2597,7 @@ PopupBookData.load().then(function (BOOK) {
       '<div class="ola-board top"><span class="ok">' + esc(d.k) + '</span><h2 id="ola-h">' + esc(d.h) + '</h2>' +
         '<button type="button" class="ola-x" aria-label="Close the plan">×</button></div>' +
       '<ol class="ola-leaves" aria-label="' + (state ? 'The day’s plan' : 'How it works') + '">' + leaves.join('') + '</ol>' +
-      '<div class="ola-board bottom"><span class="ola-tail" aria-hidden="true">' + TAIL_SVG + '</span>' +
+      '<div class="ola-board bottom"><span class="ola-tail" aria-hidden="true">' + deskImg('ola-cord') + '</span>' +
         '<button type="button" data-act="days">Jump to a day</button><button type="button" data-act="share">Send as a postcard</button>' +
         '<a data-act="enquire" href="' + esc(enquireHref()) + '">Enquire about this trip</a></div>';
   }
