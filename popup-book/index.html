@@ -645,8 +645,8 @@
 
 <button class="tune-btn" id="tune-btn" type="button" aria-expanded="false" aria-controls="cam">Tune view</button>
 <div class="cam" id="cam">
-  <label for="cam-range">Camera height <output id="cam-val">64°</output></label>
-  <input type="range" id="cam-range" min="40" max="80" step="1" value="64">
+  <label for="cam-range">Camera height <output id="cam-val">80°</output></label>
+  <input type="range" id="cam-range" min="40" max="80" step="1" value="80">
   <div class="ends"><span>High · looking down</span><span>Low · table level</span></div>
   <label for="sun-range" class="second">Sun height <output id="sun-val">35°</output></label>
   <input type="range" id="sun-range" min="15" max="70" step="1" value="35">
@@ -1321,7 +1321,7 @@ PopupBookData.load().then(function (BOOK) {
      A higher open tilt = a lower camera, looking across the pop-ups rather than down on them. */
   // While the cover stands upright mid-turn it is the tallest thing on screen, so the camera
   // eases back a little (pull) and drops slightly (lift), then returns once the book is open.
-  var CAM = { tiltClosed: 28, tiltOpen: 64, tyClosed: -70, tyOpen: 100, zoomOpen: 1, lift: 40, pull: 0.13 };
+  var CAM = { tiltClosed: 28, tiltOpen: 80, tyClosed: -70, tyOpen: 110, zoomOpen: 1, lift: 40, pull: 0.13 };
 
   /* Framing for each open tilt: [tilt, shift down, zoom]. Measured so the open book, both page
      turns and the cover turn all stay inside the stage. Higher cameras see more page, so they
@@ -1339,7 +1339,8 @@ PopupBookData.load().then(function (BOOK) {
     CAM.zoomOpen = a[2] + (b[2] - a[2]) * f;
   }
   var startTilt = parseFloat(new URLSearchParams(location.search).get('tilt'));
-  setTilt(isNaN(startTilt) ? 64 : startTilt);
+  /* the open book's camera: all the way down, at table level (80°, the user's pick, 2026-11-19; it was 64°) */
+  setTilt(isNaN(startTilt) ? 80 : startTilt);
   function smooth(t) { return t * t * (3 - 2 * t); }
   function popOut(t) { var c = 1.7; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); }  // ~10% overshoot, ends at 1
   // a sign's lean: its tilt and wobble as it rises (f.lean, from layoutSpread), plus a wave when tapped
