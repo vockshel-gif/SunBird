@@ -196,7 +196,8 @@
   /* clipped, not just hidden: the 3D stage reaches past the screen's edge, and on a phone that made the
      page wider than the screen (so it could be panned and pinched out, and fixed layers grew with it) */
   html:has(> body.full) { overflow:hidden; }
-  body.full { height:100vh; height:100dvh; overflow:hidden; overflow:clip; display:flex; flex-direction:column; }
+  /* (min-height off: body's 100vh floor is, on a phone, the height with the toolbar hidden) */
+  body.full { height:100vh; height:100dvh; min-height:0; overflow:hidden; overflow:clip; display:flex; flex-direction:column; }
   body.full header { position:absolute; top:14px; left:22px; padding:0; text-align:left; z-index:6; pointer-events:none; }
   body.full header h1 { display:none; }
   body.full .wrap { flex:1 1 auto; min-height:0; max-width:none; overflow:visible; }
@@ -1922,6 +1923,11 @@ PopupBookData.load().then(function (BOOK) {
     compact = full && !big;
     document.body.classList.toggle('full', full);
     document.body.classList.toggle('compact', compact);
+    /* the page is exactly as tall as the screen shows. On a phone, 100vh (and, in some browsers, even
+       100dvh) is the height with the browser's toolbar hidden, so the book was framed for a page a
+       toolbar taller than the screen and its foot ran under the screen's edge (seen on Android,
+       sideways). The layout viewport's height is what the desk is laid out in too (pageH). */
+    document.body.style.height = full ? pageH() + 'px' : '';
     if (full) {
       wrap.style.height = '';
       PAD_X = compact ? 10 : 28; PAD_T = compact ? 6 : 8;
@@ -1937,7 +1943,7 @@ PopupBookData.load().then(function (BOOK) {
       if (!BOX) measure();
       if (upright) {   // tall enough for the open book at the full width (and the shut cover not too small)
         var ob = BOX.open, need = (ob[3] - ob[1]) * (VW - 2 * PAD_X) / (ob[2] - ob[0]) * 1.14 + PAD_T + PAD_B;
-        wrap.style.height = Math.round(Math.min(Math.max(need, VW * 0.88), window.innerHeight * 0.6)) + 'px';
+        wrap.style.height = Math.round(Math.min(Math.max(need, VW * 0.88), pageH() * 0.6)) + 'px';
         VH = wrap.clientHeight;
       }
       setZoom();
@@ -2254,6 +2260,7 @@ PopupBookData.load().then(function (BOOK) {
   function placeDesk() {
     if (!DESK || !full || !BOX || !DK.title) return;
     var W = pageW(), Hh = pageH();
+    deskEl.style.width = W + 'px'; deskEl.style.height = Hh + 'px';   // (not 100vh: see size)
     var open = rectOf(BOX.open), zone = [BOX.closed, BOX.turn1, BOX.turn2].map(rectOf).reduce(union, open);
     var ML = zone[0], MR = W - zone[2], M = Math.min(ML, MR), oh = open[3] - open[1];
     var mode = compact ? (upright ? 'tall' : 'side') : M >= 150 ? 'desk' : 'slim';
@@ -2632,6 +2639,7 @@ PopupBookData.load().then(function (BOOK) {
     var sheet = deskMode === 'tall';
     olaT.forEach(clearTimeout); olaT = [];
     olaWrap.className = 'ola-wrap' + (sheet ? ' sheet' : '');
+    olaWrap.style.width = pageW() + 'px'; olaWrap.style.height = pageH() + 'px';   // the screen as it shows (see size)
     olaWrap.innerHTML = '<div class="ola-back" data-close></div><div class="ola" role="dialog" aria-modal="true" aria-labelledby="ola-h" tabindex="-1">' + olaHTML(sheet) + '</div>';
     olaWrap.hidden = false;
     olaOpen = true; olaFocus = document.activeElement;
