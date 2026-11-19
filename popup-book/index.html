@@ -1,0 +1,1915 @@
+<!DOCTYPE html>
+<html lang="en" data-mimg="1">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your trip as a pop-up book | Sunbird Lanka Tours</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="The Adventure, Culture &amp; Nature Escape tour, day by day, as a pop-up book.">
+<meta name="theme-color" content="#1D5B99">
+<link rel="icon" type="image/png" href="../favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Caveat:wght@700&family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* brand colours, from the Sunbird logo: deep blue, sky blue, sunshine yellow, white */
+  :root { --ink:#1F2A37; --muted:#6B7280; --blue:#2773B7; --sky:#2BAAE2; --sun:#FEDD00; --coral:#E5603F;
+          --accent:var(--blue); --label:var(--sun); --book-shadow:rgba(6,20,42,.5);
+          --rule:#F5D000;   /* the brand yellow, a touch deeper so a hairline still reads on white */
+          --serif:'Instrument Serif', 'Times New Roman', serif;
+          /* book cloth: a fine weave, light and dark threads both ways, laid over the board's colour */
+          --weave:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='f0' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.2 .9' numOctaves='1' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.85 0 0 0 0 0.93 0 0 0 0 1 0.55 0 0 0 -0.275'/%3E%3C/filter%3E%3Cfilter id='f1' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9 .2' numOctaves='1' seed='10' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0.04 0 0 0 0 0.12 -0.7 0 0 0 0.35'/%3E%3C/filter%3E%3Cfilter id='f2' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.06 .06' numOctaves='2' seed='17' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0.04 0 0 0 0 0.12 -0.22 0 0 0 0.11'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url%28%23f0%29'/%3E%3Crect width='120' height='120' filter='url%28%23f1%29'/%3E%3Crect width='120' height='120' filter='url%28%23f2%29'/%3E%3C/svg%3E");
+          /* the tablecloth: linen, light threads one way and dark the other, and the cloth's soft unevenness */
+          --linen:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='f0' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.12 .7' numOctaves='1' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 0.95 0 0 0 0 0.9 0.7 0 0 0 -0.35'/%3E%3C/filter%3E%3Cfilter id='f1' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.7 .12' numOctaves='1' seed='10' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0.04 0 0 0 0 0.12 -0.85 0 0 0 0.425'/%3E%3C/filter%3E%3Cfilter id='f2' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.03 .03' numOctaves='2' seed='17' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0.04 0 0 0 0 0.12 -0.3 0 0 0 0.15'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url%28%23f0%29'/%3E%3Crect width='300' height='300' filter='url%28%23f1%29'/%3E%3Crect width='300' height='300' filter='url%28%23f2%29'/%3E%3C/svg%3E");
+          --cloth-front:#2672B5; --cloth-in:#1D5D9B; --tb:3px; }
+  * { box-sizing:border-box; }
+  html, body { margin:0; }
+  /* the table: a deep brand-blue linen cloth under a studio light. A soft pool of light falls on
+     the book (and, in the 3D scene, on the cloth around it: .pool), and the corners fall away into
+     shadow. The logo's yellow marks the rules in the notes, white the notes themselves. */
+  body {
+    font-family:'Plus Jakarta Sans', system-ui, sans-serif; color:var(--ink); -webkit-font-smoothing:antialiased;
+    background:
+      radial-gradient(ellipse 70% 76% at 50% 44%, rgba(4,16,36,0) 40%, rgba(4,16,36,.4) 74%, rgba(3,12,28,.74) 100%),
+      radial-gradient(ellipse 44% 46% at 50% 44%, rgba(160,212,252,.3), rgba(160,212,252,.12) 50%, rgba(160,212,252,0) 82%),
+      var(--linen),
+      repeating-linear-gradient(90deg, rgba(255,255,255,.02) 0 1px, rgba(255,255,255,0) 1px 3px),
+      repeating-linear-gradient(0deg, rgba(0,10,30,.035) 0 1px, rgba(0,10,30,0) 1px 3px),
+      #1D5B99;
+    background-attachment:fixed;
+    min-height:100vh;
+  }
+  header h1 { color:#fff; }
+  body:not(.full) .info { background:#fff; border-radius:20px 20px 0 0; padding-top:22px; }
+  header { text-align:center; padding:28px 16px 26px; }
+  /* the Sunbird mark, in white: the elephant, the bird and a fine ring */
+  header .mark { display:block; width:50px; height:50px; margin:0 auto; filter:drop-shadow(0 1px 2px rgba(4,16,36,.35)); }
+  header h1 { font-family:var(--serif); font-weight:400; font-size:36px; letter-spacing:-.005em; margin:10px 0 0; }
+
+  /* ---------- 3D stage ---------- */
+  .wrap { position:relative; width:100%; max-width:960px; margin:0 auto; overflow-x:clip; overflow-y:visible; }
+  .fit { position:absolute; left:50%; top:0; width:960px; height:700px; margin-left:-480px; transform-origin:50% 0; }
+  .stage { position:absolute; inset:0; perspective:2600px; perspective-origin:50% 0%; cursor:pointer; }
+  .book { position:absolute; left:50%; top:112px; width:840px; height:560px; margin-left:-420px; transform-style:preserve-3d; }
+
+  /* The book stands on the table (z = -3, the boards are 3 px thick, see TB in the script). Under it,
+     from the bottom up: the studio light's pool on the cloth, a soft shadow all round, and a tight
+     dark contact shadow right where the boards touch the cloth. Nothing here is measured for framing. */
+  .pool { position:absolute; left:-430px; top:-390px; width:1700px; height:1340px; pointer-events:none;
+    background:radial-gradient(closest-side, rgba(175,218,255,.2), rgba(175,218,255,.085) 48%, rgba(175,218,255,0)); }
+  .shadow { position:absolute; top:-2px; height:560px; width:420px; background:var(--book-shadow); border-radius:12px; filter:blur(16px); transform:translateZ(-3.6px); }
+  .shadow.r { left:422px; }
+  .shadow.l { left:-10px; }
+  .contact { position:absolute; top:-7.5px; width:428px; height:575px; background:rgba(2,9,22,.82); filter:blur(2.6px); pointer-events:none; }
+  .contact.r { left:420px; border-radius:2px 6px 6px 2px; transform:translateZ(-3.2px); }
+  .contact.l { left:-8px; border-radius:6px 2px 2px 6px; transform:translateZ(-3.2px); opacity:0; }
+  /* The boards are bound in cloth: a fine weave, a soft sheen where the light from the right
+     catches it, and a rounded edge that picks up a thin highlight. The back board lies under the
+     right-hand pages (its top is z = 0); its 3 px thickness shows on its front edge (.edge.cloth). */
+  .board-r { position:absolute; left:420px; top:-6px; width:426px; height:572px; border-radius:2px 5px 5px 2px; transform:translateZ(0);
+    background:linear-gradient(112deg, rgba(0,12,30,.16), rgba(255,255,255,0) 38%, rgba(220,240,255,.09) 72%, rgba(255,255,255,0) 92%), var(--weave), var(--cloth-in);
+    box-shadow:inset 0 0 0 1px rgba(170,215,255,.16); }
+
+  /* leaves turn around the spine (x = 420); the script sets their rotation */
+  .leaf { position:absolute; left:420px; top:0; width:420px; height:560px; transform-origin:0 50%; transform-style:preserve-3d; }
+  .face { position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; }
+  .face.back { transform:rotateY(180deg); }
+  .page-r { position:absolute; left:420px; top:0; width:420px; height:560px; transform:translateZ(.5px); }
+
+  .paper { position:absolute; inset:0; background:#FFFDF8; overflow:hidden; }
+  .panel { position:absolute; background:var(--pc); }
+  .left .panel { inset:14px 0 14px 14px; border-radius:10px 0 0 10px; }
+  .right .panel { inset:14px 14px 14px 0; border-radius:0 10px 10px 0; }
+  .left .paper::after, .right .paper::after { content:''; position:absolute; top:0; bottom:0; width:46px; pointer-events:none; }
+  .left .paper::after { right:0; background:linear-gradient(to left, rgba(0,0,0,.16), transparent); }
+  .right .paper::after { left:0; background:linear-gradient(to right, rgba(0,0,0,.16), transparent); }
+  .s1page { --pc:#A4D493; }
+  .s2page { --pc:#62B6E6; }
+  .print { position:absolute; left:36px; bottom:34px; color:#fff; }
+  .print .n { font-family:'Bricolage Grotesque', sans-serif; font-weight:800; font-size:44px; line-height:.9; }
+  .print .n small { font-family:'Plus Jakarta Sans', sans-serif; font-size:11px; letter-spacing:.2em; margin-left:6px; vertical-align:6px; }
+  .print .t { font-size:14px; font-weight:700; margin-top:6px; }
+
+  /* the cover board: its inside (the left page of spread 1) is the leaf's own plane; its cloth
+     outside sits the board's thickness (--tb) further out, and its edges are drawn by the script */
+  .cover { inset:-6px -6px -6px 0; border-radius:2px 5px 5px 2px; transform:translateZ(var(--tb));
+    background:linear-gradient(118deg, rgba(0,14,34,.18) 0%, rgba(255,255,255,0) 34%, rgba(225,242,255,.15) 66%, rgba(255,255,255,.02) 84%, rgba(0,14,34,.08) 100%), var(--weave), var(--cloth-front);
+    box-shadow:inset 0 0 0 1px rgba(190,225,255,.22), inset 0 0 0 2px rgba(0,20,50,.12); }
+  /* the cover label: printed paper pasted into a blind-stamped panel, a hair proud of the cloth */
+  .cover .in { position:absolute; inset:20px; border-radius:12px; background:#FFF8EC; display:flex; flex-direction:column; align-items:center; text-align:center; padding:22px 20px;
+    box-shadow:0 0 0 5px rgba(0,22,52,.10), 0 0 0 6px rgba(190,225,255,.16), 0 1px 1.5px rgba(0,18,44,.4), inset 0 0 0 1px rgba(120,95,60,.12); }
+  .cover img.logo { height:46px; }
+  .cover h2 { font-family:'Bricolage Grotesque', sans-serif; font-weight:800; font-size:60px; line-height:.95; letter-spacing:-.03em; color:#1B4F86; margin:14px 0 0; }
+  .cover .sub { font-family:'Caveat', cursive; font-size:30px; color:var(--coral); margin-top:2px; }
+  .cover .arch { width:230px; height:228px; margin-top:12px; border-radius:115px 115px 14px 14px; border:7px solid #fff; background:url(assets/sigiriya.jpg) center 35% / cover; box-shadow:0 6px 16px rgba(27,79,134,.25); }
+  .cover .for { font-size:12px; color:#6B7280; margin-top:14px; letter-spacing:.04em; }
+  .cover .for b { color:#1F2A37; }
+  /* the inside of the cover board: the cloth turned in round a pasted-down page (mirrored: its
+     css left is the outer edge, its css right the spine) */
+  .board-back { inset:-6px -6px -6px 0; border-radius:5px 2px 2px 5px;
+    background:linear-gradient(68deg, rgba(0,12,30,.18), rgba(255,255,255,0) 40%, rgba(220,240,255,.08) 75%, rgba(255,255,255,0)), var(--weave), var(--cloth-in);
+    box-shadow:inset 0 0 0 1px rgba(170,215,255,.16); }
+  .board-back .paper { inset:6px 0 6px 6px; }
+  /* Edges, placed by the script (see makeEdge). Drawn SS times as big and shrunk back, so they stay
+     crisp in close-up. cloth: a board's thickness. pages: the stacked paper edges of the pages. */
+  .edge { position:absolute; left:0; top:0; transform-origin:0 0; pointer-events:none; }
+  .edge.cloth { background:linear-gradient(to bottom, rgba(205,232,255,.42) 0, rgba(205,232,255,.08) 22%, rgba(0,0,0,0) 45%, rgba(0,10,26,.32) 100%), var(--weave), var(--cloth-in); }
+  .edge.cloth.front { background:linear-gradient(to bottom, rgba(205,232,255,.45) 0, rgba(205,232,255,.08) 22%, rgba(0,0,0,0) 45%, rgba(0,10,26,.32) 100%), var(--weave), var(--cloth-front); }
+  .edge.pages { background:
+      linear-gradient(var(--along), rgba(255,255,255,.55) 0, rgba(255,255,255,0) 4px, rgba(0,0,0,0) 62%, rgba(70,50,25,.24) 100%),
+      repeating-linear-gradient(var(--along), rgba(120,96,62,0) 0 5.2px, rgba(120,96,62,.2) 5.2px 6.4px, rgba(120,96,62,0) 6.4px 11.6px, rgba(120,96,62,.12) 11.6px 12.4px),
+      repeating-linear-gradient(var(--along), #F4ECDD 0 2.5px, #DDCFB6 2.5px 3.6px);
+    --along:to bottom; }
+  .edge.pages.fore { --along:to right; }
+
+  /* ---------- V-fold pop-up layers ----------
+     Each layer is two rigid card panels joined by a crease at the spine. Each panel is glued
+     along its bottom edge to one page. The script places every panel from the real angle of
+     its two pages, so pieces rise as a spread opens and fold flat as it closes. */
+  .vp { position:absolute; left:0; top:0; transform-origin:0 0; transform-style:preserve-3d; pointer-events:none; }
+  .vp > .face { overflow:visible; }
+  .vp > .face.back { filter:brightness(0) invert(.94) sepia(.18); }   /* the plain back of the card */
+  /* card stock (body.card, see CARD): on the pictures printed on each card and on the pages. Not on a
+     card face itself: a face is its own layer, so a filter there is re-applied every frame it moves;
+     on what it holds it is painted in once (and only again when that piece changes) */
+  body.card .vp:not(.flapcard) > .face.front:not(.shade) > *, body.card .paper { filter:url(#card); }
+  /* shading: a dark copy of the piece just in front of it; the script sets its opacity from the
+     angle to the light. It is its own 3D layer, so changing it never repaints the artwork. */
+  .vp > .shade { filter:brightness(0); transform:translateZ(.3px); opacity:0; will-change:opacity; }
+  .leaf > .shade { background:#1B1206; opacity:0; will-change:opacity; }
+  .leaf > .shade.front { transform:translateZ(.3px); }
+  .leaf > .shade.back { transform:rotateY(180deg) translateZ(.3px); }
+  #leaf1 > .shade { inset:-6px -6px -6px 0; }
+  #leaf1 > .shade.front { transform:translateZ(calc(var(--tb) + .3px)); border-radius:2px 5px 5px 2px; }   /* on the cloth outside */
+  #leaf1 > .shade.back { border-radius:5px 2px 2px 5px; }
+  .vp img, .vp svg, .cast img, .cast svg { position:absolute; bottom:0; display:block; }
+  /* cast shadows: copies of a card, blackened and blurred, placed by the script */
+  .shd { position:absolute; inset:0; pointer-events:none; }
+  .shd * { pointer-events:none !important; }
+  .shd .cast { position:absolute; left:0; top:0; transform-origin:0 0; will-change:transform; }
+  /* glue tab: the foot of a card, folded flat and glued to the page; the script lays it along the
+     card's glue line. Drawn on the page, under the cast shadows. */
+  .tab { position:absolute; left:0; top:0; transform-origin:0 0; pointer-events:none; }
+  .tab svg { display:block; overflow:visible; }
+  /* the gutter: the pages curve down into the spine, so a soft shadow runs along it */
+  .panel .wear { position:absolute; top:0; bottom:0; width:8px; pointer-events:none; }
+  .left .panel .wear { right:0; background:linear-gradient(to left, rgba(90,70,50,.12), rgba(90,70,50,0)); }
+  .right .panel .wear { left:0; background:linear-gradient(to right, rgba(90,70,50,.12), rgba(90,70,50,0)); }
+  .band { position:absolute; left:0; right:0; bottom:0; height:16px; background:var(--band); border-top:3px solid #fff; box-shadow:0 -1px 0 rgba(75,91,107,.25); }
+  .flag { position:absolute; bottom:13px; height:84px; display:flex; flex-direction:column; align-items:center; }
+  .flag .card { background:#fff; border-radius:9px; padding:6px 10px 7px; text-align:center; box-shadow:0 0 0 1.5px rgba(31,42,55,.12); white-space:nowrap; }
+  .flag .card b { display:block; font-size:9px; letter-spacing:.2em; color:var(--coral); font-weight:800; }
+  .flag .card span { display:block; font-size:13px; font-weight:800; color:var(--ink); }
+  .flag i { flex:1; width:4px; background:#8B6A45; border-radius:2px; }
+
+  /* pull tab: sticks out of the sky card's outer edge; a strip inside the card moves the plane */
+  .vp img.free, .cast img.free { top:0; left:0; bottom:auto; will-change:transform; }
+  .vp .flt, .cast .flt { bottom:auto; overflow:visible; }   /* floating paper pieces, placed from the top */
+  .pulltab { position:absolute; left:-30px; width:40px; height:24px; padding-right:8px; border-radius:7px 3px 3px 7px; background:var(--coral);
+    color:#fff; font-size:8.5px; font-weight:800; letter-spacing:.14em; display:flex; align-items:center; justify-content:center;
+    box-shadow:0 0 0 1.5px #fff, 0 1px 3px rgba(0,0,0,.25); pointer-events:auto; cursor:grab; touch-action:none; }
+  /* lift-the-flap: the lid is a card hinged on its right edge; it flips over to show its plain back */
+  .flap { position:absolute; bottom:0; pointer-events:auto; cursor:pointer; }
+  .flap .lid { left:0; width:100%; height:100%; transform-origin:100% 50%; }
+  .flap .lid-back { filter:brightness(0) invert(.94) sepia(.18); visibility:hidden; }
+  .flap .under { position:absolute; left:8px; right:8px; bottom:8px; height:50px; background:#fff; border-radius:6px; opacity:0;
+    box-shadow:0 0 0 1.5px rgba(31,42,55,.15); display:flex; flex-direction:column; justify-content:center; text-align:center; }
+  /* the Attractions tab: tucked behind the sky's right edge like a bookmark; it opens the "things to do" panel */
+  .vp .attrtab { pointer-events:auto; cursor:pointer; transition:transform .25s cubic-bezier(.3,1.4,.5,1); }
+  .vp .attrtab:hover { transform:translateX(4px); }   /* it gives a little, like card pulled by a finger */
+  .cast .attrtab, .vp > .face.back .attrtab { pointer-events:none; }
+  /* a card's plain back is its front drawn mirrored, which would put the pull tab's copy past the
+     fold, poking out of the book's spine while the cover is ajar: the tab has no back copy */
+  .vp > .face.back .pulltab { display:none; }
+  /* the Day 1 placard tilts around the foot of its stick, and can be tapped to wave it */
+  .vp .placard, .cast .placard { transform-origin:84px 142px; }   /* where the stick goes behind the sky's top edge */
+  .vp .placard { pointer-events:auto; cursor:pointer; }
+  .flap .under b { font-size:7px; letter-spacing:.18em; color:var(--coral); text-transform:uppercase; }
+  .flap .under span { font-size:9px; font-weight:800; color:var(--ink); line-height:1.25; margin-top:2px; }
+
+  /* ---------- info panel ---------- */
+  .info { max-width:640px; margin:0 auto; padding:0 20px 48px; text-align:center; }
+  /* quiet and editorial: a serif title, a small spaced kicker, hairline yellow rules, slim buttons */
+  .info .k { font-size:10px; letter-spacing:.3em; font-weight:700; color:var(--accent); min-height:14px; }
+  .info h2 { font-family:var(--serif); font-weight:400; font-size:34px; line-height:1.05; letter-spacing:-.005em; margin:8px 0 10px; color:#0F2340; }
+  .info h2 .arr { font-family:'Plus Jakarta Sans', sans-serif; font-weight:400; font-size:.62em; vertical-align:.14em; color:var(--accent); padding:0 .28em; }
+  .info p { margin:0 auto; color:#4B5563; font-size:14.5px; line-height:1.65; max-width:520px; }
+  .days { list-style:none; padding:0; margin:16px auto 0; text-align:left; max-width:520px; }
+  .days li { display:grid; grid-template-columns:72px 1fr; gap:10px; padding:10px 0; border-top:1px solid var(--rule); font-size:13.5px; line-height:1.45; color:#5B6472; }
+  .days li b { color:#0F2340; font-weight:600; }
+  .days li span.d { font-size:9.5px; letter-spacing:.22em; font-weight:700; color:var(--accent); padding-top:3px; }
+  .btns { display:flex; gap:12px; justify-content:center; margin-top:20px; flex-wrap:wrap; }
+  .btns button { font:inherit; font-size:12.5px; font-weight:600; letter-spacing:.03em; line-height:1; border-radius:999px; padding:10px 22px; cursor:pointer;
+    border:1px solid rgba(15,35,64,.2); background:transparent; color:#0F2340; transition:border-color .2s, background-color .2s, color .2s; }
+  .btns button:hover:not(:disabled) { border-color:rgba(15,35,64,.55); }
+  .btns button.primary { background:var(--blue); border-color:var(--blue); color:#fff; }
+  .btns button.primary:hover:not(:disabled) { background:#1D5E9E; border-color:#1D5E9E; }
+  .btns button:focus-visible { outline:2px solid var(--sky); outline-offset:2px; }
+  .btns button:disabled { opacity:.45; cursor:default; }
+  .steps { display:flex; gap:6px; justify-content:center; margin-top:16px; }
+  .steps i { width:5px; height:5px; border-radius:50%; background:rgba(15,35,64,.18); }
+  .steps i.on { background:var(--accent); width:18px; border-radius:3px; }
+
+  /* ---------- big screens: the book fills the window, the day's notes run in a strip along the bottom ---------- */
+  body.full { height:100vh; height:100dvh; overflow:hidden; display:flex; flex-direction:column; }
+  body.full header { position:absolute; top:14px; left:22px; padding:0; text-align:left; z-index:6; pointer-events:none; }
+  body.full header h1 { display:none; }
+  body.full .wrap { flex:1 1 auto; min-height:0; max-width:none; overflow:visible; }
+  body.full .fit { left:0; margin-left:0; transform-origin:0 0; }
+  /* the notes: title | a hairline yellow rule | the day's note | a rule | the buttons, and the day's
+     plan along the bottom under one more rule (the upright rules are the strip's ::before and ::after) */
+  body.full .info {
+    flex:none; position:relative; z-index:5; width:100%; max-width:none; margin:0; text-align:left;
+    padding:12px max(36px, calc(50% - 700px)) 11px;
+    display:grid; grid-template-columns:auto 1px minmax(0,1fr) 1px auto; column-gap:36px; align-items:center; align-content:center;
+    grid-template-areas:"k r1 p r2 btns" "h r1 p r2 steps" "days days days days days";
+    background:#fff; box-shadow:0 -22px 48px rgba(2,12,30,.3);
+  }
+  body.full .info::before, body.full .info::after { content:''; align-self:stretch; background:var(--rule); margin:2px 0; }
+  body.full .info::before { grid-area:r1; }
+  body.full .info::after { grid-area:r2; }
+  body.full .info .k { grid-area:k; align-self:end; }
+  body.full .info h2 { grid-area:h; align-self:start; margin:3px 0 0; font-size:30px; white-space:nowrap; }
+  body.full .info p { grid-area:p; justify-self:center; margin:0; max-width:640px; font-size:13.5px; line-height:1.65; }
+  body.full .days { grid-area:days; display:flex; flex-wrap:wrap; gap:4px 30px; margin:10px 0 0; padding-top:8px; max-width:none;
+    border-top:1px solid var(--rule); }
+  body.full .info.nodays .days { display:none; }
+  body.full .days li { display:block; padding:0; border:0; font-size:12.5px; white-space:nowrap; }
+  body.full .days li span.d { margin-right:10px; font-size:9px; }
+  body.full .btns { grid-area:btns; margin:0; flex-wrap:nowrap; justify-content:flex-end; align-self:end; }
+  body.full .btns button { padding:9px 20px; }
+  body.full .steps { grid-area:steps; margin:10px 0 0; justify-content:flex-end; align-self:start; }
+  @media (max-width:1180px) {   /* narrower windows: the notes run under the title at full width, the buttons stay on the right */
+    body.full .info { grid-template-columns:minmax(0,1fr) auto; grid-template-areas:"k btns" "h steps" "p p" "days days"; }
+    body.full .info::before, body.full .info::after { display:none; }
+    body.full .info p { justify-self:stretch; max-width:none; margin-top:12px; padding-top:11px; border-top:1px solid var(--rule); }
+  }
+
+  /* ---------- the Attractions gatefold ----------
+     A paper panel hinged on the sky's right edge (see FLAP in the script). Sizes are book px: the
+     camera moves in on the panel while it is open, so its small print reads at a normal size. */
+  .flapcard > .face { pointer-events:auto; }
+  /* the panel is laid out in book px but drawn FLAP.ss times as big, then shrunk back by its 3D
+     transform: 3D layers are drawn at their own size, so this keeps it sharp when the camera moves in */
+  .fc-in { position:absolute; left:0; top:0; width:316px; height:200px; transform:scale(var(--ss, 1)); transform-origin:0 0; }
+  .flapcard img, .flapcard svg { position:static; }
+  /* its paper: a card with rounded corners and the same smooth white edge as every other piece */
+  .flapcard .fc-paper { position:absolute; left:0; top:0; }
+  .fc-card { position:absolute; left:6px; top:5px; width:252px; height:190px; border-radius:11px; overflow:hidden; }
+  .flapcard .attrtab { position:absolute; }   /* the bookmark, on the drawer's right-hand edge */
+  /* kept minimal: the picture, a small coloured word (included / optional / spot it), the name, a
+     line or two, and quiet ‹ dots › to move along */
+  .fc-scene { position:relative; height:82px; overflow:hidden; perspective:420px; perspective-origin:50% -10%; }
+  .fc-sun { position:absolute; right:22px; top:16px; width:34px; height:34px; border-radius:50%; background:#FFB866; box-shadow:0 0 0 5px rgba(255,184,102,.35); }
+  .fc-ground { position:absolute; left:0; right:0; bottom:0; height:8px; background:var(--ground); opacity:.75; }
+  .fc-pop { position:absolute; left:0; right:0; bottom:6px; display:flex; justify-content:center; align-items:flex-end; transform-origin:50% 100%; }
+  .flapcard .fc-pop img, .flapcard .fc-pop svg { display:block; filter:drop-shadow(0 4px 4px rgba(40,28,16,.22)); }
+  .fc-x { position:absolute; top:6px; right:6px; width:13px; height:13px; border-radius:50%; background:#E0432F; color:#fff;
+    font-style:normal; font-weight:700; font-size:9px; line-height:13px; text-align:center; cursor:pointer; box-shadow:0 1px 2px rgba(80,20,10,.3); }
+  .fc-body { padding:11px 15px 0; }
+  .fc-tag { display:block; font-size:5.6px; letter-spacing:.2em; font-weight:800; text-transform:uppercase; }
+  .fc-tag.in { color:#2E7A45; }
+  .fc-tag.opt { color:#C24A2B; }
+  .fc-tag.see { color:#2766A5; }
+  .fc-body h5 { margin:3px 0 0; font-family:'Bricolage Grotesque', sans-serif; font-weight:800; font-size:15px; letter-spacing:-.02em; line-height:1.05; color:var(--ink); }
+  .fc-body p { margin:6px 0 0; font-size:7.6px; line-height:1.5; color:#5B6472; }
+  .fc-nav { position:absolute; left:0; right:0; bottom:6px; display:flex; align-items:center; justify-content:center; gap:8px; }
+  .fc-btn { font-style:normal; font-size:11px; line-height:1; color:var(--muted); cursor:pointer; padding:2px 4px; }
+  .fc-btn.off { opacity:.25; cursor:default; }
+  .fc-dots { display:flex; gap:3px; align-items:center; }
+  .fc-dot { width:3.5px; height:3.5px; border-radius:50%; background:rgba(31,42,55,.18); cursor:pointer; }
+  .fc-dot.on { width:9px; border-radius:2px; background:var(--coral); }
+
+  /* ---------- view tuning (camera, sun, stagger): tucked behind a button ---------- */
+  /* only for us: shown with ?tune=1 (body.tuning) */
+  .tune-btn { display:none; position:fixed; top:12px; right:14px; z-index:21; font:inherit; font-size:12.5px; font-weight:700; padding:7px 14px; border-radius:999px;
+    border:1.5px solid rgba(31,42,55,.14); background:rgba(255,255,255,.88); color:var(--ink); cursor:pointer; }
+  .tune-btn[aria-expanded="true"] { background:var(--ink); border-color:var(--ink); color:#fff; }
+  .cam { position:fixed; right:14px; top:52px; z-index:20; width:260px; background:#fff; border-radius:14px; padding:12px 16px 12px; box-shadow:0 10px 30px rgba(40,30,20,.18); display:none; }
+  body.tuning .tune-btn { display:block; }
+  body.tuning.tune-open .cam { display:block; }  .cam label { display:flex; justify-content:space-between; align-items:baseline; font-size:13px; font-weight:800; }
+  .cam output { font-family:ui-monospace, 'Cascadia Mono', Consolas, monospace; font-size:15px; color:var(--blue); }
+  .cam input[type=range] { width:100%; margin:10px 0 4px; accent-color:var(--blue); cursor:pointer; }
+  .cam .ends { display:flex; justify-content:space-between; font-size:11px; color:var(--muted); }
+  .cam .hint { font-size:11.5px; color:var(--coral); font-weight:700; margin-top:6px; }
+  .cam label.second { margin-top:12px; }
+  @media (max-width:520px) { .cam { left:12px; right:12px; width:auto; } }
+  body:not(.ready) .wrap, body:not(.ready) .info { visibility:hidden; }   /* until the book's data has loaded and it is built */
+
+  /* ---------- the light book (body.lite: phones and tablets, see LITE in the script) ----------
+     The same pop-ups, drawn far cheaper: no cast shadows, no shading copies, no card texture, plain
+     soft shadows under the book (painted once, not blurred every frame), and the parts that move
+     on their own (pull tab, sign, flap lid) on layers of their own so they never repaint a card. */
+  body.lite { background-attachment:scroll; }
+  body.lite .pool { display:none; }
+  body.lite .shadow { filter:none; box-shadow:0 0 26px 12px var(--book-shadow); }
+  body.lite .contact { filter:none; box-shadow:0 0 3px 1.5px rgba(2,9,22,.7); }
+  body.lite .vp > .shade { display:none; }
+  body.lite .vp .pulltab, body.lite .vp .placard, body.lite .flap .lid { will-change:transform; }
+
+  /* ---------- phones and small windows (body.full.compact): the book on top, the notes below ---------- */
+  .back-link { display:inline-flex; align-items:center; gap:6px; margin-top:10px; padding:6px 13px; border-radius:999px; font-size:12px; font-weight:600;
+    color:#fff; text-decoration:none; background:rgba(4,16,36,.32); box-shadow:inset 0 0 0 1px rgba(255,255,255,.28); pointer-events:auto; }
+  .back-link:hover { background:rgba(4,16,36,.5); }
+  .back-link[hidden] { display:none; }
+  body.full header { display:flex; align-items:center; gap:12px; }
+  body.full .back-link { margin-top:0; }
+  body.full.compact header { top:max(10px, env(safe-area-inset-top)); left:max(12px, env(safe-area-inset-left)); }
+  body.full.compact header .mark { width:30px; height:30px; }
+  body.full.compact .info {
+    padding:14px max(18px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+    grid-template-columns:minmax(0,1fr) auto; grid-template-areas:"k steps" "h h" "p p" "days days" "btns btns";
+    column-gap:12px; border-radius:18px 18px 0 0; box-shadow:0 -14px 34px rgba(2,12,30,.28);
+  }
+  body.full.compact .info::before, body.full.compact .info::after { display:none; }
+  body.full.compact .info .k { font-size:9px; letter-spacing:.24em; align-self:center; }
+  body.full.compact .info h2 { font-size:25px; white-space:normal; margin:4px 0 0; }
+  body.full.compact .info p { justify-self:stretch; max-width:none; margin:6px 0 0; padding:0; border:0; font-size:13px; line-height:1.5; }
+  body.full.compact .days { display:block; margin:10px 0 0; padding-top:4px; }
+  body.full.compact .days li { display:grid; grid-template-columns:62px 1fr; gap:8px; padding:5px 0; white-space:normal; font-size:12px; line-height:1.4; border:0; border-top:1px solid rgba(245,208,0,.45); }
+  body.full.compact .days li span.d { margin:0; padding-top:2px; font-size:8.5px; }
+  body.full.compact .btns { justify-content:flex-start; flex-wrap:wrap; gap:8px; margin-top:12px; align-self:start; }
+  body.full.compact .btns button { padding:10px 16px; font-size:12.5px; }
+  body.full.compact .btns button.primary { margin-left:auto; }
+  body.full.compact .steps { align-self:center; justify-content:flex-end; margin:0; gap:4px; }
+  body.full.compact .steps i { width:4px; height:4px; }
+  body.full.compact .steps i.on { width:12px; }
+  /* held upright: the book in a band at the top (its height set by the script), the notes fill the rest and scroll */
+  body.full.compact.upright .wrap { flex:none; }
+  body.full.compact.upright .info { flex:1 1 auto; min-height:0; overflow-y:auto; align-content:start; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; }
+  /* a phone on its side: the book gets nearly all the height, the notes shrink to one line */
+  @media (orientation:landscape) and (max-height:519px) {
+    body.full.compact header .mark { display:none; }
+    body.full.compact .info { padding-top:8px; padding-bottom:max(8px, env(safe-area-inset-bottom)); grid-template-columns:minmax(0,1fr) auto;
+      grid-template-areas:"k btns" "h btns"; border-radius:14px 14px 0 0; }
+    body.full.compact .info h2 { font-size:19px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:1px 0 0; }
+    body.full.compact .info p, body.full.compact .days, body.full.compact .steps { display:none; }
+    body.full.compact .btns { margin:0; flex-wrap:nowrap; align-self:center; }
+    body.full.compact .btns button { padding:9px 14px; font-size:12px; white-space:nowrap; }
+  }
+  /* in portrait the open book is small: a one-time hint to turn the phone */
+  .rotate-hint { position:absolute; left:50%; bottom:12px; transform:translateX(-50%); z-index:4; display:flex; align-items:center; gap:8px;
+    padding:7px 14px; border-radius:999px; background:rgba(255,255,255,.94); color:var(--ink); font-size:12px; font-weight:600; white-space:nowrap;
+    box-shadow:0 4px 14px rgba(2,12,30,.25); transition:opacity .4s; cursor:pointer; }
+  .rotate-hint svg { width:16px; height:16px; flex:none; }
+  .rotate-hint.gone { opacity:0; pointer-events:none; }
+  .rotate-hint[hidden] { display:none; }
+</style>
+</head>
+<body data-back="../adventure-nature-based-tours/">
+
+<!-- shared SVG defs: the white die-cut border filter and a cloud. The border is the shape's alpha
+     blurred and cut at a low level, so it is an even ~5.5 px wide and runs in smooth curves (corners
+     and notches round off); the faint grey line is the same cut ~1 px further out. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="cut" filterUnits="userSpaceOnUse" x="-20" y="-20" width="1200" height="600" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3.5" result="soft"/>
+      <feComponentTransfer in="soft" result="edgeA"><feFuncA type="linear" slope="30" intercept="-.4"/></feComponentTransfer>
+      <feFlood flood-color="#4B5B6B" flood-opacity=".28"/>
+      <feComposite in2="edgeA" operator="in" result="edge"/>
+      <feComponentTransfer in="soft" result="borderA"><feFuncA type="linear" slope="20" intercept="-.7"/></feComponentTransfer>
+      <feFlood flood-color="#FFFFFF"/>
+      <feComposite in2="borderA" operator="in" result="border"/>
+      <feMerge><feMergeNode in="edge"/><feMergeNode in="border"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <!-- card-stock grain: fine dark fibres speckled over a printed colour, inside its own outline -->
+    <filter id="grain" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency=".75 1.1" numOctaves="2" seed="11" result="n"/>
+      <feColorMatrix in="n" type="matrix" values="0 0 0 0 .45  0 0 0 0 .16  0 0 0 0 .08  0 0 0 -1.15 .62" result="speck"/>
+      <feComposite in="speck" in2="SourceAlpha" operator="in" result="s"/>
+      <feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="s"/></feMerge>
+    </filter>
+    <!-- card stock (on by default, see CARD): the board's tooth, a fine bumpy surface lit from the
+         right like the rest of the book, multiplied into everything printed on it, plus a faint cloudy
+         mottle from its fibres. How strong it is (#card-tone, #card-mottle) is set in the script. -->
+    <filter id="card" x="0" y="0" width="100%" height="100%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="1.1" numOctaves="2" seed="4" result="n"/>
+      <feDiffuseLighting in="n" surfaceScale="2" diffuseConstant="1" lighting-color="#fff" result="lit">
+        <feDistantLight azimuth="15" elevation="50"/>
+      </feDiffuseLighting>
+      <feComponentTransfer in="lit" result="tooth" id="card-tone">
+        <feFuncR type="linear" slope=".14" intercept=".87"/><feFuncG type="linear" slope=".14" intercept=".87"/><feFuncB type="linear" slope=".14" intercept=".87"/>
+      </feComponentTransfer>
+      <feTurbulence type="fractalNoise" baseFrequency=".018" numOctaves="2" seed="9" result="m0"/>
+      <feColorMatrix in="m0" type="matrix" id="card-mottle" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0 1" result="mottle"/>
+      <feComposite in="tooth" in2="mottle" operator="arithmetic" k1="1" result="tex"/>
+      <feBlend in="SourceGraphic" in2="tex" mode="multiply" result="printed"/>
+      <feComposite in="printed" in2="SourceAlpha" operator="in"/>
+    </filter>
+    <symbol id="cloud" viewBox="0 0 140 70">
+      <path d="M22 64 C6 64 4 42 20 38 C18 20 42 12 54 24 C62 4 100 4 106 28 C124 22 142 38 132 52 C142 64 130 66 122 64 Z" fill="#fff" stroke="#A9D3EC" stroke-width="2.5"/>
+      <path d="M60 44 c5 -8 17 -6 17 3 c0 6 -8 8 -10 3" fill="none" stroke="#A9D3EC" stroke-width="2.5" stroke-linecap="round"/>
+    </symbol>
+  </defs>
+</svg>
+
+<header>
+  <!-- the Sunbird mark in white (from design/logos/Logo-emblem.svg): the elephant is the disc with
+       the logo's blue shapes cut out of it, the bird sits above it, a fine ring holds the two -->
+  <svg class="mark" viewBox="-12 -12 252 253" role="img" aria-label="Sunbird Lanka Tours">
+    <defs><mask id="mark-cut" maskUnits="userSpaceOnUse" x="-12" y="-12" width="252" height="253">
+      <ellipse cx="113.93" cy="114.56" rx="113.83" ry="114.43" fill="#fff"/>
+      <g fill="#000" fill-rule="evenodd">
+        <path d="M187.73,55.13a40.8,40.8,0,0,1-7,10.27,26.59,26.59,0,0,1,7.91,8,29.63,29.63,0,0,0-9.78-6,60.33,60.33,0,0,1-5.69,4.9q-15.06,8-46.26,9.52c-42.37,1.31-48.43,48.11-24.38,58,38.17,15.66,45.75-30.92,14-30.19,25.37-2.92,33.05,26.17,11.92,35.76C112.6,153,90,144.87,81,129.69q-36.19,23.55-46.8,66.61A114.41,114.41,0,0,1,0,114.5C0,51.27,51,0,113.92,0A112.84,112.84,0,0,1,163.6,11.44c3.28,1.59,6.48,3.35,9.58,5.25,9.73,6.39,15.16,13.89,16.77,21.66a16.12,16.12,0,0,1,4.55,4,25.53,25.53,0,0,0-4.25-2.24,26.37,26.37,0,0,1-1.59,12.83,23.35,23.35,0,0,1,5.77,6.65,24.65,24.65,0,0,0-6.7-4.46"/>
+        <path d="M201,40.63c12.62,19.6,6.57,49.08-7.29,70.89,10.76,1.21,19.42.31,23.9.72,5.87.52,9.4,2.12-.33,4.83A121.31,121.31,0,0,1,186,121.89q-2,2.25-4,4.29c-.69.78-1.37,1.57-2,2.36q-14.9,17.86-18.74,39-2.58,28.22,5.26,48.61A114.85,114.85,0,0,0,201,40.63M128.31,204.29Q97,199.88,86.51,225.65a114.2,114.2,0,0,0,49.32,1.22,46.9,46.9,0,0,1-7.52-22.58"/>
+        <path d="M147.41,102.28A4.4,4.4,0,1,1,143,97.86a4.4,4.4,0,0,1,4.39,4.42"/>
+      </g></mask></defs>
+    <ellipse cx="113.93" cy="114.56" rx="113.83" ry="114.43" fill="#fff" mask="url(#mark-cut)"/>
+    <ellipse cx="113.93" cy="114.56" rx="121" ry="121.6" fill="none" stroke="#fff" stroke-width="4.5"/>
+    <g fill="#fff" fill-rule="evenodd">
+      <path d="M119.22,22.77a3.46,3.46,0,1,1,3.44-3.45,3.44,3.44,0,0,1-3.44,3.45m22.88.56c-4-1.75-8-5.67-10.55-8.23-9.34-9.44-25.35-6.51-29.63,7.24a35.1,35.1,0,0,1,11.43,48.41h9.91a45.64,45.64,0,0,0,4-19.06c0-14.38-1.79-22.61,14.82-28.36"/>
+      <path d="M87.86,70.75a19.11,19.11,0,0,0,14.39-18.54A18.53,18.53,0,0,0,90.54,34.94L59.33,35a7,7,0,0,1-6.94-7v-1.7l38.14.07a26.76,26.76,0,0,1,12.3,44.39Z"/>
+      <path d="M82.8,40c4.79,0,8.78,4,10.49,8.62h-34a7,7,0,0,1-6.94-7V40Z"/>
+      <path d="M59.33,62.35H85a10.17,10.17,0,0,0,8.81-8.61l-41.43,0v1.7a7,7,0,0,0,6.94,7"/>
+    </g>
+  </svg>
+  <h1>Your trip, as a pop-up book</h1>
+  <!-- the website's copy sets <body data-back="..."> (tools/publish_site.py): a way back to the tour -->
+  <a class="back-link" id="back-link" hidden>&larr; Back to the tour</a>
+</header>
+
+<div class="wrap" id="wrap">
+  <div class="fit" id="fit">
+    <div class="stage" id="stage" role="button" tabindex="0" aria-label="Pop-up itinerary book. Activate to turn the page.">
+      <div class="book" id="book">
+        <div class="pool" id="pool" aria-hidden="true"></div>
+        <div class="shadow r"></div><div class="shadow l" id="shadow-l"></div>
+        <div class="contact r" aria-hidden="true"></div><div class="contact l" id="contact-l" aria-hidden="true"></div>
+        <div class="board-r"></div>
+
+        <!-- right page of the last spread (glued to the back board) -->
+        <div class="page-r right s2page"><div class="paper"><div class="panel"></div></div></div>
+
+        <!-- the inner leaves (leaf2 .. leafN, one per day after the first) are added here by the script:
+             leaf k's front is the right page of spread k-1, its back the left page of spread k -->
+
+        <!-- the cover: front = cover art, back = left page of spread 1 -->
+        <div class="leaf" id="leaf1">
+          <div class="face front cover"><div class="in">
+            <img class="logo" src="assets/logo.svg" alt="Sunbird Lanka Tours">
+            <h2>Sri Lanka</h2>
+            <div class="sub">a pop-up journey</div>
+            <div class="arch"></div>
+            <div class="for">16 days · prepared for <b>Mr &amp; Mrs Anderson</b></div>
+          </div></div>
+          <div class="face back board-back left s1page"><div class="paper"><div class="panel"></div></div></div>
+          <div class="face shade front"></div><div class="face shade back"></div>
+        </div>
+        <!-- pop-up panels are added here by the script -->
+      </div>
+    </div>
+  </div>
+  <div class="rotate-hint" id="rotate-hint" hidden>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <rect x="3" y="8" width="18" height="11" rx="2"/><path d="M8 4.5a7 7 0 0 1 9 1.6M17 3v3.2h-3.2"/></svg>
+    Turn your phone sideways for a bigger book
+  </div>
+</div>
+
+<section class="info" aria-live="polite">
+  <div class="k" id="i-k"></div>
+  <h2 id="i-h"></h2>
+  <p id="i-p"></p>
+  <ol class="days" id="i-days"></ol>
+  <div class="btns" id="i-btns"></div>
+  <div class="steps" id="i-steps"><i></i><i></i><i></i></div>
+</section>
+
+<button class="tune-btn" id="tune-btn" type="button" aria-expanded="false" aria-controls="cam">Tune view</button>
+<div class="cam" id="cam">
+  <label for="cam-range">Camera height <output id="cam-val">64°</output></label>
+  <input type="range" id="cam-range" min="40" max="80" step="1" value="64">
+  <div class="ends"><span>High · looking down</span><span>Low · table level</span></div>
+  <label for="sun-range" class="second">Sun height <output id="sun-val">35°</output></label>
+  <input type="range" id="sun-range" min="15" max="70" step="1" value="35">
+  <div class="ends"><span>Low · long shadows</span><span>High · short</span></div>
+  <label for="stagger-range" class="second">Stagger <output id="stagger-val">100</output></label>
+  <input type="range" id="stagger-range" min="0" max="100" step="5" value="100">
+  <div class="ends"><span>All rise together</span><span>Front first, sky last</span></div>  <div class="hint" id="cam-hint">Open the book to see the change.</div>
+</div>
+
+<!-- Day 1's photo pieces, grades and attractions are data (data/book.json, made with editor/) -->
+<script src="book-data.js?v=8"></script>   <!-- bump v when book-data.js changes, so browsers fetch the new one -->
+<script>
+PopupBookData.load().then(function (BOOK) {
+  'use strict';
+
+  /* ================= the light book (phones) =================
+     A phone has a small GPU and little memory, and every 3D card is a picture the browser keeps
+     in memory at the screen's full pixel density. So on phones and tablets (PopupBookData.lite;
+     ?lite=1 tries it on a computer) the book is drawn far cheaper, with the same pop-ups:
+     - no cast shadows (they were a blurred copy of every card on every card behind it and on the
+       pages: about 80 per spread, re-blurred every frame), no shading copies, no card texture;
+     - each card drawn once (plus the plain back of the big cards; the floating pieces have none);
+     - the whole scene drawn at LITE_DENSITY device pixels per screen pixel (CSS zoom on the stage,
+       see setZoom) instead of the phone's 2-3x: a quarter of the pixels or less;
+     - edges not supersampled, spreads that are shut not laid out, only the next days' pictures
+       loaded (hydrate), and the framing measured on the first two days only (they all share it). */
+  var LITE = !!PopupBookData.lite;
+  var LITE_DENSITY = parseFloat(new URLSearchParams(location.search).get('q')) || 1.5;   // ?q= tries another density
+  document.body.classList.toggle('lite', LITE);
+
+  /* Card stock texture: see the #card filter. On by default at CARD_DEFAULT (subtle, the user's
+     pick); ?card=n tries another strength (1 subtle .. 3 strong), ?card=0 turns it off. The
+     tooth's contrast and the mottle grow with n. Off in the light book (it is the costliest filter). */
+  var CARD_DEFAULT = LITE ? 0 : 1.2, cardQ = new URLSearchParams(location.search).get('card');
+  var CARD = Math.max(0, Math.min(3, cardQ === null || isNaN(parseFloat(cardQ)) ? CARD_DEFAULT : parseFloat(cardQ)));
+  document.body.classList.toggle('card', CARD > 0);
+  if (CARD) {
+    var toneK = 0.14 * CARD, mottleK = 0.025 * CARD;   // flat card stays ~2% darker; bumps lighter/darker
+    Array.prototype.forEach.call(document.querySelectorAll('#card-tone > *'), function (f) {
+      f.setAttribute('slope', toneK.toFixed(3)); f.setAttribute('intercept', (0.98 - toneK * 0.766).toFixed(3));
+    });
+    var mo = (-2 * mottleK).toFixed(3) + ' 0 0 0 ' + (1 + mottleK).toFixed(3);   // 1 +- mottleK from the noise's red
+    document.getElementById('card-mottle').setAttribute('values', [mo, mo, mo, '0 0 0 0 1'].join('  '));
+  }
+
+
+  /* ================= artwork ================= */
+  /* A smooth die-cut edge: an even white margin round a shape, with a faint grey line just outside
+     it so it reads on light paper. Drawn as strokes that follow the shape's own curves, so it is
+     as smooth as the shape (the #cut filter does the same for the small pieces, from their alpha). */
+  function smoothEdge(d) {
+    return '<path d="' + d + '" fill="#fff" stroke="#4B5B6B" stroke-opacity=".28" stroke-width="13" stroke-linejoin="round"/>' +
+           '<path d="' + d + '" fill="#fff" stroke="#fff" stroke-width="11" stroke-linejoin="round"/>';
+  }
+  /* Each day's sky card: the day passes left to right in four colours (Day 1: morning blue to
+     sunset orange), a pale haze low down and a coloured band along the foot. Its colours are data
+     (data/book.json, sky). On Day 1 a dotted line is the plane's printed flight path (see setPull).
+     The clouds and the sun are separate paper pieces floating in front of the card (data too). */
+  var SKY_PATH = 'M8 300 V70 Q8 8 70 8 H690 Q752 8 752 70 V300 Z';
+  var SKY_DEFAULT = { colors: ['#8FD0F0', '#D3ECF5', '#FFE0B8', '#FFA77E'], band: '#9CC9D8' };
+  function skyArt(sk, i, path) {
+    sk = sk || SKY_DEFAULT;
+    var c = (sk.colors || SKY_DEFAULT.colors).map(PopupBookData.colour), id = 'g-sky-' + i;
+    return '<defs><linearGradient id="' + id + '" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="' + c[0] + '"/><stop offset=".42" stop-color="' + c[1] + '"/>' +
+        '<stop offset=".62" stop-color="' + c[2] + '"/><stop offset="1" stop-color="' + c[3] + '"/></linearGradient>' +
+      '<linearGradient id="' + id + 'v" x1="0" y1="0" x2="0" y2="1"><stop offset=".45" stop-color="#FFF6EA" stop-opacity="0"/><stop offset="1" stop-color="#FFF6EA" stop-opacity=".7"/></linearGradient></defs>' +
+      smoothEdge(SKY_PATH) + '<path d="' + SKY_PATH + '" fill="url(#' + id + ')"/>' +
+      '<path d="' + SKY_PATH + '" fill="url(#' + id + 'v)"/>' +
+      (path ? '<path d="' + path + '" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="1 9" stroke-linecap="round"/>' : '') +
+      '<path d="M8 300 V266 H752 V300 Z" fill="' + PopupBookData.colour(sk.band || SKY_DEFAULT.band) + '"/>' +
+      '<path d="M380 9V300" stroke="#5A4632" stroke-opacity=".1" stroke-width="2"/>';   // the fold's soft valley
+  }
+  /* the dotted flight path printed on the sky: where the first piece that moves with the PULL tab
+     flies (its centre's curve), when it floats in front of the sky card (data: pull.path false to
+     leave it out). The sky art is 380 units a half, the card 360 x 270 px. */
+  function flightPath(sd) {
+    var pc = (sd.pieces || []).filter(function (p) { return p.pull && !p.hidden && p.layer === 0 && p.pull.path !== false; })[0];
+    if (!pc) return '';
+    var left = pc.x < 0, x0 = (left ? 360 + pc.x : pc.x) + pc.w / 2, y0 = 270 - pc.y - pc.h / 2, P = PopupBookData.pullPath(pc);
+    function u(x, y) { return ((left ? 0 : 380) + x * 380 / 360).toFixed(1) + ' ' + (y * 300 / 270).toFixed(1); }
+    return 'M' + u(x0, y0) + ' Q' + u(x0 + P.cx, y0 + P.cy) + ' ' + u(x0 + P.ex, y0 + P.ey);
+  }
+  function sky(art, half, w, h) {
+    var vb = half === 'L' ? '0 0 380 300' : '380 0 380 300';
+    return '<svg viewBox="' + vb + '" preserveAspectRatio="none" style="left:0;width:' + w + 'px;height:' + h + 'px">' + art + '</svg>';
+  }
+  var ART_V = 6;   // bump after re-running the cut-out scripts, so browsers fetch the new images
+
+  /* The PULL tab: sticks out of the sky card's outer edge on a day that has a piece moving with it
+     (data pull, Day 1's plane); a strip inside the card moves the piece (setPull) */
+  var PULLTAB_HTML = '<div class="pulltab" style="top:150px" title="Pull it">PULL</div>';
+  // drawn before the sky art, so the sky's edge covers its root and it looks tucked in behind
+  /* The Attractions bookmark: a die-cut tongue of coral card stock fixed to the right-hand edge of
+     the Attractions drawer (see FLAP), its root tucked under the drawer's paper. Drawn 1:1 in px
+     from its top-left at (240, 16) on the drawer; the paper's edge covers x < 23.5, so about 44 px
+     shows. A smooth white cut edge, fibre grain (#grain), the paper's shadow where it overlaps, a
+     scored crease, a printed arrow and label pressed into the card, a thumb-hole. */
+  var TAB_PATH = 'M0 3Q0 0 3 0H50C60 0 66 6 66 17V147C66 158 60 164 50 164H3Q0 164 0 161Z';
+  var ATTRTAB_HTML =
+    '<svg class="flt attrtab" viewBox="-10 -10 86 184" style="left:230px;top:6px;width:86px;height:184px" role="button" ' +
+      'aria-label="Attractions: everything you can do today"><title>Everything you can do today</title>' +
+    '<defs><linearGradient id="g-tabsh" x1="0" x2="1"><stop offset="0" stop-color="#4A1E0E" stop-opacity=".42"/><stop offset="1" stop-color="#4A1E0E" stop-opacity="0"/></linearGradient></defs>' +
+    smoothEdge(TAB_PATH) + '<path d="' + TAB_PATH + '" fill="#DD5C3A" filter="url(#grain)"/>' +
+    '<path d="M63.6 19V145" stroke="#fff" stroke-opacity=".22" stroke-width="2" stroke-linecap="round"/>' +          // its rounded end catching the light
+    '<rect x="22.5" y="1" width="15" height="162" fill="url(#g-tabsh)"/>' +                                               // the paper's edge shades it
+    '<path d="M28.6 8V156" stroke="#7E2914" stroke-opacity=".42" stroke-width=".9"/><path d="M29.8 8V156" stroke="#fff" stroke-opacity=".26" stroke-width=".8"/>' +   // scored crease
+    '<path d="M41.5 11.5l6.5 6-6.5 6" fill="none" stroke="#7E2914" stroke-opacity=".4" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" transform="translate(.6 .8)"/>' +
+    '<path d="M41.5 11.5l6.5 6-6.5 6" fill="none" stroke="#FFF7EE" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>' +
+    '<text transform="translate(45.6 32.8) rotate(90)" dominant-baseline="central" font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="10.5" letter-spacing="1.9" fill="#7E2914" fill-opacity=".45">ATTRACTIONS</text>' +
+    '<text transform="translate(44.8 32) rotate(90)" dominant-baseline="central" font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="10.5" letter-spacing="1.9" fill="#FFF7EE">ATTRACTIONS</text>' +
+    // the thumb-hole, punched through: the light behind, its cut wall shaded at the top, a white cut rim
+    '<circle cx="44.8" cy="149.5" r="6.4" fill="#FFFDF6" stroke="#FFFFFF" stroke-width="1.3"/>' +
+    '<path d="M38.7 148.6a6.2 6.2 0 0 1 12.2 0a6.6 4.6 0 0 0 -12.2 0Z" fill="#7E2914" fill-opacity=".38"/>' +
+    '</svg>';
+
+  /* The day label: a protest-style placard on a stick, held up above the top right-hand corner of
+     the sky. Blue board, a big white DAY n, a red band with the place (data: sign.kicker over it,
+     sign.place in the band). It hangs on a paper slide just behind the sky card: hidden there while
+     the book is shut, it waits until the spread has settled open, then pops up out of the sky's top
+     edge, swings and settles at a lean, and waves when tapped (float.raise, see layoutSpread;
+     showSign; waveSign). Drawn 1:1 in px with a 10 px margin for the smooth white edge; the
+     board is 148 x 98, and it tilts around the point where its stick goes behind the sky (74, 132). */
+  function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); }
+  function placard(day, sg, i) {
+    var kicker = esc(String(sg.kicker == null ? '' : sg.kicker).toUpperCase()), place = esc(String(sg.place || '').toUpperCase()), d = 'DAY ' + day;
+    return '<svg class="flt placard placard-' + i + '" viewBox="-10 -10 168 200" style="left:190px;top:-134.8px;width:168px;height:200px" role="img" aria-label="Day ' + day + (place ? ': ' + place : '') + '">' +
+    '<g filter="url(#cut)">' +
+    '<rect x="70" y="88" width="8" height="92" rx="1.5" fill="#A87C4F"/><rect x="70" y="88" width="2.4" height="92" fill="#7A5634" opacity=".75"/>' +
+    '<rect x="0" y="0" width="148" height="98" rx="5" fill="#1F67B1"/>' +
+    '<path d="M0 72H148V93a5 5 0 0 1-5 5H5a5 5 0 0 1-5-5Z" fill="#E4472F"/></g>' +
+    '<path d="M0 72H148" stroke="#fff" stroke-opacity=".35" stroke-width="1"/>' +
+    '<text x="75.8" y="19.5" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="9.5" letter-spacing="3.6" fill="#fff" opacity=".85">' + kicker + '</text>' +
+    '<text x="75.8" y="65.5" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-weight="800" font-size="46" textLength="' + (day > 9 ? 134 : 126) + '" lengthAdjust="spacingAndGlyphs" fill="#144C86">' + d + '</text>' +
+    '<text x="74" y="64" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-weight="800" font-size="46" textLength="' + (day > 9 ? 134 : 126) + '" lengthAdjust="spacingAndGlyphs" fill="#fff">' + d + '</text>' +
+    '<text x="75.9" y="90" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="' + (place.length > 11 ? 10.5 : 12.5) + '" letter-spacing="' + (place.length > 11 ? 2.2 : 3.8) + '" fill="#fff">' + place + '</text>' +
+    '</svg>';
+  }
+  /* its float: 0.6 px behind the sky card (less than the card's lift off its page, so it never
+     touches the page). Lowered by 198 px the whole board and stick hide behind the sky, clear of
+     its rounded corner; raised, 34 px of stick shows above the top edge at x 274 and the board
+     leans 8° to the right, overhanging the corner. One per day (SIGNS[i]); SIGN is Day 1's. */
+  // raise: delay (ms after the spread settles open), ms (its entrance), swing (° of the first sway)
+  function makeSign(day, sg, i) {
+    return { d: -0.6, cast: true, blur: 5, show: 0, i: i, html: placard(day, sg, i),
+             raise: { by: 198, from: 150, tilt: 8, swing: 11, delay: 500, ms: 1600, sel: '.placard-' + i } };
+  }
+
+  /* ================= the spreads: one per day =================
+     left/right: which page each half is glued to. y0: where the crease meets the spine
+     (distance from the top edge of the page). vee: the V angle of the glue lines. A layer's own
+     vee is its angle at full stagger (see layoutSpread); front layers are steeper than the ones
+     behind, so they rise first and nothing can pass through anything while folding.
+     Sizes are chosen so every piece fits inside the closed book: h * cos(vee) <= y0, and the
+     glue line's outer end (y0 + w * sin(vee)) stays on the page, for every vee in use.
+     A piece that spans the fold (skyline, seafront) is cut in two at the crease: the left
+     half's right edge and the right half's left edge are the fold.
+     float: paper pieces held d px in front of their card on a hinged spacer tab (see layoutSpread);
+     cast: the piece is big enough to throw its own shadow on the cards behind and the page;
+     blur: softness of its shadow on its own card (further out = softer).
+     tab: the glue tab printed on the page at the card's foot: c colour, x [from, to] in card px.
+     Every day uses the same four layers (LAYERS: sky, skyline, landmarks, front strip), sized and
+     proven clip-free for Day 1. What stands on them is data (data/book.json, see book-data.js), made
+     with the editor: the photos, the clouds and the sun, the sky's colours, the sign's words. */
+  var LAYERS = [
+    { y0: 275, h: 270, vee: 3, L: { w: 360, tab: { c: '#C4DDE6', x: [7.6, 360] } }, R: { w: 360, tab: { c: '#C4DDE6', x: [0, 352.4] } } },
+    { y0: 335, h: 255, vee: 6, L: { w: 333, tab: { c: '#BDB9B0', x: [20, 333] } }, R: { w: 333, tab: { c: '#BDB9B0', x: [0, 314] } } },
+    { y0: 400, h: 156, vee: 9, L: { w: 360, tab: { c: '#E4D5B6', x: [2, 360] } }, R: { w: 372, tab: { c: '#B2BCB8', x: [0, 348] } } },
+    { y0: 468, h: 90, L: { w: 368, tab: { c: '#B5AD75', x: [7, 368] } }, R: { w: 368, tab: { c: '#B5AD75', x: [0, 361] } } }
+  ];
+  var DAYS = BOOK && BOOK.spreads && BOOK.spreads.length ? BOOK.spreads : [{ day: 1, sign: { kicker: 'Arrival', place: 'Colombo' } }];
+  var NS = DAYS.length;   // spreads; the book has NS leaves: the cover (leaf1) and leaf2..leafNS, then the base page
+  var SIGNS = [];
+  var SPREADS = DAYS.map(function (sd, i) {
+    var day = sd.day || i + 1, ps = (sd.pieces || []).filter(function (p) { return !p.hidden; }), used = { 0: 1 };
+    ps.forEach(function (p) { used[p.layer] = 1; });
+    var pulls = ps.some(function (p) { return p.pull; }), flaps = ps.some(function (p) { return p.kind === 'flap'; });
+    var art = skyArt(sd.sky, i, flightPath(sd)), sign = makeSign(day, sd.sign || {}, i);
+    SIGNS.push(sign);
+    /* a layer's glue tabs are printed on the pages only if something stands on it (the sky always);
+       their colours (data layers[j].tab: [left, right]) should match the card's foot */
+    var layers = LAYERS.map(function (L, j) {
+      var o = { y0: L.y0, h: L.h }, tabs = sd.layers && sd.layers[j] && sd.layers[j].tab;
+      if (L.vee != null) o.vee = L.vee;
+      ['L', 'R'].forEach(function (s, k) {
+        o[s] = { w: L[s].w, html: '' };
+        if (used[j]) o[s].tab = { c: PopupBookData.colour((tabs && tabs[k]) || L[s].tab.c), x: L[s].tab.x.slice() };
+      });
+      return o;
+    });
+    layers[0].L.html = sky(art, 'L', 360, 270) + (pulls ? PULLTAB_HTML : '');
+    layers[0].R.html = sky(art, 'R', 360, 270);
+    layers[0].R.float = [sign];   // the day's placard, behind the sky
+    return { left: 'leaf' + (i + 1), right: i + 1 < NS ? 'leaf' + (i + 2) : 'base', vee: 12, day: day, pulls: pulls, flaps: flaps, data: sd, layers: layers };
+  });
+  var SIGN = SIGNS[0];
+  PopupBookData.applyPieces(SPREADS, BOOK);   // the data's photos, clouds and suns onto their layers' cards
+
+  /* the inner leaves: leaf k's front is the right page of spread k-1, its back the left page of
+     spread k. Drawn under the cover, the top leaf last. Each spread's pages take its page colour. */
+  (function () {
+    var cover = document.getElementById('leaf1');
+    for (var k = NS; k >= 2; k--) {
+      var el = document.createElement('div');
+      el.className = 'leaf';
+      el.id = 'leaf' + k;
+      el.innerHTML = '<div class="face front right"><div class="paper"><div class="panel"></div></div></div>' +
+        '<div class="face back left"><div class="paper"><div class="panel"></div></div></div><div class="face shade front"></div><div class="face shade back"></div>';
+      cover.parentNode.insertBefore(el, cover);
+    }
+    SPREADS.forEach(function (sp, i) {
+      var pc = PopupBookData.colour(sp.data.page || '#A4D493');
+      [pagePaper(sp.left, 'L'), pagePaper(sp.right, 'R')].forEach(function (p) { p.parentNode.style.setProperty('--pc', pc); });
+    });
+  })();
+
+  /* ================= build panels ================= */
+  var book = document.getElementById('book');
+  var TAB = 7;   // depth of a glue tab, px
+  /* p: { w, h, html } -> a 3D card with its printed front, shading copy and plain back. The light
+     book leaves the shading copy empty (and hidden), and a floating piece's back too; lazy: its
+     pictures wait (data-src) until their day comes near (hydrate). */
+  function makePanel(p, isFloat, lazy) {
+    var el = document.createElement('div'), html = p.html;
+    if (lazy) html = html.replace(/<img([^>]*?) src="/SunBird/g, '<img$1 data-src="');
+    el.className = 'vp';
+    el.style.width = p.w + 'px';
+    el.style.height = p.h + 'px';
+    el.innerHTML = '<div class="face front">' + html + '</div><div class="face front shade">' + (LITE ? '' : html) +
+      '</div><div class="face back">' + (LITE && isFloat ? '' : html) + '</div>';
+    book.appendChild(el);
+    p.el = el;
+    p.shade = el.children[1];
+  }
+  SPREADS.forEach(function (sp, si) {
+    var lazy = LITE && si >= 2;   // the first two days load at once, the rest as they come near
+    sp.layers.forEach(function (layer) {
+      ['L', 'R'].forEach(function (side) {
+        var p = layer[side];
+        p.h = layer.h;
+        makePanel(p, false, lazy);
+        // a floating piece is a card the same size as its base card, so it uses the same coordinates
+        (p.float || []).forEach(function (f) { f.w = p.w; f.h = p.h; makePanel(f, true, lazy); });
+        if (p.tab) makeTab(sp, p, side);
+      });
+    });
+  });
+  PopupBookData.afterBuild(SPREADS, BOOK);    // one colour grade over each whole spread
+
+  /* The light book loads a day's pictures only as it comes near (see makePanel): the open day, the
+     day before it and the two after. The first two days load at once. s: the state (open day). */
+  function hydrate(s) {
+    if (!LITE) return;
+    for (var i = Math.max(0, s - 2); i <= Math.min(NS - 1, s + 1); i++) {
+      var sp = SPREADS[i];
+      if (sp.hydrated) continue;
+      sp.hydrated = true;
+      sp.layers.forEach(function (layer) {
+        ['L', 'R'].forEach(function (side) {
+          [layer[side]].concat(layer[side].float || []).forEach(function (c) {
+            Array.prototype.forEach.call(c.el.querySelectorAll('img[data-src]'), function (img) {
+              img.src = img.getAttribute('data-src');
+              img.removeAttribute('data-src');
+            });
+          });
+        });
+      });
+    }
+  }
+
+  /* Glue tabs: the foot of each card, folded flat and glued to the page in front of it. A tab never
+     moves on its page, so it is drawn there once; only its angle follows the layer's V (placeTab). */
+  function makeTab(sp, p, side) {
+    var t = p.tab, len = t.x[1] - t.x[0], el = document.createElement('div');
+    t.s0 = side === 'R' ? t.x[0] : p.w - t.x[1];   // where it starts, measured from the spine
+    el.className = 'tab';
+    el.setAttribute('aria-hidden', 'true');
+    el.innerHTML = '<svg width="' + len + '" height="' + TAB + '">' +
+      '<path d="M0 0H' + len + 'L' + (len - 4) + ' ' + TAB + 'H4Z" fill="' + t.c + '"/>' +
+      '<path d="M0 .5H' + len + '" stroke="rgba(60,45,30,.3)" stroke-width="1"/>' +          // the fold
+      '<path d="M0 1.6H' + len + '" stroke="rgba(255,255,255,.4)" stroke-width="1"/>' +     // its ridge catching the light
+      '<path d="M' + len + ' 0L' + (len - 4) + ' ' + TAB + 'H4L0 0" fill="none" stroke="rgba(75,91,107,.35)" stroke-width=".8"/></svg>';
+    pagePaper(side === 'L' ? sp.left : sp.right, side).appendChild(el);
+    t.el = el;
+  }
+  function placeTab(t, side, y0, vee) {
+    var r = vee * Math.PI / 180, x = t.s0 * Math.cos(r), y = y0 + t.s0 * Math.sin(r);
+    t.el.style.transform = side === 'R' ? 'translate(' + x.toFixed(2) + 'px,' + y.toFixed(2) + 'px) rotate(' + vee + 'deg)'
+      : 'translate(' + (420 - x).toFixed(2) + 'px,' + y.toFixed(2) + 'px) rotate(' + (-vee) + 'deg) scaleX(-1)';
+  }
+
+  // the gutter of every spread: a soft shadow down the middle of the book (see .wear)
+  Array.prototype.forEach.call(book.querySelectorAll('.left .panel, .right .panel'), function (panel) {
+    var w = document.createElement('div');
+    w.className = 'wear';
+    panel.appendChild(w);
+  });
+
+  /* ================= cast shadows =================
+     Every card casts a soft shadow on the cards behind it and on the pages. A shadow is the
+     card's silhouette projected along the light onto a flat surface, which is an affine map:
+     it is recomputed from the real page angles every frame, so shadows slide, stretch and
+     sharpen as a spread folds. Cards in a spread are parallel, so a shadow on the card behind
+     is just shifted; on the page it is sheared and stretched. Shadows on a card are masked to
+     that card's own outline, shadows on a page are clipped by the paper. */
+  var SKY_SHAPE = 'M8 300 V70 Q8 8 70 8 H690 Q752 8 752 70 V300 Z';
+  function pagePaper(name, side) {
+    if (name === 'base') return document.querySelector('.page-r .paper');
+    return document.querySelector('#' + name + ' > .face.' + (side === 'L' ? 'back' : 'front') + ' .paper');
+  }
+  function maskOf(face, h) {   // the card's printed outline, built from its images and sky shape
+    var img = [], pos = [], size = [];
+    Array.prototype.forEach.call(face.children, function (c) {
+      var tag = c.tagName.toLowerCase();
+      if (tag === 'img' && !c.classList.contains('free')) {
+        img.push('url("' + c.getAttribute('src') + '")');
+        pos.push(c.style.left + ' ' + (h - parseFloat(c.style.height) - (parseFloat(c.style.bottom) || 0)) + 'px');
+        size.push(c.style.width + ' ' + c.style.height);
+      } else if (tag === 'svg') {
+        var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="' + c.getAttribute('viewBox') +
+          '" preserveAspectRatio="none"><path d="' + SKY_SHAPE + '"/></svg>';
+        img.push('url("data:image/svg+xml,' + encodeURIComponent(svg) + '")');
+        pos.push('0 ' + (h - parseFloat(c.style.height)) + 'px');
+        size.push(c.style.width + ' ' + c.style.height);
+      }
+    });
+    return img.length ? { image: img.join(','), position: pos.join(','), size: size.join(',') } : null;
+  }
+  function addShadows(sp, host, frameOf, casters, mask) {
+    var wrap = document.createElement('div');
+    wrap.className = 'shd';
+    wrap.setAttribute('aria-hidden', 'true');
+    if (mask) ['webkitMask', 'mask'].forEach(function (m) {
+      wrap.style[m + 'Image'] = mask.image; wrap.style[m + 'Position'] = mask.position;
+      wrap.style[m + 'Size'] = mask.size; wrap.style[m + 'Repeat'] = 'no-repeat';
+    });
+    casters.forEach(function (c) {
+      var el = document.createElement('div');
+      el.className = 'cast';
+      el.style.width = c.card.w + 'px';
+      el.style.height = c.card.h + 'px';
+      el.style.filter = 'brightness(0) blur(' + c.blur + 'px)';   // softer the further it falls
+      el.style.opacity = c.alpha;
+      el.innerHTML = c.card.html;
+      wrap.appendChild(el);
+      sp.shadows.push({ el: el, card: c.card, frameOf: frameOf });
+    });
+    host.appendChild(wrap);
+  }
+  // a card and the mounted pieces standing in front of it (float with cast) throw shadows together
+  function withMounted(p) { return [p].concat((p.float || []).filter(function (f) { return f.cast; })); }
+  SPREADS.forEach(function (sp) {
+    sp.shadows = [];
+    if (LITE) return;   // the light book has no cast shadows
+    var n = sp.layers.length;
+    sp.layers.forEach(function (layer, j) {
+      ['L', 'R'].forEach(function (side) {
+        var recv = layer[side], other = side === 'L' ? 'R' : 'L', casters = [];
+        // its own floating pieces: close, so small soft shadows just beside them
+        (recv.float || []).forEach(function (f) { casters.push({ card: f, blur: f.blur || 2.5, alpha: 0.24 }); });
+        for (var k = j + 1; k < n; k++) {
+          var gap = k - j;
+          withMounted(sp.layers[k][side]).forEach(function (c) {
+            casters.push({ card: c, blur: 3 + 3 * gap, alpha: (0.2 / Math.sqrt(gap)).toFixed(2) });
+          });
+          // the next card across the fold too: its shadow can cross the crease (the Lotus Tower's does)
+          if (gap === 1) withMounted(sp.layers[k][other]).forEach(function (c) { casters.push({ card: c, blur: 6, alpha: 0.2 }); });
+        }
+        var face = recv.el.children[0];
+        if (casters.length) addShadows(sp, face, function () { return recv.frame; }, casters, maskOf(face, layer.h));
+      });
+    });
+    // pages: each page gets its own cards; with the sun on the right, the right-hand cards'
+    // shadows also fall across the spine onto the left page
+    ['L', 'R'].forEach(function (side) {
+      var name = side === 'L' ? sp.left : sp.right, casters = [];
+      sp.layers.forEach(function (layer) {
+        withMounted(layer[side]).forEach(function (c) { casters.push({ card: c, blur: 7, alpha: 0.2 }); });
+        if (side === 'L') withMounted(layer.R).forEach(function (c) { casters.push({ card: c, blur: 7, alpha: 0.2 }); });
+      });
+      addShadows(sp, pagePaper(name, side), function () { return pageFrame(name, side); }, casters, null);
+    });
+  });
+
+  /* ================= geometry ================= */
+  var SPINE = 420;
+  /* turn angle of each leaf, 0..180: a[0] the cover, a[1] leaf 2, ... (a1 and a2 are the first two,
+     kept for the stored clip tests and the ?a1= ?a2= checks) */
+  var pose = { a: [] };
+  for (var li = 0; li < NS; li++) pose.a.push(0);
+  Object.defineProperty(pose, 'a1', { get: function () { return pose.a[0]; }, set: function (v) { pose.a[0] = v; }, enumerable: true });
+  Object.defineProperty(pose, 'a2', { get: function () { return NS > 1 ? pose.a[1] : 0; }, set: function (v) { if (NS > 1) pose.a[1] = v; }, enumerable: true });
+  function add(a, b) { return [a[0] + b[0], a[1] + b[1], a[2] + b[2]]; }
+  function sub(a, b) { return [a[0] - b[0], a[1] - b[1], a[2] - b[2]]; }
+  function dot(a, b) { return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]; }
+  function mul(a, k) { return [a[0] * k, a[1] * k, a[2] * k]; }
+  function cross(a, b) { return [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]]; }
+  function len(a) { return Math.sqrt(a[0] * a[0] + a[1] * a[1] + a[2] * a[2]); }
+  function unit(a) { return mul(a, 1 / len(a)); }
+  var Y = [0, 1, 0];                      // along the spine, towards the reader
+  function outward(deg) { var r = deg * Math.PI / 180; return [Math.cos(r), 0, Math.sin(r)]; } // page direction away from the spine
+  function leafNo(name) { return name === 'base' ? 0 : +name.slice(4); }
+  function pageAngle(name) { var k = leafNo(name); return k ? pose.a[k - 1] : 0; }
+  /* Height of each page at the spine (the stack of pages). The two pages of the open spread lie at
+     4 (the cover, when open, at 1 on the bare board), with 3–3.5 px of room below each for the
+     folded spread beneath. A turning leaf stays at 4. The leaf under it on the right rises to 4 only
+     once the turning leaf is past 90° (until then its own spread is still folded under it), and the
+     top leaf on the left sinks the same way as the next leaf comes down on it. With two spreads
+     this is the book as it was: cover 8 → 1, page 2 at 4, the base page at 0.5. Leaves deeper in
+     the piles sit at the same heights, hidden under the top ones (see render). */
+  var COVER_Z = NS > 1 ? 8 : 4.5;
+  /* the angle of the turning leaf at which the page under it starts to rise into its place (once
+     the turning leaf has swung well clear), and at which the top page on the other side starts to
+     settle as the leaf comes down on it (early: the spread closing on it keeps its clearance;
+     checked with sceneTest, later settling let a card dip to the page) */
+  var PILE = { rise: 90, sink: 30 };
+  function pageZ(name) {
+    var k = leafNo(name);
+    if (!k) return 0.5;
+    if (k === 1) return 1 + (COVER_Z - 1) * (1 - smooth(Math.min(1, pose.a[0] / 180)));
+    var a = pose.a[k - 1];
+    if (a > 0 && a < 180) return 4;
+    if (a <= 0) return 0.5 + 3.5 * (k === 2 ? 1 : smooth(clamp01((pose.a[k - 2] - PILE.rise) / (180 - PILE.rise))));
+    return 1 + 3 * (1 - (k < NS ? smooth(clamp01((pose.a[k] - PILE.sink) / (180 - PILE.sink))) : 0));
+  }
+  /* a page that lies under another one in its pile, fully covered: not drawn at all (deeper pages
+     share heights). The cover always is (its cloth shows), and so is the second leaf on the right
+     (under the shut cover it is the top of the page block). k 0: the base page. */
+  function buried(k) {
+    if (!k) return NS > 2 && pose.a[NS - 1] <= 0;
+    var a = pose.a[k - 1];
+    if (k === 1) return false;
+    if (a <= 0) return k > 2 && pose.a[k - 2] <= 0;
+    if (a >= 180) return k < NS && pose.a[k] >= 180;
+    return false;
+  }
+  /* The side of a page that faces into its spread (towards the other page of that spread). */
+  function innerNormal(deg, isLeftPage) {
+    var r = deg * Math.PI / 180, front = [-Math.sin(r), 0, Math.cos(r)];
+    return isLeftPage ? mul(front, -1) : front;
+  }
+  var LIFT = 1.2; // pieces sit this far off their page, on the inside, so they never share its surface
+  function m3d(X, Yv, T) {
+    var Z = cross(X, Yv);
+    return 'matrix3d(' + [X[0], X[1], X[2], 0, Yv[0], Yv[1], Yv[2], 0, Z[0], Z[1], Z[2], 0, T[0], T[1], T[2], 1]
+      .map(function (v) { return +v.toFixed(5); }).join(',') + ')';
+  }
+
+  /* Stagger: each layer has its own V angle (layer.vee, else the spread's). A V-fold's crease
+     rises at atan(sin(vee) * tan(open / 2)) above the page, so a shallower V rises later and only
+     snaps upright at the very end. The back layers get the shallowest V's, so the front pops up
+     first and the sky last. This order can't clip: a later (flatter) card always leans further
+     back than the card in front of it, and its glue line angles away from that card's. */
+  var STAGGER = 1;   // 0 = every layer at the spread's V (all rise together), 1 = each layer's own V
+  var startStagger = parseFloat(new URLSearchParams(location.search).get('stagger'));
+  if (!isNaN(startStagger)) STAGGER = Math.max(0, Math.min(1, startStagger / 100));
+  function layoutSpread(sp) {
+    var aL = pageAngle(sp.left), aR = pageAngle(sp.right);
+    var open = aL - aR;                   // angle between the two pages of this spread
+    var liftL = mul(innerNormal(aL, true), LIFT), liftR = mul(innerNormal(aR, false), LIFT);
+    var hidden = open < 0.6;              // fully closed: sandwiched between the pages
+    // the light book leaves a shut spread alone once it has been put away (hidden, its sign reset)
+    if (LITE && hidden && sp.shut && !measuring) return;
+    sp.shut = hidden;
+    /* The two pages meet the spine at slightly different heights (the page stack: a few px), but
+       a folded card is one piece, so both halves must share one crease. It sits at the spine of
+       whichever page lies on top there (blended over 1 px either way, so it never jumps). The
+       other page's cards are glued along a surface that rises from that page's outer edge to meet
+       it, like paper bending down into the gutter: a tilt of well under half a degree, the same for
+       every layer, so the fold geometry below (and its no-clipping guarantee) is unchanged. */
+    var VL0 = add([SPINE, 0, pageZ(sp.left)], liftL), VR0 = add([SPINE, 0, pageZ(sp.right)], liftR);
+    var onR = smooth(Math.max(0, Math.min(1, (pageZ(sp.right) - pageZ(sp.left) + 1) / 2)));
+    var V0 = add(VL0, mul(sub(VR0, VL0), onR));   // foot of every crease in this spread (+ its y0)
+    var eL = unit(sub(add(VL0, mul(outward(aL), 420)), V0)), eR = unit(sub(add(VR0, mul(outward(aR), 420)), V0));
+    sp.layers.forEach(function (layer) {
+      var vee = sp.vee + ((layer.vee != null ? layer.vee : sp.vee) - sp.vee) * STAGGER;
+      var d = vee * Math.PI / 180, cd = Math.cos(d), sd = Math.sin(d);
+      if (layer.tabVee !== vee) {   // glue tabs only move when the V changes (the Stagger slider)
+        layer.tabVee = vee;
+        ['L', 'R'].forEach(function (side) { if (layer[side].tab) placeTab(layer[side].tab, side, layer.y0, vee); });
+      }
+      var V = add(V0, [0, layer.y0, 0]);  // the crease's foot, lifted to the inside of the spread
+      var gL = add(mul(eL, cd), mul(Y, sd)); // glue line on the left page (angled towards the reader)
+      var gR = add(mul(eR, cd), mul(Y, sd)); // glue line on the right page
+      var c = cross(gR, gL), n = len(c);    // the crease must be at right angles to both glue lines
+      c = n > 1e-6 ? mul(c, 1 / n) : add(mul(eR, sd), mul(Y, -cd)); // closed: lying flat, pointing away from the reader
+      var up = mul(c, -1), xL = mul(gL, -1);
+      var nR = cross(gR, up), nL = cross(xL, up); // which way each printed face points
+      layer.R.frame = { O: add(V, mul(c, layer.h)), X: gR, Y: up, n: nR };
+      layer.L.frame = { O: add(add(V, mul(c, layer.h)), mul(gL, layer.L.w)), X: xL, Y: up, n: nL };
+      layer.R.el.style.transform = m3d(gR, up, layer.R.frame.O);
+      layer.L.el.style.transform = m3d(xL, up, layer.L.frame.O);
+      layer.R.el.style.visibility = layer.L.el.style.visibility = hidden ? 'hidden' : '';
+      layer.R.shade.style.opacity = layer.R.sh = shadeFor(nR);
+      layer.L.shade.style.opacity = layer.L.sh = shadeFor(nL);
+    });
+    /* Floating pieces stand f.d px in front of their card on a hinged spacer tab. The card in
+       front closes in as the spread folds, so the tab leans over and the piece sinks back towards
+       its card: it never takes more than 45% of the room in front, and lies flat when shut. */
+    sp.layers.forEach(function (layer, j) {
+      var next = sp.layers[j + 1];
+      ['L', 'R'].forEach(function (side) {
+        var p = layer[side];
+        if (!p.float) return;
+        var F = p.frame, room = next ? roomInFront(F, p.w, p.h, next[side].frame) : Infinity;
+        // all pieces on a card sink back together, so they keep their order and never meet
+        var deepest = Math.max.apply(null, p.float.map(function (f) { return f.d; }));
+        var squeeze = Math.max(0, Math.min(1, room * 0.45 / deepest));
+        p.float.forEach(function (f) {
+          // a piece behind its card (d < 0) sits on a flat slide there: nothing closes in on it
+          var d = f.d < 0 ? f.d : f.d * squeeze, O = add(F.O, mul(F.n, d));
+          if (f.raise) {
+            /* A sign on a stick, pushed up out of its card's top edge on a paper slide. It makes
+               its own entrance (f.show, 0..1, see showSign): once the spread has settled fully
+               open it waits a moment, then pops up (a touch too far, then back), swings like a
+               placard being waved, and settles at its lean. The page still holds the slide: as
+               the spread closes past raise.from it is pulled back down, straightening as it goes. */
+            var R = f.raise, uA = Math.max(0, Math.min(1, (open - R.from) / (180 - R.from)));
+            if (uA >= 1) { if (f.show < 1) showSign(f); }
+            else { holdSign(f); if (uA <= 0) f.show = 0; }   // shut: next time it comes in again
+            var s = f.show, gate = smooth(uA), ts = Math.max(0, Math.min(1, (s - 0.3) / 0.7));
+            O = add(O, mul(F.Y, R.by * (1 - popOut(Math.min(1, s / 0.4)) * gate)));
+            var lean = gate * (R.tilt * smooth(Math.max(0, Math.min(1, (s - 0.15) / 0.35))) +
+                               R.swing * Math.sin(ts * 5 * Math.PI) * (1 - ts) * (1 - ts));
+            f.u = uA;
+            if (lean !== f.lean) { f.lean = lean; tiltSign(f); }
+          }
+          f.frame = { O: O, X: F.X, Y: F.Y, n: F.n };
+          f.el.style.transform = m3d(F.X, F.Y, O);
+          f.el.style.visibility = hidden ? 'hidden' : '';
+          f.shade.style.opacity = p.sh;
+        });
+      });
+    });
+    sp.shadows.forEach(function (s) { castShadow(s, hidden); });
+  }
+  /* How far card F can move along its own normal before any of its corners would reach the
+     plane of card N in front (the two need not be parallel once layers have different V's). */
+  function roomInFront(F, w, h, N) {
+    var k = Math.max(0.3, dot(F.n, N.n)), m = Infinity;
+    [[0, 0], [w, 0], [0, h], [w, h]].forEach(function (q) {
+      var P = add(add(F.O, mul(F.X, q[0])), mul(F.Y, q[1]));
+      m = Math.min(m, dot(sub(N.O, P), N.n) / k);
+    });
+    return m;
+  }
+
+  /* A page's surface as a frame: origin at its top corner where paper-local x = 0
+     (the spine for a right page, the outer edge for a left page), x across, y down the page. */
+  function pageFrame(name, side) {
+    var e = outward(pageAngle(name)), O = [SPINE, 0, pageZ(name)];
+    if (side === 'R') return { O: O, X: e, Y: Y, n: cross(e, Y) };
+    var X = mul(e, -1);
+    return { O: add(O, mul(e, 420)), X: X, Y: Y, n: cross(X, Y) };
+  }
+  /* where a point lands on surface R, following the light: [x, y] in R's own pixels, and how far
+     the light travels from the point to the surface (negative = the point is behind it) */
+  function proj(P, R) {
+    var w = sub(P, R.O), t = dot(w, R.n) / dot(LIGHT, R.n), q = sub(w, mul(LIGHT, t));
+    return [dot(q, R.X), dot(q, R.Y), t];
+  }
+  function castShadow(s, hidden) {
+    var R = s.frameOf(), C = s.card.frame;
+    var mid = add(add(C.O, mul(C.X, s.card.w / 2)), mul(C.Y, s.card.h / 2));
+    if (hidden || dot(LIGHT, R.n) < 0.05 || proj(mid, R)[2] <= 0) { s.el.style.visibility = 'hidden'; return; }
+    var p0 = proj(C.O, R), p1 = proj(add(C.O, C.X), R), p2 = proj(add(C.O, C.Y), R);
+    s.el.style.transform = 'matrix(' + [p1[0] - p0[0], p1[1] - p0[1], p2[0] - p0[0], p2[1] - p0[1], p0[0], p0[1]]
+      .map(function (v) { return +v.toFixed(4); }).join(',') + ')';
+    s.el.style.visibility = '';
+  }
+
+  /* The sun: from the right, where it sets in the Day 1 sky and where the photos are lit from,
+     and in front of the book. SUN.el is its height above the table (the slider); a lower sun
+     throws longer shadows. LIGHT points towards the sun; flat-on-the-table is "normal" brightness. */
+  var SUN = { az: 40, el: 35 }, LIGHT, REST;
+  function setSun(el) {
+    SUN.el = Math.max(15, Math.min(70, el));
+    var a = SUN.az * Math.PI / 180, e = SUN.el * Math.PI / 180;
+    LIGHT = [Math.cos(e) * Math.sin(a), Math.cos(e) * Math.cos(a), Math.sin(e)];
+    REST = LIGHT[2];
+  }
+  var startSun = parseFloat(new URLSearchParams(location.search).get('sun'));
+  setSun(isNaN(startSun) ? 35 : startSun);
+  function shadeFor(normal) {
+    var d = normal[0] * LIGHT[0] + normal[1] * LIGHT[1] + normal[2] * LIGHT[2];
+    return Math.max(0, Math.min(0.5, (REST - d) * 0.42)).toFixed(3);
+  }
+
+  /* ================= the book's thickness =================
+     The boards are TB px thick and bound in cloth all round; the pages show their stacked paper
+     edges. Every edge is a thin strip standing on the edge of its board or page, at right angles to
+     it, so it turns with its leaf. The camera always looks from in front of the book and above it,
+     so the front (tail) edges show most; the outer (fore) edges of the pages are fanned out a
+     little, like a real book's, so they show from above too (FAN).
+     The leaves are paper-thin planes (the pop-up maths hangs on them, see pageZ), so a page's edge
+     can only reach down into the gap below it while it lies on the pages beneath: the closed spread
+     under it, pressed flat, reads as one block of pages. When a page lifts (the first LIFTOFF
+     degrees of a turn), its edge thins to the page's own thickness (OWN), and the same on landing.
+     So no edge ever stands up past a page's surface, and none reaches in towards the pop-ups, which
+     all stay well inside the page (y < 545, x < 395). */
+  var TB = 3, OWN = 0.3, BASE_TOP = 0.6, FAN = 35, LIFTOFF = 14, SS = LITE ? 1 : 4, R_CORNER = 5;
+  var FOOT = 566;   // the boards' front edge: they stand 6 px proud of the pages all round
+  var DEPTH = { pages: 4, cloth: TB };   // the depth each strip is drawn at (it is scaled to its real depth)
+  var STRIPS = [];
+  function makeEdge(parent, kind, extra, x, y, theta, len, fan) {   // a strip along an edge, from (x, y), turned theta deg
+    var el = document.createElement('div');
+    el.className = 'edge ' + kind + (extra ? ' ' + extra : '');
+    el.setAttribute('aria-hidden', 'true');
+    el.style.width = (len * SS).toFixed(1) + 'px';
+    el.style.height = (DEPTH[kind] * SS) + 'px';
+    parent.appendChild(el);
+    var s = { el: el, kind: kind, x: x, y: y, theta: theta, fan: fan || 0, tf: '' };
+    STRIPS.push(s);
+    return s;
+  }
+  /* stand strip s on its edge, from local z lo to hi; downNeg: the leaf's -z side faces the table
+     just now (so the strip hangs from hi), else its +z side does (it hangs from lo) */
+  function setStrip(s, lo, hi, downNeg) {
+    var depth = Math.max(0.01, hi - lo), f = s.fan * Math.PI / 180;
+    var tf = 'translate3d(' + s.x + 'px,' + s.y + 'px,' + (downNeg ? hi : lo).toFixed(3) + 'px) rotateZ(' + s.theta + 'deg) rotateX(' +
+      (downNeg ? -1 : 1) * (90 - s.fan) + 'deg) scale(' + (1 / SS) + ',' + (depth / (DEPTH[s.kind] * SS * Math.cos(f))).toFixed(5) + ')';
+    if (tf !== s.tf) { s.el.style.transform = tf; s.tf = tf; }
+  }
+  // each board: its front edge, its rounded front corner (a chamfer) and, for the cover, its outer edge,
+  // which shows from above while the cover stands up mid-turn
+  function boardEdges(parent, cls, x0, w) {   // x0: the board's spine end, w: its width, front edge at y FOOT
+    var rc = R_CORNER;
+    return [makeEdge(parent, 'cloth', cls, x0, FOOT, 0, w - rc), makeEdge(parent, 'cloth', cls, x0 + w - rc, FOOT, -45, rc * Math.SQRT2)];
+  }
+  var EDGES = {
+    back: boardEdges(book, '', 420, 426),
+    base: [makeEdge(book, 'pages', '', 420, 560, 0, 420)],
+    cover: boardEdges(document.getElementById('leaf1'), 'front', 0, 426)
+      .concat([makeEdge(document.getElementById('leaf1'), 'cloth', 'front', 426, FOOT - R_CORNER, -90, FOOT + 6 - 2 * R_CORNER)]),
+    coverPages: [makeEdge(document.getElementById('leaf1'), 'pages', '', 0, 560, 0, 420), makeEdge(document.getElementById('leaf1'), 'pages', 'fore', 420, 560, -90, 560, FAN)],
+    leaves: []   // each inner leaf's page edges: [front, fore], leaves[0] is leaf 2
+  };
+  for (var ek = 2; ek <= NS; ek++) {
+    var lf = document.getElementById('leaf' + ek);
+    EDGES.leaves.push([makeEdge(lf, 'pages', '', 0, 560, 0, 420), makeEdge(lf, 'pages', 'fore', 420, 560, -90, 560, FAN)]);
+  }
+  EDGES.back.forEach(function (s) { setStrip(s, -TB, 0, true); });
+  EDGES.base.forEach(function (s) { setStrip(s, 0, BASE_TOP, true); });
+  function clamp01(v) { return Math.max(0, Math.min(1, v)); }
+  function layoutEdges() {
+    var a1 = pose.a1, z1 = pageZ('leaf1');
+    // the cover: cloth outside (+z), and while it lies shut, the pages of the closed first spread below it
+    var lie1 = 1 - smooth(clamp01(a1 / LIFTOFF)), down1 = a1 < 90;
+    EDGES.cover.forEach(function (s) { setStrip(s, 0, TB, down1); });
+    var p1 = OWN + Math.max(0, z1 - (NS > 1 ? pageZ('leaf2') + OWN : BASE_TOP) - OWN) * lie1;
+    EDGES.coverPages.forEach(function (s) { setStrip(s, -p1, 0, down1); });
+    /* each inner leaf: while it lies on the right, its edge reaches down to the page below it there
+       (the next leaf, or the base page), and while it lies on the left, down to the leaf below it there */
+    EDGES.leaves.forEach(function (strips, j) {
+      var k = j + 2, a = pose.a[k - 1], z = pageZ('leaf' + k), hide = buried(k);
+      var lieR = 1 - smooth(clamp01(a / LIFTOFF)), lieL = smooth(clamp01((a - 180 + LIFTOFF) / LIFTOFF));
+      var below = k < NS ? pageZ('leaf' + (k + 1)) + OWN : BASE_TOP;
+      var lo = -(OWN + Math.max(0, z - OWN - below) * lieR), hi = OWN + Math.max(0, z - pageZ('leaf' + (k - 1)) - 2 * OWN) * lieL;
+      strips.forEach(function (s) {
+        if (s.hidden !== hide) { s.hidden = hide; s.el.style.visibility = hide ? 'hidden' : ''; }
+        setStrip(s, lo, hi, a < 90);
+      });
+    });
+  }
+
+  var LEAVES = [];
+  for (var lk = 1; lk <= NS; lk++) LEAVES.push(document.getElementById('leaf' + lk));
+  var leaf1 = LEAVES[0], baseEl = document.querySelector('.page-r'), shadowL = document.getElementById('shadow-l');
+  var contactL = document.getElementById('contact-l'), pool = document.getElementById('pool');
+  /* Camera: tilt is how far the book is laid back (90° would be edge-on, at table level).
+     A higher open tilt = a lower camera, looking across the pop-ups rather than down on them. */
+  // While the cover stands upright mid-turn it is the tallest thing on screen, so the camera
+  // eases back a little (pull) and drops slightly (lift), then returns once the book is open.
+  var CAM = { tiltClosed: 28, tiltOpen: 64, tyClosed: -70, tyOpen: 100, zoomOpen: 1, lift: 40, pull: 0.13 };
+
+  /* Framing for each open tilt: [tilt, shift down, zoom]. Measured so the open book, both page
+     turns and the cover turn all stay inside the stage. Higher cameras see more page, so they
+     zoom out a little. */
+  var FRAME = [[40, 50, .92], [44, 55, .92], [48, 65, .92], [52, 70, .92], [56, 80, .96], [60, 85, .96],
+               [64, 100, 1], [68, 100, 1], [72, 105, 1], [76, 105, 1], [80, 110, 1]];
+  var TILT_MIN = 40, TILT_MAX = 80;
+  function setTilt(t) {
+    t = Math.max(TILT_MIN, Math.min(TILT_MAX, t));
+    var i = 0;
+    while (i < FRAME.length - 2 && t > FRAME[i + 1][0]) i++;
+    var a = FRAME[i], b = FRAME[i + 1], f = (t - a[0]) / (b[0] - a[0]);
+    CAM.tiltOpen = t;
+    CAM.tyOpen = a[1] + (b[1] - a[1]) * f;
+    CAM.zoomOpen = a[2] + (b[2] - a[2]) * f;
+  }
+  var startTilt = parseFloat(new URLSearchParams(location.search).get('tilt'));
+  setTilt(isNaN(startTilt) ? 64 : startTilt);
+  function smooth(t) { return t * t * (3 - 2 * t); }
+  function popOut(t) { var c = 1.7; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); }  // ~10% overshoot, ends at 1
+  // a sign's lean: its tilt and wobble as it rises (f.lean, from layoutSpread), plus a wave when tapped
+  function tiltSign(f) {
+    var a = (f.lean || 0) + (f.shake || 0);
+    each(f.raise.sel, function (el) { el.style.transform = 'rotate(' + a.toFixed(2) + 'deg)'; });
+  }
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function render() {
+    var k = smooth(Math.min(1, pose.a1 / 180));
+    var mid = Math.sin(Math.PI * Math.min(1, pose.a1 / 180));
+    var ty = lerp(CAM.tyClosed, CAM.tyOpen, k) + CAM.lift * mid;
+    var zoom = lerp(1, CAM.zoomOpen, k) * (1 - CAM.pull * mid);
+    book.style.transform = 'translateY(' + ty.toFixed(1) + 'px) scale(' + zoom.toFixed(4) + ') rotateX(' + lerp(CAM.tiltClosed, CAM.tiltOpen, k) +
+      'deg) translateX(' + lerp(-210, 0, k) + 'px)';
+    shadowL.style.opacity = smooth(Math.max(0, Math.min(1, (pose.a1 - 120) / 60)));
+    contactL.style.opacity = smooth(clamp01((pose.a1 - 160) / 20));   // the cover only touches the cloth as it lands
+    // the light's pool stays on the book: on the shut cover, then on the open spread
+    pool.style.transform = 'translate3d(' + lerp(210, 0, k).toFixed(1) + 'px,0,' + (-TB - 0.8) + 'px)';
+    layoutEdges();
+    LEAVES.forEach(function (el, j) {
+      // a hidden leaf still goes where it is (the framing measures every page), it just isn't drawn
+      var k = j + 1, hide = buried(k);
+      if (el.__hidden !== hide) { el.__hidden = hide; el.style.visibility = hide ? 'hidden' : ''; }
+      el.style.transform = 'translateZ(' + pageZ('leaf' + k) + 'px) rotateY(' + (-pose.a[j]) + 'deg)';
+      if (hide) return;
+      var r = pose.a[j] * Math.PI / 180, front = [-Math.sin(r), 0, Math.cos(r)];
+      el.children[2].style.opacity = shadeFor(front);
+      el.children[3].style.opacity = shadeFor(mul(front, -1));
+    });
+    var bh = buried(0);
+    if (baseEl.__hidden !== bh) { baseEl.__hidden = bh; baseEl.style.visibility = bh ? 'hidden' : ''; }
+    SPREADS.forEach(layoutSpread);
+    layoutFlap();
+    placeFit();
+  }
+
+  /* ================= the moving parts: PULL tab, flaps =================
+     Both stay in the plane of the card they belong to, so they fold with it and can never
+     poke through a page. Every card is drawn three times (front, shading copy, back), so each
+     update goes to all copies. */
+  function each(sel, fn) { Array.prototype.forEach.call(book.querySelectorAll(sel), fn); }
+  /* the pieces that move with the PULL tab (Day 1's plane) follow their curve (data-pull: end and
+     control point in px from where they stand, and their tilt before and after, see pullPath),
+     nose dipping, like riding a curved slot in the card */
+  var pullT = 0, flapT = 0;
+  function setPull(t) {
+    pullT = t;
+    var u = 1 - t;
+    each('[data-pull]', function (el) {
+      var P = el.getAttribute('data-pull').split(',').map(Number), x = 2 * u * t * P[2] + t * t * P[0], y = 2 * u * t * P[3] + t * t * P[1];
+      el.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px) rotate(' + lerp(P[4], P[5], t).toFixed(2) + 'deg)';
+    });
+    each('.pulltab', function (el) { el.style.transform = 'translateX(' + (-22 * t).toFixed(1) + 'px)'; });
+  }
+  // the cart lid is hinged on its right edge: it narrows to nothing, then its plain back opens out
+  function setFlap(f) {
+    flapT = f;
+    var c = Math.cos(f * Math.PI), s = 'scaleX(' + (Math.abs(c) < 0.002 ? 0.002 : c).toFixed(3) + ')';
+    each('.flap .lid', function (el) { el.style.transform = s; });
+    each('.flap .lid-front', function (el) { el.style.visibility = c > 0 ? '' : 'hidden'; });
+    each('.flap .lid-back', function (el) { el.style.visibility = c < 0 ? 'visible' : 'hidden'; });
+    each('.flap .under', function (el) { el.style.opacity = Math.max(0, Math.min(1, (f - 0.15) / 0.3)).toFixed(2); });
+  }
+  var tweens = {};
+  function tween(key, from, to, ms, set, curve) {
+    if (reduceMotion) ms = 1;
+    var t0 = null, id = tweens[key] = {};
+    curve = curve || ease;
+    function step(now) {
+      if (tweens[key] !== id) return;      // a newer tween or a drag took over
+      if (t0 === null) t0 = now;
+      var t = Math.min(1, (now - t0) / ms);
+      set(lerp(from, to, curve(t)));
+      if (t < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  function linear(t) { return t; }
+  /* The sign's entrance (layoutSpread calls these): queued when its spread lands fully open, after
+     raise.delay; carries on from where it was if the page came back before it finished. */
+  function showSign(f) {
+    if (f.queued || f.playing || measuring) return;
+    f.queued = setTimeout(function () {
+      f.queued = null; f.playing = true;
+      tween('sign-show-' + f.i, f.show, 1, Math.max(1, f.raise.ms * (1 - f.show)), function (v) {
+        f.show = v;
+        if (v >= 1) f.playing = false;
+        render();
+      }, linear);
+    }, f.show > 0 ? 0 : f.raise.delay);
+  }
+  function holdSign(f) {   // its spread is closing: stop the entrance where it is
+    if (measuring) return;
+    if (f.queued) { clearTimeout(f.queued); f.queued = null; }
+    if (f.playing) { tweens['sign-show-' + f.i] = null; f.playing = false; }
+  }
+  function waveSign(f) {   // the sign of the open spread, unless one is given
+    f = f && f.raise ? f : SIGNS[Math.max(0, state - 1)];
+    if (!f || f.u < 1 || f.show < 1) return;   // only once it is all the way up
+    tween('sign-' + f.i, 0, 1, 1100, function (v) { f.shake = 9 * Math.sin(v * 4 * Math.PI) * (1 - v); tiltSign(f); });
+  }
+  function togglePull() { tween('pull', pullT, pullT < 0.5 ? 1 : 0, 1200, setPull); }
+  function toggleFlap() { tween('flap', flapT, flapT < 0.5 ? 1 : 0, 700, setFlap); }
+  var ACTIONS = { pull: togglePull, flap: toggleFlap, wave: waveSign };
+
+  /* ================= turning pages ================= */
+  // state s: the cover and the first s-1 leaves turned (0 = shut, 1 = Day 1 open, ... NS = the last day)
+  function poseFor(s) { return pose.a.map(function (v, k) { return k < s ? 180 : 0; }); }
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var state = 0, busy = false;
+  function ease(t) { return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+  /* The staggered rise happens in the last ~30° of a spread opening (and the staggered fold in
+     its first ~30° when closing), so page turns linger there: about half the turn's time. */
+  function settleIn(t) { return 1 - Math.pow(1 - t, 3); }               // a spread opens at the end
+  function settleOut(t) { return t * t * t; }                            // a spread closes at the start
+  function settleBoth(t) { return t < .5 ? 16 * Math.pow(t, 5) : 1 - Math.pow(-2 * t + 2, 5) / 2; }
+  function turnTo(target, ms, done, curve) {   // target: an angle per leaf
+    var from = pose.a.slice(), t0 = null;
+    curve = curve || ease;
+    if (reduceMotion) ms = 1;
+    function step(now) {
+      if (t0 === null) t0 = now;
+      var t = Math.min(1, (now - t0) / ms), e = curve(t);
+      for (var k = 0; k < pose.a.length; k++) pose.a[k] = lerp(from[k], target[k], e);
+      render();
+      if (t < 1) requestAnimationFrame(step); else done();
+    }
+    requestAnimationFrame(step);
+  }
+  /* One leaf at a time, like a real book. Opening the cover, the spread rises at the end; closing
+     it, the spread folds at the start; an inner page: one spread closes, the next opens. Several
+     pages in a row (back to the cover, say) turn quicker. */
+  function go(n) {
+    n = Math.max(0, Math.min(NS, n));
+    if (busy || n === state) return;
+    if (FLAP && FLAP.open) { closeFlap(function () { go(n); }); return; }   // fold the Attractions panel away before the page can turn
+    var was = state, steps = [];
+    for (var s = was; s !== n; ) { s += n > was ? 1 : -1; steps.push(s); }
+    busy = true; state = n; renderInfo(); hydrate(n);
+    (function next(j) {
+      if (j === steps.length) { busy = false; useDrawer(); renderInfo(); hydrate(state); rotateHint(); return; }
+      var from = j ? steps[j - 1] : was, to = steps[j], cover = Math.min(from, to) === 0;
+      var ms = cover ? (to > from ? 1900 : 1700) : 2000, curve = cover ? (to > from ? settleIn : settleOut) : settleBoth;
+      if (steps.length > 1) ms = Math.round(ms * (cover ? 0.8 : 0.75));
+      turnTo(poseFor(to), ms, function () { next(j + 1); }, curve);
+    })(0);
+  }
+
+  /* ================= info panel ================= */
+  /* the notes under the book: the cover's, then each day's (data: title, notes.text, notes.plan
+     as [label, place, detail] lines). Day 1's fall back to these if the data has none. */
+  var TOUR_DAYS = (BOOK && BOOK.tourDays) || 16;
+  var DAY1_NOTES = { text: 'Pull the tab on the left to land the plane, lift the food cart, tap the Day 1 sign, or open Attractions on the right for everything you can do today.', plan: [
+    ['Arrive', 'Bandaranaike International Airport', 'CMB'],
+    ['Explore', 'Colombo', 'Independence Square, Galle Face, Gangaramaya Temple'],
+    ['Optional', 'Street-food crawl', 'or a sunset cruise'],
+    ['Stay', 'Colombo', 'overnight']] };
+  function infoFor(s) {
+    if (!s) return { k: TOUR_DAYS + ' DAYS · ADVENTURE, CULTURE & NATURE ESCAPE', h: 'Sixteen days across Sri Lanka', p: 'Tap the book to open it.', days: [], btns: [['Open the book', 1, true]] };
+    var sp = SPREADS[s - 1], sd = sp.data, day1 = s === 1 && sp.day === 1, n = sd.notes || (day1 ? DAY1_NOTES : {});
+    var btns = [[s === 1 ? '← Close' : '← Back', s - 1, false]];
+    if (sp.pulls) btns.push(['Pull the tab', 'pull', false]);
+    if (sp.flaps) btns.push(['Lift the flap', 'flap', false]);
+    btns.push(s < NS ? ['Turn the page →', s + 1, true] : ['Start again', 0, true]);
+    return { k: 'DAY ' + sp.day + ' OF ' + TOUR_DAYS, h: sd.title || (day1 ? 'Arrival → Colombo' : 'Day ' + sp.day), p: n.text || '', days: n.plan || [], btns: btns };
+  }
+  function renderInfo() {
+    var d = infoFor(state);
+    document.getElementById('i-k').textContent = d.k;
+    var h = document.getElementById('i-h'), parts = d.h.split('→');   // the arrow is set small, in the sans
+    h.textContent = parts[0];
+    if (parts.length > 1) {
+      var arr = document.createElement('span'); arr.className = 'arr'; arr.textContent = '→';
+      h.appendChild(arr); h.appendChild(document.createTextNode(parts.slice(1).join('→')));
+    }
+    var p = document.getElementById('i-p'); p.textContent = d.p; p.style.display = d.p ? '' : 'none';
+    document.querySelector('.info').classList.toggle('nodays', !d.days.length);
+    document.getElementById('i-days').innerHTML = d.days.map(function (x) {
+      return '<li><span class="d">' + esc(String(x[0] || '').toUpperCase()) + '</span><span><b>' + esc(x[1]) + '</b>' + (x[2] ? ' · ' + esc(x[2]) : '') + '</span></li>';
+    }).join('');
+    var b = document.getElementById('i-btns'); b.innerHTML = '';
+    d.btns.forEach(function (x) {
+      var el = document.createElement('button');
+      el.textContent = x[0]; if (x[2]) el.className = 'primary';
+      el.disabled = busy;
+      el.addEventListener('click', function () { if (typeof x[1] === 'number') go(x[1]); else ACTIONS[x[1]](); });
+      b.appendChild(el);
+    });
+    var steps = document.getElementById('i-steps');
+    if (steps.children.length !== NS + 1) steps.innerHTML = new Array(NS + 2).join('<i></i>');
+    Array.prototype.forEach.call(steps.children, function (el, i) { el.classList.toggle('on', i === state); });
+    showCam();
+  }
+  /* ================= Attractions gatefold =================
+     A paper panel lies folded flat behind the sky card, hinged on its right edge; the Attractions
+     tab is its handle. Opened, it swings out from behind the sky like a door (round through the
+     empty space behind the card, so it never meets the scenery in front) until it stands beside the
+     sky, and the camera moves in on it. It shows one attraction at a time: the picture pops up from
+     the panel's little scene; swipe it, or use its arrows, for the next. It folds away again before
+     the book can close (go waits for it), so it never pokes out of the shut book. */
+  var BOAT_SVG = '<svg width="88" height="70" viewBox="-12 -12 190 150" aria-hidden="true"><g filter="url(#cut)">' +
+    '<rect x="84" y="4" width="4" height="96" fill="#7A5634"/><path d="M88 4l13 4-13 4z" fill="#E5603F"/>' +
+    '<path d="M91 12V84H146Z" fill="#FFF6E8"/><path d="M82 20V84H40Z" fill="#F5B48A"/>' +
+    '<rect x="58" y="86" width="52" height="15" rx="2" fill="#F2E6D3"/><path d="M6 100H162L147 124H22Z" fill="#1F4F7A"/>' +
+    '<path d="M14 108H155" stroke="#FFFFFF" stroke-opacity=".5" stroke-width="2"/></g></svg>';
+  function fcImg(name, style) { return '<img src="cutouts/' + name + '.webp?v=' + ART_V + '" alt="" draggable="false" style="' + style + '">'; }
+  var FADE_SIDES = '-webkit-mask-image:linear-gradient(to right, transparent, #000 22%, #000 78%, transparent);mask-image:linear-gradient(to right, transparent, #000 22%, #000 78%, transparent)';
+  var ATTR_TAGS = { in: 'Included', opt: 'Optional', see: 'Spot it' };
+  var SEE_DO = {
+    1: {
+      items: [
+        { name: 'Independence Square', tag: 'in', sky: 'linear-gradient(#A9DBF2, #EEF5F4)', ground: '#D9C9A2',
+          pic: fcImg('d01-independence-hall', 'width:146px'),
+          text: 'The Independence Memorial Hall commemorates freedom from British rule in 1948. Its carved pillars and stone lions follow the royal audience hall of Kandy.' },
+        { name: 'Gangaramaya Temple', tag: 'in', sky: 'linear-gradient(#BFE2F0, #F4EEE2)', ground: '#7EA6B4',
+          pic: fcImg('d01-seema-malaka', 'width:136px'),
+          text: 'A lively Buddhist temple packed with curiosities, and its Seema Malaka pavilion on Beira Lake, designed by Geoffrey Bawa.' },
+        { name: 'Galle Face Green', tag: 'in', sky: 'linear-gradient(#FFB989, #FFE9CF)', ground: '#A9C987', sun: true,
+          pic: fcImg('d01-galle-face', 'width:176px;height:62px;object-fit:cover;object-position:35% 100%;border-radius:3px'),
+          text: 'Half a kilometre of seafront lawn where Colombo comes out at sunset for kites, snacks and the sea breeze.' },
+        { name: 'Street-food crawl', tag: 'opt', sky: 'linear-gradient(#F6A98A, #FCE3CC)', ground: '#C9B48C',
+          pic: fcImg('d01-food-cart', 'width:84px'),
+          text: 'Isso vadai (lentil fritters topped with prawns) and more from the carts along Galle Face as the lights come on.' },
+        { name: 'Sunset cruise', tag: 'opt', sky: 'linear-gradient(#FF9E73, #FFE0BD)', ground: '#3E7FA8', sun: true,
+          pic: BOAT_SVG,
+          text: 'Watch the sun go down over Colombo from the water.' },
+        { name: 'Lotus Tower', tag: 'see', sky: 'linear-gradient(#B9B6E6, #F6E3D6)', ground: '#8F9BAA',
+          pic: fcImg('d01-skyline', 'width:180px;height:66px;object-fit:cover;object-position:50% 100%;' + FADE_SIDES),
+          text: 'The 350 m tower on the skyline, the tallest in South Asia. You’ll spot it all day.' }] }
+  };
+  // the list above is only the fallback: the data's attractions (made in the editor) win
+  PopupBookData.applyAttractions(SEE_DO, BOOK, { boat: BOAT_SVG });
+  var FLAT = 88;   // the angle of a pop-up piece folded (almost) flat onto its panel
+  /* The panel is a drawer: a card lying just behind the sky (d px), its bookmark (the Attractions
+     tab) fixed to its right-hand edge. Shut, the card hides behind the sky and only the bookmark
+     sticks out past the sky's edge; pulled, it slides out to stand beside the sky with the bookmark
+     still on its edge. Book px: x0/x1 where its left edge sits shut/open, y its top on the sky
+     card, ew x eh the whole piece (paper 252 x 190 plus the bookmark); s how far out it is (0..1,
+     a touch more on the bounce) and z how far the camera has moved in. */
+  /* Every day with attractions has its own drawer (DRAWERS[spread]), behind its own sky card. FLAP is
+     the open spread's: the one the bookmark, the keys and the camera work with (useDrawer). */
+  var FC_SHAPE = 'M17 5H247A11 11 0 0 1 258 16V184A11 11 0 0 1 247 195H17A11 11 0 0 1 6 184V16A11 11 0 0 1 17 5Z';   // 252 x 190, corners r 11
+  var FC_PAPER = '<svg class="fc-paper" width="264" height="200" viewBox="0 0 264 200" aria-hidden="true">' +
+    smoothEdge(FC_SHAPE) + '<path d="' + FC_SHAPE + '" fill="#FFFDF8"/></svg>';   // the same smooth edge as its bookmark
+  // its shadow on the right-hand page (the paper and the bookmark), like every other piece
+  var FC_SILHOUETTE = '<svg width="316" height="200" viewBox="0 0 316 200"><path d="' + FC_SHAPE + '"/>' +
+    '<path transform="translate(240 16)" d="' + TAB_PATH + '"/></svg>';
+  function makeDrawer(si) {
+    var sp = SPREADS[si], day = SEE_DO[sp.day];
+    if (!day || !day.items || !day.items.length) return null;
+    var D = { ss: 2.5, x0: 94, x1: 362, y: 64, ew: 316, eh: 200, d: -0.85, s: 0, z: 0, open: false, busy: false, closing: false, then: null, i: 0, day: day, run: 0, si: si };
+    var el = D.el = document.createElement('div');
+    el.className = 'vp flapcard';
+    el.style.width = D.ew * D.ss + 'px';    // drawn big, shrunk back in layoutFlap (see .fc-in)
+    el.style.height = D.eh * D.ss + 'px';
+    el.style.setProperty('--ss', D.ss);
+    el.innerHTML = '<div class="face front"></div><div class="face front shade"></div><div class="face back"></div>';
+    book.appendChild(el);
+    D.shadow = null;
+    if (LITE) return D;   // no cast shadow in the light book
+    var wrap = document.createElement('div'), c = document.createElement('div');
+    wrap.className = 'shd';
+    wrap.setAttribute('aria-hidden', 'true');
+    c.className = 'cast';
+    c.style.width = D.ew + 'px';
+    c.style.height = D.eh + 'px';
+    c.style.filter = 'brightness(0) blur(7px)';
+    c.style.opacity = 0.2;
+    c.innerHTML = FC_SILHOUETTE;
+    wrap.appendChild(c);
+    pagePaper(sp.right, 'R').appendChild(wrap);
+    D.shadow = { el: c, card: { w: D.ew, h: D.eh, frame: null }, frameOf: function () { return pageFrame(sp.right, 'R'); } };
+    return D;
+  }
+  var DRAWERS = SPREADS.map(function (sp, si) { return makeDrawer(si); });
+  var FLAP = null;
+  function useDrawer() { if (!FLAP || !FLAP.open) FLAP = DRAWERS[Math.max(0, state - 1)] || null; }
+  function flapHTML(i, a, D) {
+    var d = (D || FLAP).day, it = d.items[i], n = d.items.length, dots = '';
+    for (var k = 0; k < n; k++) dots += '<i class="fc-dot' + (k === i ? ' on' : '') + '" data-i="' + k + '"></i>';
+    return '<div class="fc-in">' + ATTRTAB_HTML + FC_PAPER + '<div class="fc-card">' +   // the bookmark first: its root tucks under the paper
+      '<div class="fc-scene" style="background:' + it.sky + ';--ground:' + it.ground + '">' + (it.sun ? '<i class="fc-sun"></i>' : '') +
+      '<div class="fc-ground"></div><div class="fc-pop" style="transform:rotateX(' + a + 'deg)">' + it.pic + '</div><i class="fc-x" title="Close">×</i></div>' +
+      '<div class="fc-body"><span class="fc-tag ' + it.tag + '">' + ATTR_TAGS[it.tag] + '</span><h5>' + it.name + '</h5><p>' + it.text + '</p></div>' +
+      '<div class="fc-nav"><i class="fc-btn fc-prev' + (i ? '' : ' off') + '" title="Previous">‹</i><span class="fc-dots">' + dots + '</span>' +
+      '<i class="fc-btn fc-next' + (i < n - 1 ? '' : ' off') + '" title="Next">›</i></div>' +
+      '</div></div>';
+  }
+  function flapFill(i, a, D) {
+    D = D || FLAP;
+    if (!D) return;
+    var html = flapHTML(i, a, D);
+    Array.prototype.forEach.call(D.el.children, function (f, k) { f.innerHTML = LITE && k === 1 ? '' : html; });   // (the light book has no shading copy)
+  }
+  DRAWERS.forEach(function (D) { if (D) flapFill(0, FLAT, D); });
+  // where each drawer is: slid D.s of the way out, just behind its sky card
+  function layoutFlap() { DRAWERS.forEach(function (D) { if (D) layoutDrawer(D); }); }
+  function layoutDrawer(D) {
+    var sky = SPREADS[D.si].layers[0].R, F = sky.frame;
+    if (!F) return;
+    var x = D.x0 + (D.x1 - D.x0) * D.s;
+    var O = add(add(add(F.O, mul(F.X, x)), mul(F.Y, D.y)), mul(F.n, D.d));
+    var hidden = sky.el.style.visibility === 'hidden';
+    D.frame = { O: O, X: F.X, Y: F.Y, n: F.n };
+    var s1 = 1 / D.ss;   // shrink the big drawing back to book size (its normal stays unit length)
+    D.el.style.transform = 'matrix3d(' + [F.X[0] * s1, F.X[1] * s1, F.X[2] * s1, 0, F.Y[0] * s1, F.Y[1] * s1, F.Y[2] * s1, 0, F.n[0], F.n[1], F.n[2], 0, O[0], O[1], O[2], 1]
+      .map(function (v) { return +v.toFixed(5); }).join(',') + ')';
+    D.el.style.visibility = hidden ? 'hidden' : '';
+    D.el.children[1].style.opacity = sky.sh;
+    if (D.shadow) { D.shadow.card.frame = D.frame; castShadow(D.shadow, hidden); }
+  }
+  function dur(ms) { return reduceMotion ? 1 : ms; }
+  function run(ms, step, done) {   // a small animation loop: step(t) for t from 0 to 1; a newer run stops it
+    var t0 = null, id = ++FLAP.run;
+    ms = dur(ms);
+    requestAnimationFrame(function frame(now) {
+      if (id !== FLAP.run) return;
+      if (t0 === null) t0 = now;
+      var t = Math.min(1, (now - t0) / ms);
+      step(t);
+      if (t < 1) requestAnimationFrame(frame); else done();
+    });
+  }
+  function pullOut(t) { return 1 + 1.9 * Math.pow(t - 1, 3) + 0.9 * Math.pow(t - 1, 2); }   // pulled out: a touch too far, then back
+  function pops(frames, ms, easing, fill) {
+    Array.prototype.forEach.call(FLAP.el.querySelectorAll('.fc-pop'), function (el) { el.animate(frames, { duration: dur(ms), easing: easing || 'ease-out', fill: fill || 'none' }); });
+  }
+  function settled() { return state > 0 && pose.a[state - 1] >= 180 && (state >= NS || pose.a[state] <= 0); }
+  function openFlap() {
+    useDrawer();
+    if (!FLAP || FLAP.open || busy || FLAP.si !== state - 1 || !settled()) return;
+    FLAP.open = FLAP.busy = true; FLAP.i = 0;
+    flapFill(0, 0);
+    book.classList.add('flap-open');
+    run(950, function (t) {
+      FLAP.s = pullOut(t);
+      FLAP.z = ease(Math.min(1, t * 1.1));
+      render();
+    }, function () { FLAP.s = 1; FLAP.z = 1; render(); FLAP.busy = false; });
+    // the picture lies flat while the drawer slides out, and stands up as it arrives
+    pops([{ transform: 'rotateX(' + FLAT + 'deg)' }, { transform: 'rotateX(' + FLAT + 'deg)', offset: 0.55, easing: 'cubic-bezier(.3,1.55,.5,1)' },
+      { transform: 'rotateX(0deg)' }], 1350);
+  }
+  function closeFlap(then) {
+    if (!FLAP || !FLAP.open) { if (then) then(); return; }
+    if (then) FLAP.then = then;
+    if (FLAP.closing) return;
+    FLAP.closing = FLAP.busy = true;
+    pops([{ transform: 'rotateX(0deg)' }, { transform: 'rotateX(' + FLAT + 'deg)' }], 260, 'ease-in', 'forwards');
+    var s0 = FLAP.s, z0 = FLAP.z;
+    run(750, function (t) {
+      var e = ease(t);
+      FLAP.s = s0 * (1 - e);
+      FLAP.z = z0 * (1 - e);
+      render();
+    }, function () {
+      FLAP.s = 0; FLAP.z = 0;
+      FLAP.open = FLAP.busy = FLAP.closing = false;
+      book.classList.remove('flap-open');
+      render();
+      var t = FLAP.then; FLAP.then = null;
+      if (t) t();
+    });
+  }
+  // the next attraction: this picture folds down and its notes slide off; the next one pops up
+  function flapTo(j) {
+    if (!FLAP || !FLAP.open || FLAP.busy || j < 0 || j >= FLAP.day.items.length || j === FLAP.i) return;
+    var dir = j > FLAP.i ? 1 : -1, D = FLAP;
+    FLAP.busy = true;
+    pops([{ transform: 'rotateX(0deg)' }, { transform: 'rotateX(' + FLAT + 'deg)' }], 220, 'ease-in', 'forwards');
+    Array.prototype.forEach.call(D.el.querySelectorAll('.fc-body'), function (el) {
+      el.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateX(' + (-16 * dir) + 'px)' }], { duration: dur(220), fill: 'forwards' });
+    });
+    setTimeout(function () {
+      FLAP.i = j;
+      flapFill(j, 0);
+      pops([{ transform: 'rotateX(' + FLAT + 'deg)' }, { transform: 'rotateX(-9deg)', offset: 0.65 }, { transform: 'rotateX(0deg)' }], 520);
+      each('.flapcard .fc-body', function (el) {
+        el.animate([{ opacity: 0, transform: 'translateX(' + (16 * dir) + 'px)' }, { opacity: 1, transform: 'none' }], { duration: dur(300), easing: 'ease-out' });
+      });
+      setTimeout(function () { FLAP.busy = false; }, dur(300));
+    }, dur(230));
+  }
+  document.addEventListener('keydown', function (e) {
+    if (!FLAP || !FLAP.open) return;
+    if (e.key === 'Escape') closeFlap();
+    else if (e.key === 'ArrowRight') { e.preventDefault(); flapTo(FLAP.i + 1); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); flapTo(FLAP.i - 1); }
+  });
+
+  function showCam() {
+    if (!camVal) return;
+    camVal.textContent = Math.round(CAM.tiltOpen) + '°';
+    camHint.style.display = state === 0 ? '' : 'none';
+  }
+
+  /* ================= input ================= */
+  var stage = document.getElementById('stage');
+  function hit(e, sel) { return e.target && e.target.closest ? e.target.closest(sel) : null; }
+  // drag the pull tab outwards (left) to move the plane; a plain click plays it
+  var dragging = false;
+  stage.addEventListener('pointerdown', function (e) {
+    if (!hit(e, '.pulltab')) return;
+    e.preventDefault();
+    var x0 = e.clientX, t0 = pullT, moved = false;
+    dragging = true; tweens.pull = null;
+    function move(ev) {
+      var dx = x0 - ev.clientX;
+      if (Math.abs(dx) > 4) moved = true;
+      if (moved) setPull(Math.max(0, Math.min(1, t0 + dx / 80)));
+    }
+    function up() {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+      window.removeEventListener('pointercancel', up);
+      if (!moved) togglePull();
+      setTimeout(function () { dragging = false; }, 0);   // after the click this release fires
+    }
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+    window.addEventListener('pointercancel', up);
+  });
+  // a swipe across the Attractions panel shows the next (or the previous) attraction
+  var flapSwiped = false, flapX = null;
+  stage.addEventListener('pointerdown', function (e) { flapSwiped = false; flapX = FLAP && FLAP.open && hit(e, '.flapcard') ? e.clientX : null; });
+  window.addEventListener('pointerup', function (e) {
+    if (flapX === null) return;
+    var dx = e.clientX - flapX;
+    flapX = null;
+    if (Math.abs(dx) > 36) { flapSwiped = true; flapTo(FLAP.i + (dx < 0 ? 1 : -1)); }
+  });
+  stage.addEventListener('click', function (e) {
+    if (dragging || hit(e, '.pulltab')) return;
+    if (FLAP && FLAP.open) {   // the Attractions drawer is out: it has the clicks; its bookmark, the × or a click anywhere else slides it back
+      var dot = hit(e, '.fc-dot');
+      if (flapSwiped) flapSwiped = false;
+      else if (hit(e, '.fc-next')) flapTo(FLAP.i + 1);
+      else if (hit(e, '.fc-prev')) flapTo(FLAP.i - 1);
+      else if (dot) flapTo(+dot.getAttribute('data-i'));
+      else if (hit(e, '.fc-x') || hit(e, '.attrtab') || !hit(e, '.flapcard')) closeFlap();
+      return;
+    }
+    if (hit(e, '.attrtab')) { openFlap(); return; }
+    if (hit(e, '.flap')) { toggleFlap(); return; }
+    if (hit(e, '.placard')) { waveSign(); return; }
+    if (state < NS) go(state + 1);
+  });
+  stage.addEventListener('keydown', function (e) {
+    if (FLAP && FLAP.open) return;   // the Attractions panel has the keys while it is out
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowRight') { e.preventDefault(); if (state < NS) go(state + 1); }
+    if (e.key === 'ArrowLeft' && state > 0) go(state - 1);
+  });
+  var sx = null;
+  stage.addEventListener('touchstart', function (e) { sx = FLAP && FLAP.open || hit(e, '.pulltab, .flap, .placard, .attrtab') ? null : e.touches[0].clientX; }, { passive: true });
+  stage.addEventListener('touchend', function (e) {
+    if (sx === null) return;
+    var dx = e.changedTouches[0].clientX - sx; sx = null;
+    if (dx < -40 && state < NS) go(state + 1);
+    if (dx > 40 && state > 0) go(state - 1);
+  });
+
+  /* ================= framing =================
+     Big screens (body.full): the book fills the window above the notes strip. The camera frames
+     the open book as tightly as it fits, frames the closed cover the same way, and eases back
+     while a page stands up mid-turn (placeFit, every frame). The extents it frames are measured
+     from the real scene at the current camera height (measure).
+     Small screens: the 960 x 700 scene is scaled down to the width, with the notes below it. */
+  var wrap = document.getElementById('wrap'), fit = document.getElementById('fit'), info = document.querySelector('.info');
+  // ?loupe=scale,x,y magnifies the stage around book point (x, y), for checking paper details
+  var loupe = (new URLSearchParams(location.search).get('loupe') || '').split(',').map(parseFloat);
+  if (loupe.length === 3) document.querySelector('.cam').style.display = document.getElementById('tune-btn').style.display = 'none';
+  var BIG = window.matchMedia ? window.matchMedia('(min-width: 900px) and (min-height: 520px)') : null;
+  var full = false, BOX = null, VW = 0, VH = 0, measuring = false, remeasure = 0;
+  var PAD_X = 28, PAD_T = 8, PAD_B = 6;   // room left around the book, px
+  // what counts as the book: pages, boards and their edges, cards, the pull tab and the sign (not its shadows)
+  var EXTENT = '.leaf > .face, .page-r, .board-r, .edge, .vp, .pulltab, .vp > .face.front > .placard';   // (the Attractions drawer is a .vp, bookmark and all)
+  function boxNow(o) {
+    var b = [Infinity, Infinity, -Infinity, -Infinity];
+    Array.prototype.forEach.call(book.querySelectorAll(EXTENT), function (el) {
+      if (el.classList.contains('vp') && el.querySelector('.placard')) return;   // the sign's holder: only its art counts
+      var r = el.getBoundingClientRect();
+      if (!r.width) return;
+      b[0] = Math.min(b[0], r.left - o.left); b[1] = Math.min(b[1], r.top - o.top);
+      b[2] = Math.max(b[2], r.right - o.left); b[3] = Math.max(b[3], r.bottom - o.top);
+    });
+    return b;
+  }
+  function union(a, b) { return [Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.max(a[2], b[2]), Math.max(a[3], b[3])]; }
+  function lerpBox(a, b, t) { return a.map(function (v, i) { return v + (b[i] - v) * t; }); }
+  /* the book's extent: shut, open at every day (the sign at rest and at the top of its pop), and
+     everything the cover's turn and the inner pages' turns reach; and for each Attractions drawer, the
+     close-up on it. The drawers are shut while measuring (their bookmarks still show). */
+  function measure() {
+    measuring = true;
+    var keep = { a: pose.a.slice(), show: SIGNS.map(function (g) { return g.show; }), flap: DRAWERS.map(function (D) { return D && D.s; }) }, tf = fit.style.transform;
+    var zk = stage.style.zoom;   // measured in plain book px: the light book's zoom is taken off meanwhile
+    fit.style.transform = 'none';
+    stage.style.zoom = '';
+    DRAWERS.forEach(function (D) { if (D) D.s = 0; });
+    var o = fit.getBoundingClientRect();
+    function at(a, show) { for (var k = 0; k < a.length; k++) pose.a[k] = a[k]; SIGNS.forEach(function (g) { g.show = show; }); render(); return boxNow(o); }
+    /* every day shares one frame (LAYERS) and one sign, so the light book measures only the first
+       two days and their turn: the rest reach the same places */
+    var MS = LITE ? Math.min(NS, 2) : NS;
+    var closed = at(poseFor(0), 0), open = null, s, a, p;
+    for (s = 1; s <= MS; s++) { var b = union(at(poseFor(s), 1), at(poseFor(s), 0.233)); open = open ? union(open, b) : b; }
+    var turn1 = union(closed, open), turn2 = open;
+    for (a = 15; a < 180; a += 15) { p = poseFor(0); p[0] = a; turn1 = union(turn1, at(p, 0)); }
+    for (s = 1; s < MS; s++) for (a = 15; a < 180; a += (NS > 3 ? 30 : 15)) { p = poseFor(s); p[s] = a; turn2 = union(turn2, at(p, 0)); }
+    BOX = { closed: closed, open: open, turn1: turn1, turn2: turn2 };
+    // the close-up for each Attractions panel: the panel itself, with some of the book beside it
+    // (on a phone held upright, the panel alone, as big as it goes: its print is small)
+    var tight = compact && upright, first = null;
+    DRAWERS.forEach(function (D) {
+      if (!D) return;
+      if (LITE && first) { D.focus = first.focus; return; }   // every drawer stands in the same place
+      D.s = 1; at(poseFor(D.si + 1), 1);
+      var f = D.el.children[0].getBoundingClientRect(), fx = f.left - o.left, fy = f.top - o.top;
+      D.focus = tight ? [fx - 0.03 * f.width, fy - 0.06 * f.height, fx + 0.97 * f.width, fy + 1.06 * f.height]
+                      : [fx - 0.7 * f.width, fy - 0.17 * f.height, fx + 1.1 * f.width, fy + 1.15 * f.height];
+      D.s = 0;
+      first = first || D;
+    });
+    for (var k = 0; k < keep.a.length; k++) pose.a[k] = keep.a[k];
+    SIGNS.forEach(function (g, i) { g.show = keep.show[i]; });
+    DRAWERS.forEach(function (D, i) { if (D) D.s = keep.flap[i]; });
+    fit.style.transform = tf;
+    stage.style.zoom = zk;
+    measuring = false;
+    render();
+  }
+  function placeFit() {
+    if (!full || !BOX || measuring) return;
+    // mid-turn it frames everything that turn can reach; it only closes in again near the end
+    var u = smooth(Math.min(1, pose.a1 / 180));
+    var w1 = smooth(Math.min(1, 2.2 * Math.sin(Math.PI * Math.min(1, pose.a1 / 180))));
+    var w2 = 0;
+    for (var k = 1; k < NS; k++) w2 = Math.max(w2, smooth(Math.min(1, 2.2 * Math.sin(Math.PI * Math.min(1, pose.a[k] / 180)))));
+    var b = lerpBox(lerpBox(lerpBox(BOX.closed, BOX.open, u), BOX.turn1, w1), BOX.turn2, w2);
+    var fz = FLAP && FLAP.z > 0 && FLAP.focus ? FLAP.z : 0;
+    if (fz) b = lerpBox(b, FLAP.focus, fz);   // in close on the Attractions panel while it is out
+    var bw = b[2] - b[0], bh = b[3] - b[1], H = VH - PAD_T - PAD_B;
+    var k = Math.min((VW - 2 * PAD_X) / bw, H / bh, 2.6);
+    /* the light book is drawn for the open book's size (setZoom): the shut cover may only come a
+       little closer than that, or it would look soft (the Attractions close-up is drawn sharp) */
+    if (LITE && KCAP) k = Math.min(k, KCAP) + Math.max(0, k - KCAP) * fz;
+    var tx = (VW - bw * k) / 2 - b[0] * k, ty = PAD_T + (H - bh * k) / 2 - b[1] * k;
+    /* With the zoom Z on the stage the whole scene is already drawn Z times as big, around the
+       stage's perspective origin (480, 0), so the stage is scaled by k / Z and shifted to match. */
+    var s = k / ZOOM;
+    tx -= s * 480 * (1 - ZOOM);
+    fit.style.transform = 'translate(' + tx.toFixed(1) + 'px,' + ty.toFixed(1) + 'px) scale(' + s.toFixed(4) + ')';
+  }
+  /* The light book's resolution. 3D cards are drawn at their own size times the screen's pixel
+     density, whatever the camera does to them, so the 840 px book shrunk to fit a phone would
+     still be drawn at full size at 2-3x: most of it wasted. Zooming the stage down to the open
+     book's on-screen size (KOPEN) draws it at its real size, and at LITE_DENSITY device pixels
+     per screen pixel rather than the phone's own density. Changed only when the size changes a
+     lot (a new zoom redraws the whole book once). */
+  var ZOOM = 1, KOPEN = 0, KCAP = 0;
+  function setZoom() {
+    if (!LITE || !BOX) return;
+    var o = BOX.open, H = VH - PAD_T - PAD_B;
+    KOPEN = Math.min((VW - 2 * PAD_X) / (o[2] - o[0]), H / (o[3] - o[1]), 2.6);
+    KCAP = KOPEN * 1.2;
+    var z = Math.min(1, KOPEN * Math.min(1, LITE_DENSITY / (window.devicePixelRatio || 1)));
+    if (Math.abs(z / ZOOM - 1) > 0.1) { ZOOM = +z.toFixed(4); stage.style.zoom = ZOOM; }
+    /* The Attractions drawer is read in close-up, so it stays sharp at the phone's full density:
+       it is drawn ss times as big (see .fc-in), enough for its close-up at this zoom. */
+    DRAWERS.forEach(function (D) {
+      if (!D || !D.focus) return;
+      var f = D.focus, kf = Math.min((VW - 2 * PAD_X) / (f[2] - f[0]), H / (f[3] - f[1]), 2.6);
+      var ss = Math.max(2.5, Math.min(8, Math.ceil(kf / ZOOM * 4) / 4));
+      if (ss === D.ss) return;
+      D.ss = ss;
+      D.el.style.width = D.ew * ss + 'px';
+      D.el.style.height = D.eh * ss + 'px';
+      D.el.style.setProperty('--ss', ss);
+      layoutDrawer(D);
+    });
+  }
+  // the notes strip keeps the height of its tallest page, so the book doesn't jump between pages
+  function fitBand() {
+    var keep = state, h = 0;
+    info.style.minHeight = '';
+    info.setAttribute('aria-live', 'off');
+    for (var s = 0; s <= NS; s++) { state = s; renderInfo(); h = Math.max(h, info.offsetHeight); }
+    state = keep; renderInfo();
+    info.setAttribute('aria-live', 'polite');
+    info.style.minHeight = h + 'px';
+  }
+  /* Every window now gets the framed book (body.full); phones and small windows (compact) put the
+     notes in a card under it. The editor's preview keeps the old split (its tools rely on it). */
+  var compact = false, upright = false, lastShape = '';
+  function size() {
+    var big = !!(BIG && BIG.matches);
+    full = loupe.length !== 3 && (PopupBookData.edit ? big : true);
+    compact = full && !big;
+    document.body.classList.toggle('full', full);
+    document.body.classList.toggle('compact', compact);
+    if (full) {
+      wrap.style.height = '';
+      PAD_X = compact ? 10 : 28; PAD_T = compact ? 6 : 8;
+      upright = compact && window.innerWidth < window.innerHeight;
+      document.body.classList.toggle('upright', upright);
+      /* the notes strip keeps its tallest page's height, so the book doesn't jump; a phone held
+         upright instead gives the book a fixed band at the top and the notes scroll under it */
+      if (upright) info.style.minHeight = ''; else fitBand();
+      VW = wrap.clientWidth; VH = wrap.clientHeight;
+      // the Attractions close-up depends on the phone's way up: measure again when it turns
+      var shape = compact ? (upright ? 'tall' : 'wide') : 'big';
+      if (shape !== lastShape) { lastShape = shape; BOX = null; }
+      if (!BOX) measure();
+      if (upright) {   // tall enough for the open book at the full width (and the shut cover not too small)
+        var ob = BOX.open, need = (ob[3] - ob[1]) * (VW - 2 * PAD_X) / (ob[2] - ob[0]) * 1.14 + PAD_T + PAD_B;
+        wrap.style.height = Math.round(Math.min(Math.max(need, VW * 0.88), window.innerHeight * 0.6)) + 'px';
+        VH = wrap.clientHeight;
+      }
+      setZoom();
+      placeFit();
+      rotateHint();
+    } else {
+      info.style.minHeight = '';
+      var k = Math.min(1, wrap.clientWidth / 960);
+      fit.style.transform = loupe.length === 3 && !isNaN(loupe[2])
+        ? 'scale(' + loupe[0] + ') translate(' + (480 - loupe[1]) + 'px,' + (300 / loupe[0] - loupe[2]) + 'px)' : 'scale(' + k + ')';
+      wrap.style.height = Math.round(700 * k) + 'px';
+    }
+  }
+  var sizing = 0;
+  window.addEventListener('resize', function () { cancelAnimationFrame(sizing); sizing = requestAnimationFrame(size); });
+
+  /* A phone held upright shows the open book small: once (the first time a day is open), a hint
+     that it is bigger sideways. It goes by itself, on a tap, or when the phone turns. */
+  var hintEl = document.getElementById('rotate-hint'), hintSeen = false, hintTimer = 0;
+  try { hintSeen = localStorage.getItem('popup-rotate-hint') === '1'; } catch (e) {}
+  function hideHint() {
+    clearTimeout(hintTimer);
+    if (hintEl.hidden) return;
+    hintEl.classList.add('gone');
+    setTimeout(function () { hintEl.hidden = true; }, 450);
+  }
+  function rotateHint() {
+    if (!upright) { hideHint(); return; }
+    if (hintSeen || state < 1) return;
+    hintSeen = true;
+    try { localStorage.setItem('popup-rotate-hint', '1'); } catch (e) {}
+    hintEl.hidden = false;
+    hintEl.classList.remove('gone');
+    hintTimer = setTimeout(hideHint, 5000);
+  }
+  hintEl.addEventListener('click', hideHint);
+
+  // the website's copy: a way back to the tour page (tools/publish_site.py sets <body data-back>)
+  var backTo = document.body.getAttribute('data-back');
+  if (backTo) { var backLink = document.getElementById('back-link'); backLink.href = backTo; backLink.hidden = false; }
+
+  /* the view-tuning panel opens from its button, and remembers that in this browser */
+  var tuneBtn = document.getElementById('tune-btn');
+  document.body.classList.toggle('tuning', new URLSearchParams(location.search).get('tune') === '1');   // visitors never see it
+  function setTune(open) {
+    document.body.classList.toggle('tune-open', open);
+    tuneBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    try { localStorage.setItem('popup-tune', open ? '1' : '0'); } catch (e) {}
+  }
+  var tuneWas = null;
+  try { tuneWas = localStorage.getItem('popup-tune'); } catch (e) {}
+  setTune(tuneWas === '1');
+  tuneBtn.addEventListener('click', function () { setTune(!document.body.classList.contains('tune-open')); });
+
+  /* ?state=0..NS jumps to a day (0 = shut); ?a1=..&a2=.. freezes a pose mid-turn (for checking) */
+  var q = new URLSearchParams(location.search);
+  var s = parseInt(q.get('state'), 10);
+  if (s >= 1 && s <= NS) { state = s; poseFor(s).forEach(function (v, k) { pose.a[k] = v; }); }
+  hydrate(state);
+  if (q.get('a1') !== null) pose.a1 = +q.get('a1');
+  if (q.get('a2') !== null) pose.a2 = +q.get('a2');
+  useDrawer();
+  setPull(Math.max(0, Math.min(1, +q.get('pull') || 0)));   // ?pull=0..1 and ?flap=0..1 freeze the moving parts
+  setFlap(Math.max(0, Math.min(1, +q.get('flap') || 0)));
+  /* camera height slider: changes the open-book camera live, and remembers it in the address */
+  var camRange = document.getElementById('cam-range'), camVal = document.getElementById('cam-val'), camHint = document.getElementById('cam-hint');
+  camRange.value = Math.round(CAM.tiltOpen);
+  camRange.addEventListener('input', function () {
+    setTilt(+camRange.value);
+    render(); showCam();
+    // the book's extent changes with the camera: re-measure once the slider rests
+    clearTimeout(remeasure);
+    remeasure = setTimeout(function () { BOX = null; if (full) measure(); }, 150);
+    try { var u = new URL(location.href); u.searchParams.set('tilt', camRange.value); history.replaceState(null, '', u); } catch (e) {}
+  });
+  /* sun height slider: moves the light live (shadows and shading), also remembered in the address */
+  var sunRange = document.getElementById('sun-range'), sunVal = document.getElementById('sun-val');
+  sunRange.value = Math.round(SUN.el);
+  sunVal.textContent = Math.round(SUN.el) + '°';
+  sunRange.addEventListener('input', function () {
+    setSun(+sunRange.value);
+    sunVal.textContent = Math.round(SUN.el) + '°';
+    render();
+    try { var u = new URL(location.href); u.searchParams.set('sun', sunRange.value); history.replaceState(null, '', u); } catch (e) {}
+  });
+  /* stagger slider: how much later the back layers rise than the front ones */
+  var stagRange = document.getElementById('stagger-range'), stagVal = document.getElementById('stagger-val');
+  stagRange.value = Math.round(STAGGER * 100);
+  stagVal.textContent = stagRange.value;
+  stagRange.addEventListener('input', function () {
+    STAGGER = +stagRange.value / 100;
+    stagVal.textContent = stagRange.value;
+    render();
+    try { var u = new URL(location.href); u.searchParams.set('stagger', stagRange.value); history.replaceState(null, '', u); } catch (e) {}
+  });
+
+  render(); renderInfo(); size();
+  // ?flap=i[,s] opens the Attractions drawer at attraction i (from 0), optionally caught part-way out, s 0..1 (for checking)
+  var flapQ = (q.get('flap') || '').split(',').map(parseFloat);
+  if (state >= 1 && FLAP && !isNaN(flapQ[0])) {
+    FLAP.open = true; FLAP.i = Math.max(0, Math.min(FLAP.day.items.length - 1, flapQ[0] | 0));
+    FLAP.s = isNaN(flapQ[1]) ? 1 : Math.max(0, Math.min(1.1, flapQ[1])); FLAP.z = Math.min(1, FLAP.s);
+    flapFill(FLAP.i, 0); book.classList.add('flap-open'); render();
+  }
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(size);   // the notes strip's height depends on the fonts
+  window.popupBook = { CAM: CAM, pose: pose, render: render, SPREADS: SPREADS, // handy for tuning from the console
+    NS: NS, SIGNS: SIGNS, DRAWERS: DRAWERS, PILE: PILE, setPull: setPull, setFlap: setFlap, pageZ: pageZ, pageAngle: pageAngle, poseFor: poseFor, go: go,
+    state: function () { return state; },
+    setPose: function (a) { for (var k = 0; k < pose.a.length; k++) pose.a[k] = a[k] || 0; render(); },
+    // for the editor's live preview: the Attractions drawer opened on item i (or shut: -1), and shadow masks
+    SEE_DO: SEE_DO, maskOf: maskOf, flapFill: flapFill,
+    showFlap: function (i) {
+      useDrawer();
+      if (!FLAP) return;
+      FLAP.open = i >= 0; FLAP.s = FLAP.z = i >= 0 ? 1 : 0; FLAP.busy = FLAP.closing = false;
+      if (i >= 0) { FLAP.i = Math.min(i, FLAP.day.items.length - 1); flapFill(FLAP.i, 0); }
+      book.classList.toggle('flap-open', i >= 0); render();
+    } };
+  Object.defineProperty(window.popupBook, 'FLAP', { get: function () { return FLAP; } });
+  document.body.classList.add('ready');
+  PopupBookData.ready(window.popupBook);
+});
+</script>
+</body>
+</html>
