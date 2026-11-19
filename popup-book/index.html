@@ -40,7 +40,6 @@
     min-height:100vh;
   }
   header h1 { color:#fff; }
-  body:not(.full) .info { background:#fff; border-radius:20px 20px 0 0; padding-top:22px; }
   header { text-align:center; padding:28px 16px 26px; }
   /* the Sunbird mark, in white: the elephant, the bird and a fine ring */
   header .mark { display:block; width:50px; height:50px; margin:0 auto; filter:drop-shadow(0 1px 2px rgba(4,16,36,.35)); }
@@ -187,63 +186,21 @@
   .flap .under b { font-size:7px; letter-spacing:.18em; color:var(--coral); text-transform:uppercase; }
   .flap .under span { font-size:9px; font-weight:800; color:var(--ink); line-height:1.25; margin-top:2px; }
 
-  /* ---------- info panel ---------- */
-  .info { max-width:640px; margin:0 auto; padding:0 20px 48px; text-align:center; }
-  /* quiet and editorial: a serif title, a small spaced kicker, hairline yellow rules, slim buttons */
-  .info .k { font-size:10px; letter-spacing:.3em; font-weight:700; color:var(--accent); min-height:14px; }
-  .info h2 { font-family:var(--serif); font-weight:400; font-size:34px; line-height:1.05; letter-spacing:-.005em; margin:8px 0 10px; color:#0F2340; }
-  .info h2 .arr { font-family:'Plus Jakarta Sans', sans-serif; font-weight:400; font-size:.62em; vertical-align:.14em; color:var(--accent); padding:0 .28em; }
-  .info p { margin:0 auto; color:#4B5563; font-size:14.5px; line-height:1.65; max-width:520px; }
-  .days { list-style:none; padding:0; margin:16px auto 0; text-align:left; max-width:520px; }
-  .days li { display:grid; grid-template-columns:72px 1fr; gap:10px; padding:10px 0; border-top:1px solid var(--rule); font-size:13.5px; line-height:1.45; color:#5B6472; }
-  .days li b { color:#0F2340; font-weight:600; }
-  .days li span.d { font-size:9.5px; letter-spacing:.22em; font-weight:700; color:var(--accent); padding-top:3px; }
-  .btns { display:flex; gap:12px; justify-content:center; margin-top:20px; flex-wrap:wrap; }
-  .btns button { font:inherit; font-size:12.5px; font-weight:600; letter-spacing:.03em; line-height:1; border-radius:999px; padding:10px 22px; cursor:pointer;
-    border:1px solid rgba(15,35,64,.2); background:transparent; color:#0F2340; transition:border-color .2s, background-color .2s, color .2s; }
-  .btns button:hover:not(:disabled) { border-color:rgba(15,35,64,.55); }
-  .btns button.primary { background:var(--blue); border-color:var(--blue); color:#fff; }
-  .btns button.primary:hover:not(:disabled) { background:#1D5E9E; border-color:#1D5E9E; }
-  .btns button:focus-visible { outline:2px solid var(--sky); outline-offset:2px; }
-  .btns button:disabled { opacity:.45; cursor:default; }
-  .steps { display:flex; gap:6px; justify-content:center; margin-top:16px; }
-  .steps i { width:5px; height:5px; border-radius:50%; background:rgba(15,35,64,.18); }
-  .steps i.on { background:var(--accent); width:18px; border-radius:3px; }
+  /* ---------- the day's notes, for screen readers ----------
+     Seen, a day's notes are the travel desk round the book (see .desk): its route in big letters,
+     the flight path, the stamp, and the plan on ola leaves behind the ? button. Heard, this live line
+     says which day is open whenever a page turns. */
+  .info, .sr-only { position:absolute; width:1px; height:1px; margin:-1px; padding:0; border:0; overflow:hidden; clip:rect(0 0 0 0); clip-path:inset(50%); white-space:nowrap; }
 
-  /* ---------- big screens: the book fills the window, the day's notes run in a strip along the bottom ---------- */
-  body.full { height:100vh; height:100dvh; overflow:hidden; display:flex; flex-direction:column; }
+  /* ---------- every window (body.full): the book fills it, the desk lies round it ---------- */
+  /* clipped, not just hidden: the 3D stage reaches past the screen's edge, and on a phone that made the
+     page wider than the screen (so it could be panned and pinched out, and fixed layers grew with it) */
+  html:has(> body.full) { overflow:hidden; }
+  body.full { height:100vh; height:100dvh; overflow:hidden; overflow:clip; display:flex; flex-direction:column; }
   body.full header { position:absolute; top:14px; left:22px; padding:0; text-align:left; z-index:6; pointer-events:none; }
   body.full header h1 { display:none; }
   body.full .wrap { flex:1 1 auto; min-height:0; max-width:none; overflow:visible; }
   body.full .fit { left:0; margin-left:0; transform-origin:0 0; }
-  /* the notes: title | a hairline yellow rule | the day's note | a rule | the buttons, and the day's
-     plan along the bottom under one more rule (the upright rules are the strip's ::before and ::after) */
-  body.full .info {
-    flex:none; position:relative; z-index:5; width:100%; max-width:none; margin:0; text-align:left;
-    padding:12px max(36px, calc(50% - 700px)) 11px;
-    display:grid; grid-template-columns:auto 1px minmax(0,1fr) 1px auto; column-gap:36px; align-items:center; align-content:center;
-    grid-template-areas:"k r1 p r2 btns" "h r1 p r2 steps" "days days days days days";
-    background:#fff; box-shadow:0 -22px 48px rgba(2,12,30,.3);
-  }
-  body.full .info::before, body.full .info::after { content:''; align-self:stretch; background:var(--rule); margin:2px 0; }
-  body.full .info::before { grid-area:r1; }
-  body.full .info::after { grid-area:r2; }
-  body.full .info .k { grid-area:k; align-self:end; }
-  body.full .info h2 { grid-area:h; align-self:start; margin:3px 0 0; font-size:30px; white-space:nowrap; }
-  body.full .info p { grid-area:p; justify-self:center; margin:0; max-width:640px; font-size:13.5px; line-height:1.65; }
-  body.full .days { grid-area:days; display:flex; flex-wrap:wrap; gap:4px 30px; margin:10px 0 0; padding-top:8px; max-width:none;
-    border-top:1px solid var(--rule); }
-  body.full .info.nodays .days { display:none; }
-  body.full .days li { display:block; padding:0; border:0; font-size:12.5px; white-space:nowrap; }
-  body.full .days li span.d { margin-right:10px; font-size:9px; }
-  body.full .btns { grid-area:btns; margin:0; flex-wrap:nowrap; justify-content:flex-end; align-self:end; }
-  body.full .btns button { padding:9px 20px; }
-  body.full .steps { grid-area:steps; margin:10px 0 0; justify-content:flex-end; align-self:start; }
-  @media (max-width:1180px) {   /* narrower windows: the notes run under the title at full width, the buttons stay on the right */
-    body.full .info { grid-template-columns:minmax(0,1fr) auto; grid-template-areas:"k btns" "h steps" "p p" "days days"; }
-    body.full .info::before, body.full .info::after { display:none; }
-    body.full .info p { justify-self:stretch; max-width:none; margin-top:12px; padding-top:11px; border-top:1px solid var(--rule); }
-  }
 
   /* ---------- the Attractions gatefold ----------
      A paper panel hinged on the sky's right edge (see FLAP in the script). Sizes are book px: the
@@ -307,7 +264,7 @@
   body.lite .vp > .shade { display:none; }
   body.lite .vp .pulltab, body.lite .vp .placard, body.lite .flap .lid { will-change:transform; }
 
-  /* ---------- phones and small windows (body.full.compact): the book on top, the notes below ---------- */
+  /* ---------- the way back to the tour (the website's copy), and phones (body.full.compact) ---------- */
   .back-link { display:inline-flex; align-items:center; gap:6px; margin-top:10px; padding:6px 13px; border-radius:999px; font-size:12px; font-weight:600;
     color:#fff; text-decoration:none; background:rgba(4,16,36,.32); box-shadow:inset 0 0 0 1px rgba(255,255,255,.28); pointer-events:auto; }
   .back-link:hover { background:rgba(4,16,36,.5); }
@@ -316,37 +273,9 @@
   body.full .back-link { margin-top:0; }
   body.full.compact header { top:max(10px, env(safe-area-inset-top)); left:max(12px, env(safe-area-inset-left)); }
   body.full.compact header .mark { width:30px; height:30px; }
-  body.full.compact .info {
-    padding:14px max(18px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
-    grid-template-columns:minmax(0,1fr) auto; grid-template-areas:"k steps" "h h" "p p" "days days" "btns btns";
-    column-gap:12px; border-radius:18px 18px 0 0; box-shadow:0 -14px 34px rgba(2,12,30,.28);
-  }
-  body.full.compact .info::before, body.full.compact .info::after { display:none; }
-  body.full.compact .info .k { font-size:9px; letter-spacing:.24em; align-self:center; }
-  body.full.compact .info h2 { font-size:25px; white-space:normal; margin:4px 0 0; }
-  body.full.compact .info p { justify-self:stretch; max-width:none; margin:6px 0 0; padding:0; border:0; font-size:13px; line-height:1.5; }
-  body.full.compact .days { display:block; margin:10px 0 0; padding-top:4px; }
-  body.full.compact .days li { display:grid; grid-template-columns:62px 1fr; gap:8px; padding:5px 0; white-space:normal; font-size:12px; line-height:1.4; border:0; border-top:1px solid rgba(245,208,0,.45); }
-  body.full.compact .days li span.d { margin:0; padding-top:2px; font-size:8.5px; }
-  body.full.compact .btns { justify-content:flex-start; flex-wrap:wrap; gap:8px; margin-top:12px; align-self:start; }
-  body.full.compact .btns button { padding:10px 16px; font-size:12.5px; }
-  body.full.compact .btns button.primary { margin-left:auto; }
-  body.full.compact .steps { align-self:center; justify-content:flex-end; margin:0; gap:4px; }
-  body.full.compact .steps i { width:4px; height:4px; }
-  body.full.compact .steps i.on { width:12px; }
-  /* held upright: the book in a band at the top (its height set by the script), the notes fill the rest and scroll */
+  /* held upright: the book in a band at the top (its height set by the script), the desk under it */
   body.full.compact.upright .wrap { flex:none; }
-  body.full.compact.upright .info { flex:1 1 auto; min-height:0; overflow-y:auto; align-content:start; -webkit-overflow-scrolling:touch; overscroll-behavior:contain; }
-  /* a phone on its side: the book gets nearly all the height, the notes shrink to one line */
-  @media (orientation:landscape) and (max-height:519px) {
-    body.full.compact header .mark { display:none; }
-    body.full.compact .info { padding-top:8px; padding-bottom:max(8px, env(safe-area-inset-bottom)); grid-template-columns:minmax(0,1fr) auto;
-      grid-template-areas:"k btns" "h btns"; border-radius:14px 14px 0 0; }
-    body.full.compact .info h2 { font-size:19px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin:1px 0 0; }
-    body.full.compact .info p, body.full.compact .days, body.full.compact .steps { display:none; }
-    body.full.compact .btns { margin:0; flex-wrap:nowrap; align-self:center; }
-    body.full.compact .btns button { padding:9px 14px; font-size:12px; white-space:nowrap; }
-  }
+  @media (orientation:landscape) and (max-height:519px) { body.full.compact header .mark { display:none; } }
   /* in portrait the open book is small: a one-time hint to turn the phone */
   .rotate-hint { position:absolute; left:50%; bottom:12px; transform:translateX(-50%); z-index:4; display:flex; align-items:center; gap:8px;
     padding:7px 14px; border-radius:999px; background:rgba(255,255,255,.94); color:var(--ink); font-size:12px; font-weight:600; white-space:nowrap;
@@ -354,6 +283,229 @@
   .rotate-hint svg { width:16px; height:16px; flex:none; }
   .rotate-hint.gone { opacity:0; pointer-events:none; }
   .rotate-hint[hidden] { display:none; }
+  /* ---------- the travel desk ----------
+     Flat paper things lying on the cloth round the book, each with a job: the day's route in big
+     yellow letters under the book, a passport stamp for where you are, the flight path for how far
+     along, a compass to jump to any day, a Ceylon postage stamp to send the day as a postcard, a
+     Sri Lanka sticker to enquire, the ? for the day's plan (on ola leaves, below) and ‹ › to turn the
+     page. Plain 2D page, placed by the script once per window size (placeDesk): nothing on the desk
+     is redrawn while the book moves. The light book gives them no shadows or filters.
+     body[data-desk]: desk (a big window with room each side), slim (a big window without), side (a
+     phone on its side), tall (a phone held upright: the desk is under the book's band). */
+  /* Sized to the screen, not inset:0: on a phone the 3D stage reaches past the page's edge, and mobile
+     Chrome then sizes fixed layers to that wider page. Clipped, so nothing on it can widen the page more. */
+  .desk { position:fixed; left:0; top:0; width:100vw; height:100vh; height:100dvh; z-index:5; pointer-events:none; overflow:hidden; }
+  body:not(.ready) .desk { visibility:hidden; }
+  .dk { position:absolute; left:0; top:0; pointer-events:auto; transition:opacity .35s, visibility .35s; }
+  .dk[hidden] { display:none !important; }
+  body.flap-zoom .dk { opacity:0; visibility:hidden; }   /* the Attractions close-up has the screen */
+  .desk button, .desk a { font:inherit; color:inherit; background:none; border:0; padding:0; margin:0; cursor:pointer; text-decoration:none; -webkit-tap-highlight-color:transparent; }
+  .desk :focus { outline:none; }
+  .desk :focus-visible { outline:2px solid var(--sun); outline-offset:5px; border-radius:16px; }
+  .dk > svg, .dk .art > svg { display:block; width:100%; height:100%; overflow:visible; }
+  .dk .art { position:absolute; inset:0; transform:rotate(var(--rot, 0deg)); transition:transform .3s cubic-bezier(.3,1.5,.5,1); }
+  body:not(.lite) .dk .art { filter:drop-shadow(0 2px 2px rgba(2,10,28,.32)) drop-shadow(0 7px 12px rgba(2,10,28,.2)); }
+  @media (hover:hover) { .dk.lift:hover .art { transform:rotate(var(--rot, 0deg)) translateY(-4px) scale(1.04); } }
+  .dk.lift:active .art { transform:rotate(var(--rot, 0deg)) scale(.96); }
+  /* what a thing does: on hover or keyboard focus (on a touch screen the ola leaves say it) */
+  .dk .lbl { position:absolute; left:50%; top:100%; margin-top:10px; transform:translateX(-50%); padding:5px 11px; border-radius:999px; white-space:nowrap;
+    background:rgba(4,16,36,.8); color:#fff; font-size:11.5px; font-weight:600; letter-spacing:.02em; line-height:1.2; opacity:0; pointer-events:none; transition:opacity .2s; }
+  .dk.lbl-up .lbl { top:auto; bottom:100%; margin:0 0 10px; }
+  .dk:hover .lbl, .dk:focus-visible .lbl { opacity:1; }
+  @media (hover:none) { .dk .lbl { display:none; } }
+
+  /* the day's route, in the brand's yellow, under the book (the shut book: the tour's name) */
+  .dk.title { pointer-events:none; text-align:center; white-space:nowrap; }
+  .dk.title h2 { display:inline-block; margin:0; font-family:'Bricolage Grotesque', sans-serif; font-weight:800; font-size:40px; line-height:1; letter-spacing:.005em;
+    text-transform:uppercase; color:var(--sun); text-shadow:0 .05em 0 #A88600, 0 .14em .34em rgba(2,12,30,.55); vertical-align:middle; }
+  .dk.title .arr { display:inline-block; width:1.55em; height:.6em; margin:0 .06em; vertical-align:.08em; overflow:visible; }
+  .dk.title .kick { display:none; font-size:10.5px; font-weight:700; letter-spacing:.26em; text-transform:uppercase; color:rgba(255,255,255,.86); text-shadow:0 1px 3px rgba(2,12,30,.6); }
+  body[data-desk="slim"] .dk.title .kick, body[data-desk="side"] .dk.title .kick { display:inline-block; vertical-align:middle; margin-right:1.2em; }
+  body[data-desk="tall"] .dk.title { text-align:left; white-space:normal; }
+  body[data-desk="tall"] .dk.title .kick { display:block; margin-bottom:7px; }
+  body[data-desk="tall"] .dk.title h2 { display:block; line-height:1.04; }
+  .dk.title.in h2 { animation:dk-rise .6s cubic-bezier(.2,1.25,.4,1); }
+  @keyframes dk-rise { from { opacity:0; transform:translateY(.3em); } }
+
+  /* ‹ › turn the page; the caption says where to (Close on Day 1, Start again on the last day) */
+  .dk.arrow { display:flex; flex-direction:column; align-items:center; gap:7px; width:var(--aw, 48px); }
+  .dk.arrow .disc { flex:none; width:var(--aw, 48px); height:var(--aw, 48px); border-radius:50%; display:grid; place-items:center; color:var(--blue); background:#FFFDF8;
+    box-shadow:0 0 0 3px #fff, 0 0 0 4.2px rgba(75,91,107,.3), 0 5px 12px rgba(2,12,30,.38); transition:transform .25s cubic-bezier(.3,1.5,.5,1); }
+  .dk.arrow .disc svg { width:44%; height:44%; overflow:visible; }
+  .dk.arrow .cap { font-size:10px; font-weight:700; letter-spacing:.2em; text-transform:uppercase; color:#fff; white-space:nowrap; text-shadow:0 1px 3px rgba(2,12,30,.75); }
+  .dk.arrow.band .cap { display:none; }
+  @media (hover:hover) { .dk.arrow:hover .disc { transform:scale(1.08); } }
+  .dk.arrow:active .disc { transform:scale(.92); }
+  .dk.arrow:focus-visible { outline:none; }
+  .dk.arrow:focus-visible .disc { outline:2px solid var(--sun); outline-offset:5px; }
+  .dk.arrow.off { visibility:hidden; }
+
+  /* the ? : a round paper badge; on a computer it wiggles when the mouse comes over it */
+  .dk.help { width:var(--hw, 60px); height:var(--hw, 60px); border-radius:50%; }
+  .dk.help .disc { position:absolute; inset:0; border-radius:50%; display:grid; place-items:center; color:var(--sun);
+    font-family:'Bricolage Grotesque', sans-serif; font-weight:800; font-size:calc(var(--hw, 60px) * .54); line-height:1;
+    background:radial-gradient(circle at 36% 30%, #3E8DD0, #2773B7 58%, #1D5C9B);
+    box-shadow:inset 0 0 0 calc(var(--hw, 60px) * .07) #2773B7, inset 0 0 0 calc(var(--hw, 60px) * .1) var(--sun), 0 0 0 4px #fff, 0 0 0 5.4px rgba(75,91,107,.3), 0 6px 14px rgba(2,12,30,.42); }
+  .dk.help .disc span { transform:translateY(.02em); text-shadow:0 .05em 0 #164A80; }
+  @media (hover:hover) and (pointer:fine) { .dk.help:hover .disc { animation:dk-wiggle .7s ease-in-out; } }
+  .dk.help:active .disc { transform:scale(.93); }
+  .dk.help:focus-visible { outline:none; }
+  .dk.help:focus-visible .disc { outline:2px solid var(--sun); outline-offset:6px; }
+  @keyframes dk-wiggle { 0%, 100% { transform:rotate(0); } 18% { transform:rotate(-16deg) scale(1.07); } 40% { transform:rotate(12deg) scale(1.07); } 62% { transform:rotate(-7deg); } 82% { transform:rotate(3deg); } }
+
+  /* paper speech bubbles: the day's tip from the guide, and on a first visit the ?'s own. One at a
+     time. The paper and its die-cut edge are an SVG drawn to the bubble's size (showBubble). */
+  .dk.bubble { isolation:isolate; padding:13px 17px 14px; color:#16365C; cursor:default; transform-origin:var(--ox, 50%) var(--oy, 100%); }
+  .dk.bubble > svg.bg { position:absolute; left:0; top:0; z-index:-1; overflow:visible; }
+  body:not(.lite) .dk.bubble > svg.bg { filter:drop-shadow(0 6px 10px rgba(2,10,28,.34)); }
+  .dk.bubble p { margin:0; font-family:'Bricolage Grotesque', sans-serif; font-weight:800; font-size:var(--bfs, 15px); line-height:1.17; text-transform:uppercase; letter-spacing:.01em; }
+  .dk.bubble .by { display:block; margin-top:7px; font-family:'Caveat', cursive; font-weight:700; font-size:calc(var(--bfs, 15px) * 1.32); line-height:1; text-transform:none; letter-spacing:0; color:#C24A2B; }
+  .dk.bubble.ask p b { color:#C24A2B; }
+  .dk.bubble.tip { cursor:pointer; }
+  .dk.bubble.pop { animation:dk-pop .5s cubic-bezier(.25,1.45,.45,1) both; }
+  @keyframes dk-pop { from { opacity:0; transform:scale(.45); } }
+
+  /* the passport stamp: a cream paper disc, and the day's place stamped on it in blue ink. The ink
+     is its own layer: it thunks down (dk-thunk) when a day opens, and the disc gives a little. */
+  .dk.passport { cursor:pointer; }
+  .dk.passport .ink { position:absolute; inset:0; opacity:.9; transform:rotate(var(--ink-rot, -10deg)); }
+  .dk.passport .ink svg { display:block; width:100%; height:100%; overflow:visible; }
+  .dk.passport .ink.thunk { animation:dk-thunk .55s cubic-bezier(.4,0,.3,1) both; }
+  .dk.passport.jolt .art { animation:dk-jolt .32s .24s ease-out; }
+  @keyframes dk-thunk { 0% { opacity:0; transform:rotate(calc(var(--ink-rot, -10deg) - 12deg)) scale(1.8); } 50% { opacity:.95; transform:rotate(var(--ink-rot, -10deg)) scale(.92); }
+    70% { transform:rotate(var(--ink-rot, -10deg)) scale(1.03); } 100% { opacity:.9; transform:rotate(var(--ink-rot, -10deg)) scale(1); } }
+  @keyframes dk-jolt { 30% { transform:rotate(var(--rot, 0deg)) translateY(2px) scale(.97); } }
+  .dk.compass .rose { position:absolute; inset:0; transition:transform .7s cubic-bezier(.3,1.6,.5,1); }
+  @media (hover:hover) { .dk.compass:hover .rose { transform:rotate(-24deg); } }
+  .dk.compass[aria-expanded="true"] .rose { transform:rotate(200deg); }
+
+  /* the flight path: one dot a day, today's a yellow disc with the plane (pointer-events off: it is a picture) */
+  .dk.flight { pointer-events:none; }
+  .dk.flight.away { opacity:0; visibility:hidden; transition-duration:.2s; }   /* while pages turn, and over the shut cover */
+  .dk.flight .dots circle { fill:#1B4C82; stroke:#FEDD00; stroke-width:1.6; }
+  .dk.flight .dots circle.past { fill:#FEDD00; stroke:none; }
+  .dk.flight .dots circle.today { visibility:hidden; }
+  .dk.flight text { font-family:'Plus Jakarta Sans', sans-serif; font-weight:800; fill:#fff; }
+
+  /* jump to a day: a paper card over the compass (or above the ? on a phone) */
+  .dk.picker { width:270px; padding:14px 8px 10px; border-radius:14px; background:#FFFDF8; color:var(--ink); cursor:default;
+    box-shadow:0 0 0 4px #fff, 0 0 0 5.4px rgba(75,91,107,.3), 0 14px 34px rgba(2,12,30,.45); transform-origin:var(--ox, 50%) 100%; }
+  .dk.picker.pop { animation:dk-pop .38s cubic-bezier(.25,1.35,.45,1) both; }
+  .dk.picker h3 { margin:0 12px 8px; font-size:10px; font-weight:800; letter-spacing:.24em; text-transform:uppercase; color:var(--blue); }
+  .dk.picker button { display:grid; grid-template-columns:54px 1fr; align-items:baseline; width:100%; padding:9px 12px; border-radius:9px; text-align:left; font-size:14px; font-weight:600; line-height:1.3; color:#0F2340; }
+  .dk.picker button:hover { background:#F3ECDD; }
+  .dk.picker button[aria-current="true"] { background:#FFF1A1; }
+  .dk.picker button:focus-visible { outline:2px solid var(--blue); outline-offset:-2px; border-radius:9px; }
+  .dk.picker button .d { font-size:10px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:var(--blue); }
+  .dk.picker .soon { margin:6px 12px 2px; font-size:12px; line-height:1.4; color:var(--muted); }
+
+  /* first-visit hints: a hand showing the PULL tab and the Attractions bookmark */
+  .dk.hand { pointer-events:none; width:var(--hs, 42px); height:calc(var(--hs, 42px) * 1.2); transform-origin:44% 7%; opacity:0; transition:opacity .35s; }
+  .dk.hand.on { opacity:1; }
+  .dk.hand .fing { position:absolute; inset:0; transform-origin:44% 7%; animation:dk-tap 1.2s ease-in-out infinite; }
+  .dk.hand.pull .fing { animation:dk-tug 1.6s ease-in-out infinite; }
+  .dk.hand .fing svg { display:block; width:100%; height:100%; overflow:visible; }
+  @keyframes dk-tap { 0%, 100% { transform:translate(0, 0); } 45% { transform:translate(0, 8px); } 62% { transform:translate(0, 0) scale(.95); } }
+  @keyframes dk-tug { 0%, 100% { transform:translate(6px, 2px); } 50% { transform:translate(-16px, 2px); } }
+  .dk.hand .tag { position:absolute; top:100%; left:50%; margin-top:5px; transform:translateX(-35%) rotate(var(--unrot, 0deg)); padding:4px 10px; border-radius:999px;
+    background:var(--sun); color:#16365C; font-size:11px; font-weight:800; letter-spacing:.06em; white-space:nowrap; box-shadow:0 3px 8px rgba(2,12,30,.35); }
+
+  /* "Link copied" and other small notes; above the ola leaves too */
+  .toast { position:fixed; left:0; top:0; z-index:50; max-width:calc(100vw - 24px); padding:7px 14px; border-radius:16px; background:#fff; color:#0F2340; font-size:12.5px; font-weight:700; text-align:center;
+    box-shadow:0 6px 16px rgba(2,12,30,.35); pointer-events:none; opacity:0; transform:translateY(6px); transition:opacity .25s, transform .25s; }
+  .toast.show { opacity:1; transform:none; }
+  .toast[hidden] { display:none; }
+
+  /* ---------- the day's plan: an ola-leaf book (puskola poth) ----------
+     The ? opens it over the desk: long strips of dried palm leaf with the plan etched in dark ink,
+     threaded on a cord between two wooden covers. It slides in tied up, the cord loosens and the
+     leaves fan out (openOla: the leaves start stacked under the top cover, --dy, and spring to their
+     places). Only transforms and opacity move. On a phone held upright it is a sheet from the
+     bottom, the leaves a full-width list. Esc, the ×, or a tap outside shuts it. */
+  .ola-wrap { position:fixed; left:0; top:0; width:100vw; height:100vh; height:100dvh; z-index:40; display:flex; align-items:center; justify-content:center; padding:max(14px, 2.5vh) 16px; }
+  .ola-wrap[hidden] { display:none; }
+  .ola-back { position:absolute; inset:0; background:rgba(3,12,28,.6); opacity:0; transition:opacity .35s; }
+  .ola-wrap.st-in .ola-back { opacity:1; }
+  .ola { position:relative; width:min(660px, 100%); max-height:100%; overflow-x:hidden; overflow-y:auto; overscroll-behavior:contain; padding:8px 18px 40px 14px; scrollbar-width:thin; scrollbar-color:rgba(255,236,190,.35) transparent;
+    opacity:0; transform:translateX(110px) rotate(6deg); transition:opacity .3s, transform .6s cubic-bezier(.2,1.12,.35,1); }
+  .ola-wrap.st-in .ola { opacity:1; transform:none; }
+  .ola:focus { outline:none; }
+  .ola button:focus-visible, .ola a:focus-visible { outline:2px solid var(--sun); outline-offset:2px; }
+  /* the covers: lacquered wood, a painted yellow border, the cord's hole */
+  .ola-board { position:relative; z-index:3; border-radius:12px; color:#F8E6B8; padding:13px 54px 14px 60px;
+    background:
+      repeating-linear-gradient(177deg, rgba(255,214,150,.07) 0 2px, rgba(0,0,0,0) 2px 9px, rgba(30,10,0,.14) 9px 10px, rgba(0,0,0,0) 10px 17px),
+      linear-gradient(180deg, #8C4524, #6B3018 55%, #56240F);
+    box-shadow:inset 0 0 0 2px #3F1A08, inset 0 2px 0 rgba(255,214,150,.18), 0 3px 0 #2E1206, 0 10px 18px rgba(2,10,28,.35); }
+  .ola-board::before { content:''; position:absolute; inset:6px; border-radius:8px; border:1.5px solid rgba(232,184,48,.75); outline:1.5px dotted rgba(229,96,63,.7); outline-offset:-5px; pointer-events:none; }
+  .ola-board::after { content:''; position:absolute; left:28px; top:50%; width:12px; height:12px; margin-top:-6px; border-radius:50%;
+    background:radial-gradient(circle, #8A5A2B 0 1.6px, #1B0C04 2.2px); box-shadow:inset 0 2px 2px rgba(0,0,0,.6), 0 1px 0 rgba(255,214,150,.25); }
+  .ola-board .ok { display:block; font-size:10px; font-weight:800; letter-spacing:.26em; text-transform:uppercase; color:#E8B830; }
+  .ola-board h2 { margin:2px 0 0; font-family:var(--serif); font-weight:400; font-size:28px; line-height:1.05; color:#FFF1C9; text-shadow:0 1px 0 #2E1206; }
+  .ola-x { position:absolute; top:50%; right:14px; width:34px; height:34px; margin-top:-17px; border-radius:50%; border:0; display:grid; place-items:center;
+    background:rgba(255,236,190,.14); color:#FFF1C9; font:inherit; font-size:22px; line-height:1; cursor:pointer; }
+  .ola-x:hover { background:rgba(255,236,190,.26); }
+  .ola-board.bottom { z-index:2; display:flex; flex-wrap:wrap; align-items:center; gap:8px; padding:11px 18px 11px 60px; transform:translateY(var(--dy, 0px));
+    transition:transform .6s cubic-bezier(.22,1.2,.4,1) calc(var(--i, 0) * 45ms); }
+  .ola-board.bottom button, .ola-board.bottom a { font:inherit; font-size:12.5px; font-weight:700; padding:7px 13px; border-radius:999px; border:1px solid rgba(232,184,48,.55);
+    color:#FFF1C9; background:rgba(255,236,190,.08); cursor:pointer; text-decoration:none; }
+  .ola-board.bottom button:hover, .ola-board.bottom a:hover { background:rgba(255,236,190,.2); }
+  /* the leaves: dried palm leaf, golden-tan, darker at the ends, fine fibres along it, the cord's hole */
+  .ola-leaves { position:relative; z-index:1; list-style:none; margin:0; padding:7px 0; display:flex; flex-direction:column; gap:6px; }
+  .ola-leaf { position:relative; display:grid; grid-template-columns:96px 1fr; column-gap:16px; align-items:baseline; min-height:46px; padding:10px 30px 10px 60px;
+    border-radius:22px / 23px; color:#3A2210; text-shadow:0 1px 0 rgba(255,240,205,.55);
+    background:
+      linear-gradient(90deg, rgba(110,62,18,.45), rgba(110,62,18,0) 7%, rgba(110,62,18,0) 93%, rgba(110,62,18,.45)),
+      repeating-linear-gradient(180deg, rgba(255,240,205,0) 0 2px, rgba(255,240,205,.22) 2px 3px, rgba(120,76,28,0) 3px 5px, rgba(120,76,28,.12) 5px 6px),
+      linear-gradient(180deg, #E8CB8F 0%, #D9B574 48%, #C99F5E 100%);
+    box-shadow:inset 0 1px 0 rgba(255,244,214,.65), inset 0 -1px 0 rgba(90,50,12,.3), 0 2px 0 rgba(70,38,8,.4), 0 6px 10px rgba(2,10,28,.24);
+    transform:translateY(var(--dy, 0px)); transition:transform .6s cubic-bezier(.22,1.25,.4,1) calc(var(--i, 0) * 45ms); }
+  .ola-leaf::before { content:''; position:absolute; left:28px; top:50%; width:12px; height:12px; margin-top:-6px; border-radius:50%;
+    background:linear-gradient(90deg, rgba(0,0,0,0) 4.5px, #8A5A2B 4.5px 7.5px, rgba(0,0,0,0) 7.5px), radial-gradient(circle, #2A1608 50%, #4A2A12);
+    box-shadow:inset 0 1.5px 2px rgba(0,0,0,.55), 0 1px 0 rgba(255,244,214,.5); }
+  .ola-wrap.st-fan .ola-leaf { transform:translateX(var(--fx, 0px)) rotate(var(--fr, 0deg)); }
+  .ola-wrap.st-fan .ola-board.bottom { transform:none; }
+  .ola-wrap.st-closing .ola-leaf, .ola-wrap.st-closing .ola-board.bottom { transition-duration:.3s; transition-delay:0s; }
+  .ol-lab { font-size:10.5px; font-weight:800; letter-spacing:.2em; text-transform:uppercase; color:#5A3414; }
+  .ol-txt { font-size:14px; line-height:1.45; color:#4A2C14; }
+  .ol-txt b { font-family:var(--serif); font-weight:400; font-size:20px; line-height:1.1; color:#2A1508; margin-right:8px; }
+  .ol-det { color:#5A3A1C; }
+  .ola-leaf.opt .ol-lab { justify-self:start; color:#9C3412; border:1.5px solid rgba(156,52,18,.75); border-radius:999px; padding:2px 8px 1px; transform:rotate(-3deg); }
+  .ola-leaf.opt b { color:#5A2410; }
+  .ola-leaf.stay .ol-lab::before { content:'☾'; display:inline-block; margin-right:5px; font-size:13px; letter-spacing:0; }
+  .ola-leaf.tip .ol-txt { font-family:'Caveat', cursive; font-weight:700; font-size:22px; line-height:1.1; color:#2A1508; }
+  .ola-leaf.tip .ol-by { display:block; margin-top:3px; font-family:'Plus Jakarta Sans', sans-serif; font-weight:700; font-size:12px; color:#7A4A1E; }
+  .ola-leaf.how .ol-txt { font-size:13.5px; line-height:1.4; }
+  .ol-acts { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
+  .ol-acts button { font:inherit; font-size:11.5px; font-weight:700; padding:5px 11px; border-radius:999px; border:1.5px solid rgba(74,44,20,.45); background:rgba(255,244,214,.35);
+    color:#3A2210; cursor:pointer; text-shadow:none; }
+  .ol-acts button:hover { background:rgba(255,244,214,.7); }
+  /* the cord: wound round the bundle while it is shut (.ola-tie), then threaded through every hole (.ola-thread), its end hanging from the bottom cover */
+  .ola-thread { position:absolute; left:46.5px; width:3px; z-index:0; border-radius:2px; opacity:0; transition:opacity .4s .3s;
+    background:repeating-linear-gradient(160deg, #A86E31 0 2px, #6E4219 2px 4px); }
+  .ola-wrap.st-fan .ola-thread { opacity:1; }
+  .ola-tie { position:absolute; z-index:4; left:34%; width:50px; pointer-events:none; transition:opacity .3s, transform .45s cubic-bezier(.4,0,.6,1); }
+  .ola-tie svg { display:block; width:100%; height:100%; overflow:visible; }
+  .ola-wrap.st-loose .ola-tie { opacity:0; transform:translate(-30px, 18px) rotate(-16deg); }
+  .ola-tail { position:absolute; left:28px; top:50%; width:44px; height:62px; pointer-events:none; transform-origin:6px 3px; opacity:0; transform:rotate(-40deg);
+    transition:opacity .25s .1s, transform .7s cubic-bezier(.3,1.6,.5,1) .1s; }
+  .ola-tail svg { display:block; width:100%; height:100%; overflow:visible; }
+  .ola-wrap.st-loose .ola-tail { opacity:1; transform:none; }
+  /* a phone held upright: a sheet from the bottom, the leaves straight, full width */
+  .ola-wrap.sheet { align-items:flex-end; padding:0; }
+  .ola-wrap.sheet .ola { width:100%; max-height:90%; padding:10px 10px max(54px, calc(env(safe-area-inset-bottom) + 44px)); transform:translateY(105%); }
+  .ola-wrap.sheet.st-in .ola { transform:none; }
+  .ola-wrap.sheet .ola-leaf { grid-template-columns:76px 1fr; column-gap:10px; padding:11px 16px 11px 56px; border-radius:16px / 22px; }
+  .ola-wrap.sheet .ol-txt b { font-size:19px; }
+  .ola-wrap.sheet .ola-board { padding-left:56px; }
+  .ola-wrap.sheet .ola-board h2 { font-size:24px; }
+  .ola-wrap.sheet .ola-thread { left:42.5px; }
+  @media (max-width:520px) { .ola-leaf { grid-template-columns:1fr; row-gap:3px; } .ola-wrap.sheet .ola-leaf { grid-template-columns:1fr; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ola, .ola-leaf, .ola-back, .ola-thread, .ola-tie, .ola-tail, .ola-board.bottom, .dk .art, .dk.compass .rose { transition:none !important; }
+    .dk.bubble.pop, .dk.picker.pop, .dk .ink.thunk, .dk.passport.jolt .art, .dk.title.in h2, .dk.hand .fing, .dk.help .disc { animation:none !important; }
+  }
 </style>
 </head>
 <body data-back="../adventure-nature-based-tours/">
@@ -400,6 +552,21 @@
     <symbol id="cloud" viewBox="0 0 140 70">
       <path d="M22 64 C6 64 4 42 20 38 C18 20 42 12 54 24 C62 4 100 4 106 28 C124 22 142 38 132 52 C142 64 130 66 122 64 Z" fill="#fff" stroke="#A9D3EC" stroke-width="2.5"/>
       <path d="M60 44 c5 -8 17 -6 17 3 c0 6 -8 8 -10 3" fill="none" stroke="#A9D3EC" stroke-width="2.5" stroke-linecap="round"/>
+    </symbol>
+    <!-- the travel desk's little pictures (drawn in currentColor): an elephant, a palm, a plane -->
+    <symbol id="dk-elephant" viewBox="0 0 72 50">
+      <path fill="currentColor" d="M8 22C8 12 18 7 30 7C40 7 46 9 50 12C52 8 58 6 63 9C69 13 69 22 66 28C64 32 63 37 64 42C64.5 45 66.5 46 68 45.5L68 48C63 49.5 59.5 46 59.5 41C59.5 37 59 34 58 32L56 33L56 47L49 47L48.5 36.2L46 36.8L46 47L40 47L40 37C37 37.3 35 37.1 33 36.6L32.5 47L25.5 47L25 36C22 35 20 34 19 33L18.5 47L11.5 47L11.5 32C9 29.5 8 26 8 22Z"/>
+      <path d="M8.8 19.5C5 21.5 4 26.5 4.6 31" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+      <path d="M51 13.5C46.5 15.5 45.5 24 48.5 29.5C52 30.5 55.6 28 56.6 24C57 18.5 55 14.5 51 13.5Z" fill="#fff" fill-opacity=".22"/>
+      <circle cx="61.2" cy="17" r="1.2" fill="#fff" fill-opacity=".85"/>
+    </symbol>
+    <symbol id="dk-palm" viewBox="0 0 40 60">
+      <path d="M21 59C20 45 19 31 22 18" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/>
+      <g fill="currentColor"><path d="M22 18C14 12 7 13 2 19C9 16 15 17 22 18Z"/><path d="M22 18C17 9 10 6 4 7C11 9 17 12 22 18Z"/>
+      <path d="M22 18C24 9 30 4 37 5C31 8 26 12 22 18Z"/><path d="M22 18C30 13 36 15 39 21C33 17 28 17 22 18Z"/><path d="M22 18C22 10 21 5 18 1C23 5 24 11 22 18Z"/></g>
+    </symbol>
+    <symbol id="dk-plane" viewBox="0 0 40 24">
+      <path fill="currentColor" d="M38 12C38 10.8 36.5 10 35 10L25 10L16 1L12.5 1L17.5 10L8 10L5 6L2 6L4 12L2 18L5 18L8 14L17.5 14L12.5 23L16 23L25 14L35 14C36.5 14 38 13.2 38 12Z"/>
     </symbol>
   </defs>
 </svg>
@@ -467,14 +634,13 @@
   </div>
 </div>
 
-<section class="info" aria-live="polite">
-  <div class="k" id="i-k"></div>
-  <h2 id="i-h"></h2>
-  <p id="i-p"></p>
-  <ol class="days" id="i-days"></ol>
-  <div class="btns" id="i-btns"></div>
-  <div class="steps" id="i-steps"><i></i><i></i><i></i></div>
-</section>
+<!-- the travel desk round the book, and the day's plan on ola leaves: built by the script (see buildDesk) -->
+<div class="desk" id="desk"></div>
+<div class="ola-wrap" id="ola" hidden></div>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<!-- for screen readers: which day is open, said again whenever a page turns -->
+<section class="info" aria-live="polite" aria-atomic="true"><p id="i-live"></p></section>
 
 <button class="tune-btn" id="tune-btn" type="button" aria-expanded="false" aria-controls="cam">Tune view</button>
 <div class="cam" id="cam">
@@ -1277,7 +1443,6 @@ PopupBookData.load().then(function (BOOK) {
   }
   function togglePull() { tween('pull', pullT, pullT < 0.5 ? 1 : 0, 1200, setPull); }
   function toggleFlap() { tween('flap', flapT, flapT < 0.5 ? 1 : 0, 700, setFlap); }
-  var ACTIONS = { pull: togglePull, flap: toggleFlap, wave: waveSign };
 
   /* ================= turning pages ================= */
   // state s: the cover and the first s-1 leaves turned (0 = shut, 1 = Day 1 open, ... NS = the last day)
@@ -1312,9 +1477,10 @@ PopupBookData.load().then(function (BOOK) {
     if (FLAP && FLAP.open) { closeFlap(function () { go(n); }); return; }   // fold the Attractions panel away before the page can turn
     var was = state, steps = [];
     for (var s = was; s !== n; ) { s += n > was ? 1 : -1; steps.push(s); }
+    deskLeave();   // the day's bubbles and hints go as the page lifts
     busy = true; state = n; renderInfo(); hydrate(n);
     (function next(j) {
-      if (j === steps.length) { busy = false; useDrawer(); renderInfo(); hydrate(state); rotateHint(); return; }
+      if (j === steps.length) { busy = false; useDrawer(); renderInfo(); hydrate(state); rotateHint(); deskSettle(); return; }
       var from = j ? steps[j - 1] : was, to = steps[j], cover = Math.min(from, to) === 0;
       var ms = cover ? (to > from ? 1900 : 1700) : 2000, curve = cover ? (to > from ? settleIn : settleOut) : settleBoth;
       if (steps.length > 1) ms = Math.round(ms * (cover ? 0.8 : 0.75));
@@ -1322,49 +1488,29 @@ PopupBookData.load().then(function (BOOK) {
     })(0);
   }
 
-  /* ================= info panel ================= */
-  /* the notes under the book: the cover's, then each day's (data: title, notes.text, notes.plan
-     as [label, place, detail] lines). Day 1's fall back to these if the data has none. */
+  /* ================= the day's notes =================
+     The cover's, then each day's (data: title, sign, notes.text, notes.plan as [label, place,
+     detail] lines, tip {text, by}). Day 1's fall back to these if the data has none. They are shown
+     by the travel desk (renderDesk) and the ola leaves (olaHTML); a live line says them aloud. */
   var TOUR_DAYS = (BOOK && BOOK.tourDays) || 16;
+  var TOUR_NAME = (BOOK && BOOK.tour) || 'Adventure, Culture & Nature Escape';
   var DAY1_NOTES = { text: 'Pull the tab on the left to land the plane, lift the food cart, tap the Day 1 sign, or open Attractions on the right for everything you can do today.', plan: [
     ['Arrive', 'Bandaranaike International Airport', 'CMB'],
     ['Explore', 'Colombo', 'Independence Square, Galle Face, Gangaramaya Temple'],
     ['Optional', 'Street-food crawl', 'or a sunset cruise'],
     ['Stay', 'Colombo', 'overnight']] };
   function infoFor(s) {
-    if (!s) return { k: TOUR_DAYS + ' DAYS · ADVENTURE, CULTURE & NATURE ESCAPE', h: 'Sixteen days across Sri Lanka', p: 'Tap the book to open it.', days: [], btns: [['Open the book', 1, true]] };
-    var sp = SPREADS[s - 1], sd = sp.data, day1 = s === 1 && sp.day === 1, n = sd.notes || (day1 ? DAY1_NOTES : {});
-    var btns = [[s === 1 ? '← Close' : '← Back', s - 1, false]];
-    if (sp.pulls) btns.push(['Pull the tab', 'pull', false]);
-    if (sp.flaps) btns.push(['Lift the flap', 'flap', false]);
-    btns.push(s < NS ? ['Turn the page →', s + 1, true] : ['Start again', 0, true]);
-    return { k: 'DAY ' + sp.day + ' OF ' + TOUR_DAYS, h: sd.title || (day1 ? 'Arrival → Colombo' : 'Day ' + sp.day), p: n.text || '', days: n.plan || [], btns: btns };
+    if (!s) return { day: 0, k: TOUR_DAYS + ' days in Sri Lanka', h: TOUR_NAME, p: '', plan: [], place: '', kicker: '', sp: null };
+    var sp = SPREADS[s - 1], sd = sp.data, day1 = s === 1 && sp.day === 1, n = sd.notes || (day1 ? DAY1_NOTES : {}), sg = sd.sign || {};
+    return { day: sp.day, k: 'Day ' + sp.day + ' of ' + TOUR_DAYS, h: sd.title || (day1 ? 'Arrival → Colombo' : sg.place || 'Day ' + sp.day),
+             p: n.text || '', plan: n.plan || [], place: sg.place || '', kicker: sg.kicker || '', sp: sp };
   }
+  function stayOf(d) { return d.plan.filter(function (x) { return /stay|overnight|night/i.test(x[0] || ''); })[0]; }
   function renderInfo() {
-    var d = infoFor(state);
-    document.getElementById('i-k').textContent = d.k;
-    var h = document.getElementById('i-h'), parts = d.h.split('→');   // the arrow is set small, in the sans
-    h.textContent = parts[0];
-    if (parts.length > 1) {
-      var arr = document.createElement('span'); arr.className = 'arr'; arr.textContent = '→';
-      h.appendChild(arr); h.appendChild(document.createTextNode(parts.slice(1).join('→')));
-    }
-    var p = document.getElementById('i-p'); p.textContent = d.p; p.style.display = d.p ? '' : 'none';
-    document.querySelector('.info').classList.toggle('nodays', !d.days.length);
-    document.getElementById('i-days').innerHTML = d.days.map(function (x) {
-      return '<li><span class="d">' + esc(String(x[0] || '').toUpperCase()) + '</span><span><b>' + esc(x[1]) + '</b>' + (x[2] ? ' · ' + esc(x[2]) : '') + '</span></li>';
-    }).join('');
-    var b = document.getElementById('i-btns'); b.innerHTML = '';
-    d.btns.forEach(function (x) {
-      var el = document.createElement('button');
-      el.textContent = x[0]; if (x[2]) el.className = 'primary';
-      el.disabled = busy;
-      el.addEventListener('click', function () { if (typeof x[1] === 'number') go(x[1]); else ACTIONS[x[1]](); });
-      b.appendChild(el);
-    });
-    var steps = document.getElementById('i-steps');
-    if (steps.children.length !== NS + 1) steps.innerHTML = new Array(NS + 2).join('<i></i>');
-    Array.prototype.forEach.call(steps.children, function (el, i) { el.classList.toggle('on', i === state); });
+    var d = infoFor(state), stay = stayOf(d), live = document.getElementById('i-live');
+    var say = d.k + ': ' + d.h.replace(/\s*→\s*/g, ' to ') + '.' + (stay && stay[1] ? ' Overnight in ' + stay[1] + '.' : '');
+    if (live.textContent !== say) live.textContent = say;
+    renderDesk(d);
     showCam();
   }
   /* ================= Attractions gatefold =================
@@ -1508,6 +1654,7 @@ PopupBookData.load().then(function (BOOK) {
     FLAP.open = FLAP.busy = true; FLAP.i = 0;
     flapFill(0, 0);
     book.classList.add('flap-open');
+    deskFlap(true);   // the desk steps aside for the close-up
     run(950, function (t) {
       FLAP.s = pullOut(t);
       FLAP.z = ease(Math.min(1, t * 1.1));
@@ -1533,6 +1680,7 @@ PopupBookData.load().then(function (BOOK) {
       FLAP.s = 0; FLAP.z = 0;
       FLAP.open = FLAP.busy = FLAP.closing = false;
       book.classList.remove('flap-open');
+      deskFlap(false);
       render();
       var t = FLAP.then; FLAP.then = null;
       if (t) t();
@@ -1641,7 +1789,7 @@ PopupBookData.load().then(function (BOOK) {
      while a page stands up mid-turn (placeFit, every frame). The extents it frames are measured
      from the real scene at the current camera height (measure).
      Small screens: the 960 x 700 scene is scaled down to the width, with the notes below it. */
-  var wrap = document.getElementById('wrap'), fit = document.getElementById('fit'), info = document.querySelector('.info');
+  var wrap = document.getElementById('wrap'), fit = document.getElementById('fit');
   // ?loupe=scale,x,y magnifies the stage around book point (x, y), for checking paper details
   var loupe = (new URLSearchParams(location.search).get('loupe') || '').split(',').map(parseFloat);
   if (loupe.length === 3) document.querySelector('.cam').style.display = document.getElementById('tune-btn').style.display = 'none';
@@ -1680,10 +1828,16 @@ PopupBookData.load().then(function (BOOK) {
     var MS = LITE ? Math.min(NS, 2) : NS;
     var closed = at(poseFor(0), 0), open = null, s, a, p;
     for (s = 1; s <= MS; s++) { var b = union(at(poseFor(s), 1), at(poseFor(s), 0.233)); open = open ? union(open, b) : b; }
+    // where the first day's sky card and sign stand when open: the travel desk lays its flight path
+    // above the sky and its stamps beside the sign (placeDesk). Only read, nothing moves.
+    at(poseFor(1), 1);
+    var skyEl = SPREADS[0].layers[0].L.el, signEl = book.querySelector('.vp > .face.front > .placard-0');
+    var rectIn = function (el) { var r = el.getBoundingClientRect(); return [r.left - o.left, r.top - o.top, r.right - o.left, r.bottom - o.top]; };
+    var skyBox = rectIn(skyEl), signBox = signEl ? rectIn(signEl) : skyBox;
     var turn1 = union(closed, open), turn2 = open;
     for (a = 15; a < 180; a += 15) { p = poseFor(0); p[0] = a; turn1 = union(turn1, at(p, 0)); }
     for (s = 1; s < MS; s++) for (a = 15; a < 180; a += (NS > 3 ? 30 : 15)) { p = poseFor(s); p[s] = a; turn2 = union(turn2, at(p, 0)); }
-    BOX = { closed: closed, open: open, turn1: turn1, turn2: turn2 };
+    BOX = { closed: closed, open: open, turn1: turn1, turn2: turn2, sky: skyBox, sign: signBox };
     // the close-up for each Attractions panel: the panel itself, with some of the book beside it
     // (on a phone held upright, the panel alone, as big as it goes: its print is small)
     var tight = compact && upright, first = null;
@@ -1705,6 +1859,14 @@ PopupBookData.load().then(function (BOOK) {
     measuring = false;
     render();
   }
+  // how big a box of the scene (bw x bh book px) is framed: as big as fits, within the pads
+  function fitK(bw, bh, fz) {
+    var k = Math.min((VW - 2 * PAD_X) / bw, (VH - PAD_T - PAD_B) / bh, 2.6);
+    /* the light book is drawn for the open book's size (setZoom): the shut cover may only come a
+       little closer than that, or it would look soft (the Attractions close-up is drawn sharp) */
+    if (LITE && KCAP) k = Math.min(k, KCAP) + Math.max(0, k - KCAP) * (fz || 0);
+    return k;
+  }
   function placeFit() {
     if (!full || !BOX || measuring) return;
     // mid-turn it frames everything that turn can reach; it only closes in again near the end
@@ -1715,11 +1877,7 @@ PopupBookData.load().then(function (BOOK) {
     var b = lerpBox(lerpBox(lerpBox(BOX.closed, BOX.open, u), BOX.turn1, w1), BOX.turn2, w2);
     var fz = FLAP && FLAP.z > 0 && FLAP.focus ? FLAP.z : 0;
     if (fz) b = lerpBox(b, FLAP.focus, fz);   // in close on the Attractions panel while it is out
-    var bw = b[2] - b[0], bh = b[3] - b[1], H = VH - PAD_T - PAD_B;
-    var k = Math.min((VW - 2 * PAD_X) / bw, H / bh, 2.6);
-    /* the light book is drawn for the open book's size (setZoom): the shut cover may only come a
-       little closer than that, or it would look soft (the Attractions close-up is drawn sharp) */
-    if (LITE && KCAP) k = Math.min(k, KCAP) + Math.max(0, k - KCAP) * fz;
+    var bw = b[2] - b[0], bh = b[3] - b[1], H = VH - PAD_T - PAD_B, k = fitK(bw, bh, fz);
     var tx = (VW - bw * k) / 2 - b[0] * k, ty = PAD_T + (H - bh * k) / 2 - b[1] * k;
     /* With the zoom Z on the stage the whole scene is already drawn Z times as big, around the
        stage's perspective origin (480, 0), so the stage is scaled by k / Z and shifted to match. */
@@ -1755,18 +1913,8 @@ PopupBookData.load().then(function (BOOK) {
       layoutDrawer(D);
     });
   }
-  // the notes strip keeps the height of its tallest page, so the book doesn't jump between pages
-  function fitBand() {
-    var keep = state, h = 0;
-    info.style.minHeight = '';
-    info.setAttribute('aria-live', 'off');
-    for (var s = 0; s <= NS; s++) { state = s; renderInfo(); h = Math.max(h, info.offsetHeight); }
-    state = keep; renderInfo();
-    info.setAttribute('aria-live', 'polite');
-    info.style.minHeight = h + 'px';
-  }
-  /* Every window now gets the framed book (body.full); phones and small windows (compact) put the
-     notes in a card under it. The editor's preview keeps the old split (its tools rely on it). */
+  /* Every window gets the framed book (body.full) with the travel desk round it; phones and small
+     windows are compact. The editor's preview keeps the old split (its tools rely on it). */
   var compact = false, upright = false, lastShape = '';
   function size() {
     var big = !!(BIG && BIG.matches);
@@ -1779,9 +1927,9 @@ PopupBookData.load().then(function (BOOK) {
       PAD_X = compact ? 10 : 28; PAD_T = compact ? 6 : 8;
       upright = compact && window.innerWidth < window.innerHeight;
       document.body.classList.toggle('upright', upright);
-      /* the notes strip keeps its tallest page's height, so the book doesn't jump; a phone held
-         upright instead gives the book a fixed band at the top and the notes scroll under it */
-      if (upright) info.style.minHeight = ''; else fitBand();
+      /* under the book, a band for the day's title (deskBand); a phone held upright gives the book
+         a fixed band at the top instead, and the desk lies under it */
+      PAD_B = deskBand();
       VW = wrap.clientWidth; VH = wrap.clientHeight;
       // the Attractions close-up depends on the phone's way up: measure again when it turns
       var shape = compact ? (upright ? 'tall' : 'wide') : 'big';
@@ -1794,9 +1942,9 @@ PopupBookData.load().then(function (BOOK) {
       }
       setZoom();
       placeFit();
+      placeDesk();
       rotateHint();
     } else {
-      info.style.minHeight = '';
       var k = Math.min(1, wrap.clientWidth / 960);
       fit.style.transform = loupe.length === 3 && !isNaN(loupe[2])
         ? 'scale(' + loupe[0] + ') translate(' + (480 - loupe[1]) + 'px,' + (300 / loupe[0] - loupe[2]) + 'px)' : 'scale(' + k + ')';
@@ -1830,6 +1978,724 @@ PopupBookData.load().then(function (BOOK) {
   // the website's copy: a way back to the tour page (tools/publish_site.py sets <body data-back>)
   var backTo = document.body.getAttribute('data-back');
   if (backTo) { var backLink = document.getElementById('back-link'); backLink.href = backTo; backLink.hidden = false; }
+
+  /* ================= the travel desk =================
+     Round the book, flat paper things lie on the cloth, each with a job (see .desk in the styles):
+     the day's route in big letters under the book, a passport stamp for where you are, the flight
+     path for how far along, the compass to jump to any day, a Ceylon postage stamp to send the day
+     as a postcard, a Sri Lanka sticker to enquire, the ? for the day's plan on ola leaves, ‹ › to
+     turn the page, the guide's tip in a paper bubble, and on a first visit a hand showing the PULL
+     tab and the Attractions bookmark. Built once (buildDesk); placeDesk lays them in the room the
+     book leaves free, once per window size; renderDesk changes their words when the day changes.
+     None of it is touched while the book moves, and none of it is 3D. The editor has no desk. */
+  var DESK = !PopupBookData.edit;
+  var deskEl = document.getElementById('desk'), olaWrap = document.getElementById('ola'), toastEl = document.getElementById('toast');
+  var headerEl = document.querySelector('header');
+  var DK = {}, DL = {}, deskMode = '', deskTfs = 40, bubbleOn = '', stampKey = '', tipHidden = {};
+  var tipTimer = 0, handTimer = 0, toastTimer = 0, pickerFrom = null, olaOpen = false, olaFocus = null, olaT = [];
+  var FINE = !!(window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches);
+  function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  var askPending = DESK && lsGet('popup-ask-seen') !== '1';   // the ?'s own bubble: once per browser
+  /* the page's own size: on a phone window.innerWidth can report more than the screen (the 3D stage
+     reaches past it), so the desk goes by the layout viewport */
+  function pageW() { return document.documentElement.clientWidth || window.innerWidth; }
+  function pageH() { return document.documentElement.clientHeight || window.innerHeight; }
+  function clampN(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function f1(p) { return p[0].toFixed(1) + ' ' + p[1].toFixed(1); }
+  var ENQUIRE_LOCAL = 'On the website this opens the tour’s enquiry form';
+  function enquireHref() { return backTo ? backTo + '#enquire' : '#'; }
+
+  /* ---------- the desk's art: the book's paper style, smooth die-cut white edges ---------- */
+  function cutEdge(d, m) {   // m units of white round the shape, a faint grey line just outside
+    return '<path d="' + d + '" fill="#fff" stroke="#4B5B6B" stroke-opacity=".3" stroke-width="' + (2 * m + 2.2) + '" stroke-linejoin="round"/>' +
+           '<path d="' + d + '" fill="#fff" stroke="#fff" stroke-width="' + 2 * m + '" stroke-linejoin="round"/>';
+  }
+  function circlePath(r) { return 'M' + (-r) + ' 0A' + r + ' ' + r + ' 0 1 0 ' + r + ' 0A' + r + ' ' + r + ' 0 1 0 ' + (-r) + ' 0Z'; }
+  function roundPoly(pts, r) {   // a polygon with its corners rounded off
+    var n = pts.length, d = '';
+    for (var i = 0; i < n; i++) {
+      var p = pts[i], a = pts[(i + n - 1) % n], b = pts[(i + 1) % n];
+      var la = Math.hypot(a[0] - p[0], a[1] - p[1]), lb = Math.hypot(b[0] - p[0], b[1] - p[1]);
+      d += (i ? 'L' : 'M') + f1([p[0] + (a[0] - p[0]) * r / la, p[1] + (a[1] - p[1]) * r / la]) + 'Q' + f1(p) + ' ' + f1([p[0] + (b[0] - p[0]) * r / lb, p[1] + (b[1] - p[1]) * r / lb]);
+    }
+    return d + 'Z';
+  }
+  // a speech bubble's paper: a w x h box with rounded corners and a tail t long on one side ('r', 'b', 't'), its tip near a along that side
+  function bubblePath(w, h, side, a, t) {
+    var r = Math.min(16, h / 2 - 1), b = 11;
+    a = clampN(a, r + b + 2, (side === 'r' ? h : w) - r - b - 2);
+    var d = 'M' + r + ' 0';
+    if (side === 't') d += 'H' + (a - b) + 'L' + (a - 3) + ' ' + (-t) + 'L' + (a + b) + ' 0';
+    d += 'H' + (w - r) + 'Q' + w + ' 0 ' + w + ' ' + r;
+    if (side === 'r') d += 'V' + (a - b) + 'L' + (w + t) + ' ' + (a + 3) + 'L' + w + ' ' + (a + b);
+    d += 'V' + (h - r) + 'Q' + w + ' ' + h + ' ' + (w - r) + ' ' + h;
+    if (side === 'b') d += 'H' + (a + b) + 'L' + (a - 3) + ' ' + (h + t) + 'L' + (a - b) + ' ' + h;
+    return d + 'H' + r + 'Q0 ' + h + ' 0 ' + (h - r) + 'V' + r + 'Q0 0 ' + r + ' 0Z';
+  }
+  var ICONS = {
+    prev: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4.5L7.5 12l7.5 7.5"/></svg>',
+    next: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 4.5l7.5 7.5L9 19.5"/></svg>',
+    again: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 12a7.5 7.5 0 1 0 2.4-5.5"/><path d="M4.5 3.5v4h4"/></svg>'
+  };
+  // the long arrow in the title, with a darker copy under it like the letters' own shadow
+  var TITLE_ARROW = '<svg class="arr" viewBox="0 0 64 26" aria-hidden="true"><g fill="none" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">' +
+    '<path d="M3 14.5H55M45 5.5L57 14.5L45 23.5" stroke="#A88600"/><path d="M3 12H55M45 3L57 12L45 21" stroke="currentColor"/></g></svg>';
+  var PASSPORT_PAPER = '<svg viewBox="-70 -70 140 140" aria-hidden="true">' + cutEdge(circlePath(60), 5) +
+    '<circle r="60" fill="#FFF7E6"/><circle r="57" fill="none" stroke="#EADCC0" stroke-width="1"/></svg>';
+  // the ink: the place round the top, SRI LANKA round the bottom, a plane and the day (or a real date) in the middle
+  function passportInk(top, bottom, mid, sub) {
+    var ts = clampN(116 / (top.length * 0.78 + 1.2), 8, 14.5), bs = clampN(116 / (bottom.length * 0.78 + 1.2), 8, 11);
+    var star = 'M0 -4.2l1.25 2.8 3.05.3-2.3 2 .7 3-2.7-1.6-2.7 1.6.7-3-2.3-2 3.05-.3z';
+    return '<svg viewBox="-70 -70 140 140" aria-hidden="true"><defs><path id="dk-pp-t" d="M-38.5 0A38.5 38.5 0 0 1 38.5 0"/><path id="dk-pp-b" d="M-46.5 0A46.5 46.5 0 0 0 46.5 0"/></defs>' +
+      '<g fill="none" stroke="#2773B7"><circle r="54" stroke-width="3"/><circle r="50" stroke-width="1.1"/><circle r="29" stroke-width="1.8"/></g>' +
+      '<g fill="#2773B7" font-family="Plus Jakarta Sans, sans-serif" font-weight="800" text-anchor="middle">' +
+      '<text font-size="' + ts.toFixed(1) + '" letter-spacing="1.6"><textPath href="#dk-pp-t" startOffset="50%">' + esc(top) + '</textPath></text>' +
+      '<text font-size="' + bs.toFixed(1) + '" letter-spacing="2"><textPath href="#dk-pp-b" startOffset="50%">' + esc(bottom) + '</textPath></text>' +
+      '<path transform="translate(-42.5 2)" d="' + star + '"/><path transform="translate(42.5 2)" d="' + star + '"/>' +
+      '<use href="#dk-plane" x="-10" y="-23" width="20" height="12" style="color:#2773B7"/>' +
+      '<text y="' + (sub ? 6.5 : 9) + '" font-family="Bricolage Grotesque, sans-serif" font-size="' + (mid.length > 7 ? 10.5 : 15) + '" letter-spacing=".4">' + esc(mid) + '</text>' +
+      (sub ? '<text y="18.5" font-size="6.4" letter-spacing="1.5">' + esc(sub) + '</text>' : '') + '</g></svg>';
+  }
+  // the Ceylon postage stamp: a perforated sheet, an elephant against the sun, and a postmark
+  var POSTAGE_SVG = (function () {
+    var holes = '', x, y;
+    for (x = 4; x <= 96.1; x += 8) holes += '<circle cx="' + x + '" cy="0" r="3.2"/><circle cx="' + x + '" cy="124" r="3.2"/>';
+    for (y = 6; y <= 118.1; y += 8) holes += '<circle cx="0" cy="' + y + '" r="3.2"/><circle cx="100" cy="' + y + '" r="3.2"/>';
+    return '<svg viewBox="-4 -4 108 132" aria-hidden="true"><defs><mask id="dk-perf" maskUnits="userSpaceOnUse" x="-4" y="-4" width="108" height="132">' +
+      '<rect width="100" height="124" fill="#fff"/><g fill="#000">' + holes + '</g></mask>' +
+      '<linearGradient id="dk-pg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9ED6F2"/><stop offset=".72" stop-color="#FFF3D2"/></linearGradient></defs>' +
+      '<rect width="100" height="124" fill="#FFFDF7" mask="url(#dk-perf)"/>' +
+      '<rect x="9" y="9" width="82" height="106" fill="#FBF2DC" stroke="#2773B7" stroke-width="1.3"/>' +
+      '<rect x="14" y="26" width="72" height="62" fill="url(#dk-pg)"/>' +
+      '<circle cx="64" cy="44" r="11" fill="#FEDD00"/>' +
+      '<path d="M14 72Q32 61 50 68T86 64V88H14Z" fill="#2BAAE2" fill-opacity=".5"/>' +
+      '<use href="#dk-palm" x="66" y="40" width="22" height="34" style="color:#1F5E99"/>' +
+      '<use href="#dk-elephant" x="17" y="46" width="52" height="36" style="color:#1F5E99"/>' +
+      '<path d="M14 83.5H86" stroke="#2773B7" stroke-width="1"/>' +
+      '<rect x="14" y="26" width="72" height="62" fill="none" stroke="#2773B7" stroke-width=".8"/>' +
+      '<text x="50" y="21" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-weight="800" font-size="10.5" letter-spacing="2.6" fill="#2773B7">CEYLON</text>' +
+      '<text x="50" y="103" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-weight="800" font-size="8.2" letter-spacing="2.2" fill="#2773B7">SRI LANKA</text>' +
+      '<text x="84" y="111.5" text-anchor="end" font-family="Bricolage Grotesque, sans-serif" font-weight="800" font-size="7" fill="#E5603F">10c</text>' +
+      '<g fill="none" stroke="#173A63" stroke-opacity=".5" stroke-width="1.3"><circle cx="90" cy="100" r="16"/><circle cx="90" cy="100" r="12.5"/>' +
+      '<path d="M48 114q5-3.5 10 0t10 0 10 0 10 0 10 0 10 0M52 120q5-3.5 10 0t10 0 10 0 10 0 10 0M56 108q5-3.5 10 0t10 0"/></g></svg>';
+  })();
+  // the Sri Lanka sticker: a hexagon, the sun over an elephant between two palms, the name on a band
+  var STICKER_SVG = (function () {
+    var hex = roundPoly([[30, 0], [90, 0], [120, 52], [90, 104], [30, 104], [0, 52]], 10);
+    var inner = roundPoly([[33.5, 6], [86.5, 6], [113, 52], [86.5, 98], [33.5, 98], [7, 52]], 8);
+    return '<svg viewBox="-10 -10 140 124" aria-hidden="true"><defs><clipPath id="dk-hex"><path d="' + inner + '"/></clipPath>' +
+      '<linearGradient id="dk-hsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2BAAE2"/><stop offset=".8" stop-color="#C4EAF9"/></linearGradient></defs>' +
+      cutEdge(hex, 6) + '<path d="' + hex + '" fill="#FFF7E6"/>' +
+      '<g clip-path="url(#dk-hex)"><rect width="120" height="104" fill="url(#dk-hsky)"/>' +
+      '<circle cx="60" cy="21" r="10" fill="#FEDD00"/><circle cx="60" cy="21" r="14.5" fill="none" stroke="#FEDD00" stroke-opacity=".5" stroke-width="2"/>' +
+      '<path d="M0 44Q20 35 40 40T80 37T120 40V54H0Z" fill="#2773B7" fill-opacity=".45"/>' +
+      '<use href="#dk-palm" x="12" y="14" width="25" height="38" style="color:#1B4F86"/>' +
+      '<use href="#dk-palm" x="84" y="20" width="21" height="32" style="color:#1B4F86"/>' +
+      '<use href="#dk-elephant" x="37" y="24" width="45" height="31" style="color:#1B4F86"/>' +
+      '<rect y="51.5" width="120" height="24" fill="#2773B7"/><path d="M0 53.6H120M0 73.4H120" stroke="#FEDD00" stroke-width="1.1"/>' +
+      '<text x="60" y="68.4" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-weight="800" font-size="12.6" letter-spacing=".6" fill="#fff">SRI LANKA</text>' +
+      '<rect y="75.5" width="120" height="30" fill="#E9D3A4"/><path d="M14 86q8-3 16 0t16 0M70 92q8-3 16 0t16 0" fill="none" stroke="#C9AE78" stroke-width="1.2" stroke-linecap="round"/></g>' +
+      '<path d="' + inner + '" fill="none" stroke="#FFF7E6" stroke-width="1.6"/></svg>';
+  })();
+  // the compass: a paper card with a ring of ticks and N E S W; the rose turns on its own layer
+  var COMPASS_DISC = (function () {
+    var ticks = '';
+    for (var a = 0; a < 360; a += 15) {
+      var r0 = a % 90 ? 42.5 : 40, c = Math.cos(a * Math.PI / 180), s = Math.sin(a * Math.PI / 180);
+      ticks += '<path d="M' + (c * r0).toFixed(1) + ' ' + (s * r0).toFixed(1) + 'L' + (c * 45).toFixed(1) + ' ' + (s * 45).toFixed(1) + '"/>';
+    }
+    return '<svg viewBox="-60 -60 120 120" aria-hidden="true">' + cutEdge(circlePath(52), 5) + '<circle r="52" fill="#FFF7E6"/>' +
+      '<g fill="none" stroke="#2773B7"><circle r="45" stroke-width="1.4"/><circle r="38.5" stroke-width=".6"/><g stroke-width="1">' + ticks + '</g></g>' +
+      '<g font-family="Bricolage Grotesque, sans-serif" font-weight="800" font-size="8.5" fill="#2773B7" text-anchor="middle">' +
+      '<text y="-29">N</text><text x="32" y="3">E</text><text y="35">S</text><text x="-32" y="3">W</text></g></svg>';
+  })();
+  var COMPASS_ROSE = (function () {
+    function pt(a, L, w, c1, c2) {
+      return '<g transform="rotate(' + a + ')"><path d="M0 0L' + (-w) + ' ' + (-w) + 'L0 ' + (-L) + 'Z" fill="' + c1 + '"/><path d="M0 0L' + w + ' ' + (-w) + 'L0 ' + (-L) + 'Z" fill="' + c2 + '"/></g>';
+    }
+    return '<svg class="rose" viewBox="-60 -60 120 120" aria-hidden="true">' +
+      [45, 135, 225, 315].map(function (a) { return pt(a, 19, 4.5, '#BFE6F7', '#2BAAE2'); }).join('') +
+      [90, 180, 270].map(function (a) { return pt(a, 27, 6, '#5BA4DC', '#2773B7'); }).join('') + pt(0, 27, 6, '#F08263', '#D9472B') +
+      '<circle r="4.6" fill="#FEDD00" stroke="#2773B7" stroke-width="1.2"/></svg>';
+  })();
+  // a pointing hand for the first-visit hints (the fingertip at 44%, 7%)
+  var HAND_SVG = '<svg viewBox="0 0 40 48" aria-hidden="true"><path d="M14 22V7a3.5 3.5 0 0 1 7 0v12l.5-1a3.2 3.2 0 0 1 6 1.4V21a3.2 3.2 0 0 1 6 1v2a3 3 0 0 1 5.6 1.4V33c0 7-5 12-12 12h-4c-5 0-8-2.5-10.5-6.5L4.5 31a3.4 3.4 0 0 1 5.4-4L14 31Z" ' +
+    'fill="#fff" stroke="#16365C" stroke-width="2.2" stroke-linejoin="round"/><path d="M21 19.5v5M27.5 21.4v3.6M33.6 24.4v3" stroke="#16365C" stroke-width="1.6" stroke-linecap="round"/></svg>';
+  var TIE_SVG = '<svg viewBox="0 0 50 100" preserveAspectRatio="none" aria-hidden="true"><g fill="none" stroke-linecap="round" vector-effect="non-scaling-stroke">' +
+    [6, 20, 34].map(function (x) { return '<path d="M' + x + ' -4L' + (x + 10) + ' 104" stroke="#6E4219" stroke-width="5" vector-effect="non-scaling-stroke"/><path d="M' + x + ' -4L' + (x + 10) + ' 104" stroke="#B9813F" stroke-width="2.2" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/>'; }).join('') + '</g></svg>';
+  var TAIL_SVG = '<svg viewBox="0 0 44 62" aria-hidden="true"><path d="M6 3C4 20 18 26 15 44" fill="none" stroke="#6E4219" stroke-width="3.4" stroke-linecap="round"/>' +
+    '<path d="M6 3C4 20 18 26 15 44" fill="none" stroke="#B9813F" stroke-width="1.6" stroke-dasharray="2.5 2.5" stroke-linecap="round"/><circle cx="6" cy="4" r="4.4" fill="#6E4219"/>' +
+    '<rect x="9" y="42" width="12" height="17" rx="5.5" fill="#B07A3C" stroke="#5C3510" stroke-width="1.2"/><path d="M11 47H19M11 52H19" stroke="#5C3510" stroke-width=".9"/></svg>';
+
+  /* ---------- building it ---------- */
+  /* the flight path's two shapes: wide, across the cloth above the open book's sky (where there is
+     room); tall, down the left margin */
+  var FLIGHT = {
+    wide: { w: 600, h: 150, d: 'M12 44C92 8 176 18 222 58C262 92 252 132 214 126C176 120 184 72 238 58C304 42 378 100 452 94C514 89 560 52 590 26' },
+    tall: { w: 230, h: 196, d: 'M14 22C64 2 124 8 148 38C168 64 142 94 116 80C92 67 108 34 150 40C196 47 220 100 198 140C186 162 156 176 120 182' }
+  };
+  var FLIGHT_PTS = [], flightShape = '';
+  function buildDesk() {
+    deskEl.innerHTML =
+      '<div class="dk flight" id="dk-flight" role="img"></div>' +
+      '<div class="dk bubble tip" id="dk-tip" hidden></div>' +
+      '<div class="dk passport" id="dk-passport" role="img"><div class="art" style="--rot:0deg">' + PASSPORT_PAPER + '</div><div class="ink" id="dk-ink"></div></div>' +
+      '<div class="dk title" id="dk-title"><span class="kick" id="dk-kick"></span><h2 id="dk-h"></h2></div>' +
+      '<button class="dk arrow prev" id="dk-prev" type="button"><span class="disc"></span><span class="cap" aria-hidden="true"></span></button>' +
+      '<button class="dk arrow next" id="dk-next" type="button"><span class="disc"></span><span class="cap" aria-hidden="true"></span></button>' +
+      '<div class="dk bubble ask" id="dk-ask" aria-hidden="true" hidden><p>Wondering what you can do? <b>' + (FINE ? 'Click' : 'Tap') + ' me!</b></p></div>' +
+      '<button class="dk help" id="dk-help" type="button" aria-haspopup="dialog" aria-label="Today’s plan, and what you can do"><span class="disc"><span>?</span></span><span class="lbl">Today’s plan</span></button>' +
+      '<button class="dk compass lift lbl-up" id="dk-compass" type="button" aria-label="Jump to a day" aria-haspopup="true" aria-expanded="false" aria-controls="dk-picker">' +
+        '<span class="art">' + COMPASS_DISC + COMPASS_ROSE + '</span><span class="lbl">Jump to a day</span></button>' +
+      '<div class="dk picker" id="dk-picker" role="group" aria-label="Jump to a day" hidden></div>' +
+      '<button class="dk postage lift" id="dk-postage" type="button" aria-label="Send this day as a postcard"><span class="art" style="--rot:7deg">' + POSTAGE_SVG + '</span><span class="lbl">Send this day as a postcard</span></button>' +
+      '<a class="dk sticker lift lbl-up" id="dk-sticker" href="' + esc(enquireHref()) + '" aria-label="Enquire about this trip"><span class="art" style="--rot:-8deg">' + STICKER_SVG + '</span><span class="lbl">Enquire about this trip</span></a>' +
+      '<div class="dk hand" id="dk-hand" aria-hidden="true" hidden><div class="fing">' + HAND_SVG + '</div><span class="tag"></span></div>';
+    ['flight', 'tip', 'passport', 'ink', 'title', 'kick', 'h', 'prev', 'next', 'ask', 'help', 'compass', 'picker', 'postage', 'sticker', 'hand']
+      .forEach(function (n) { DK[n] = document.getElementById('dk-' + n); });
+    buildFlight('wide');
+    buildPicker();
+    DK.prev.addEventListener('click', function () { if (state > 0) go(state - 1); });
+    DK.next.addEventListener('click', function () { go(state < NS ? state + 1 : 0); });
+    DK.help.addEventListener('click', function () { askPending = false; openOla(); });
+    DK.compass.addEventListener('click', function () { if (DK.picker.hidden) openPicker(false); else closePicker(true); });
+    DK.picker.addEventListener('click', function (e) {
+      var b = e.target.closest('button[data-go]');
+      if (!b) return;
+      closePicker(false);
+      go(+b.getAttribute('data-go'));
+    });
+    DK.picker.addEventListener('keydown', function (e) {   // ↑ ↓ move along the days, Esc shuts it
+      var bs = Array.prototype.slice.call(DK.picker.querySelectorAll('button')), i = bs.indexOf(document.activeElement);
+      if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closePicker(true); }
+      else if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); e.stopPropagation(); bs[(i + (e.key === 'ArrowDown' ? 1 : bs.length - 1)) % bs.length].focus(); }
+      else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') e.stopPropagation();
+    });
+    DK.postage.addEventListener('click', function () { shareDay(DK.postage); });
+    DK.sticker.addEventListener('click', function (e) { if (!backTo) { e.preventDefault(); toast(ENQUIRE_LOCAL, DK.sticker); } });
+    DK.passport.addEventListener('click', thunk);
+    DK.tip.addEventListener('click', function () { tipHidden[state] = true; hideBubbles(); });
+    DK.ask.addEventListener('click', function () { askPending = false; openOla(); });
+    // a tap anywhere else shuts the day picker; a touch on the book sends the hint's hand away
+    document.addEventListener('pointerdown', function (e) {
+      if (!DK.picker.hidden && !DK.picker.contains(e.target) && !DK.compass.contains(e.target)) closePicker(false);
+      if (!DK.hand.hidden && stage.contains(e.target)) { hideHand(); clearTimeout(handTimer); handTimer = setTimeout(nextHint, 2600); }
+    }, true);
+    // the arrow keys turn the page wherever the focus is (not in the tuning sliders, nor under the ola leaves)
+    document.addEventListener('keydown', function (e) {
+      if (olaOpen || e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || (FLAP && FLAP.open)) return;
+      var t = e.target;
+      if (t === stage || (t && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) || !DK.picker.hidden) return;
+      if (e.key === 'ArrowRight' && state < NS) { e.preventDefault(); go(state + 1); }
+      else if (e.key === 'ArrowLeft' && state > 0) { e.preventDefault(); go(state - 1); }
+    });
+    olaWrap.addEventListener('click', olaClick);
+    olaWrap.addEventListener('keydown', olaKey);
+  }
+  // the flight path: a looping dotted route, one dot per day of the tour
+  function buildFlight(shape) {
+    if (shape === flightShape) return;
+    flightShape = shape;
+    var F = FLIGHT[shape];
+    DK.flight.innerHTML = '<svg viewBox="0 0 ' + F.w + ' ' + F.h + '" preserveAspectRatio="xMinYMid meet" aria-hidden="true">' +
+      '<path class="route" d="' + F.d + '" fill="none" stroke="#FEDD00" stroke-width="3.2" stroke-linecap="round" stroke-dasharray="7 8" opacity=".85"/><g class="dots"></g><g class="now"></g></svg>';
+    var path = DK.flight.querySelector('.route'), L = path.getTotalLength(), html = '';
+    FLIGHT_PTS = [];
+    for (var i = 0; i < TOUR_DAYS; i++) {
+      var p = path.getPointAtLength(L * (0.03 + 0.94 * i / Math.max(1, TOUR_DAYS - 1)));
+      FLIGHT_PTS.push([p.x, p.y]);
+      html += '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="3.6"/>';
+    }
+    DK.flight.querySelector('.dots').innerHTML = html;
+  }
+  function renderFlight(day) {
+    Array.prototype.forEach.call(DK.flight.querySelectorAll('.dots circle'), function (c, i) { c.setAttribute('class', i + 1 < day ? 'past' : i + 1 === day ? 'today' : ''); });
+    var now = DK.flight.querySelector('.now');
+    DK.flight.setAttribute('aria-label', day ? 'Day ' + day + ' of ' + TOUR_DAYS : TOUR_DAYS + ' days');
+    if (!day || !FLIGHT_PTS[day - 1]) { now.innerHTML = '<text x="14" y="44" font-size="10" letter-spacing="2">' + TOUR_DAYS + ' DAYS</text>'; return; }
+    var p = FLIGHT_PTS[day - 1], q = FLIGHT_PTS[Math.min(TOUR_DAYS - 1, day)], o = FLIGHT_PTS[Math.max(0, day - 2)];
+    var ang = Math.atan2(q[1] - o[1], q[0] - o[0]) * 180 / Math.PI, right = p[0] < FLIGHT[flightShape].w - 80;
+    now.innerHTML = '<circle cx="' + p[0].toFixed(1) + '" cy="' + p[1].toFixed(1) + '" r="10" fill="#FEDD00" stroke="#fff" stroke-width="2.5"/>' +
+      '<g transform="translate(' + f1(p) + ') rotate(' + ang.toFixed(1) + ')"><use href="#dk-plane" x="-7" y="-4.2" width="14" height="8.4" style="color:#16365C"/></g>' +
+      '<text x="' + (p[0] + (right ? 17 : -17)).toFixed(1) + '" y="' + (p[1] + 0.5).toFixed(1) + '" font-size="13" letter-spacing="2.2" text-anchor="' + (right ? 'start' : 'end') + '">DAY ' + day + '</text>' +
+      '<text x="' + (p[0] + (right ? 17 : -17)).toFixed(1) + '" y="' + (p[1] + 12.5).toFixed(1) + '" font-size="9" letter-spacing="1.8" fill-opacity=".72" text-anchor="' + (right ? 'start' : 'end') + '">OF ' + TOUR_DAYS + '</text>';
+  }
+  function buildPicker() {
+    var html = '<h3>Jump to a day</h3><button type="button" data-go="0"><span class="d">Cover</span><span>' + esc(TOUR_NAME) + '</span></button>';
+    SPREADS.forEach(function (sp, i) { html += '<button type="button" data-go="' + (i + 1) + '"><span class="d">Day ' + sp.day + '</span><span>' + esc(infoFor(i + 1).h) + '</span></button>'; });
+    var last = SPREADS.length ? SPREADS[SPREADS.length - 1].day : 0;
+    if (last < TOUR_DAYS) html += '<p class="soon">Days ' + (last + 1) + '–' + TOUR_DAYS + ' are still being made.</p>';
+    DK.picker.innerHTML = html;
+  }
+
+  /* ---------- where everything goes: once per window size ---------- */
+  function deskBand() {   // the room under the book for the day's title (6 px, as before, without a desk)
+    if (!DESK) return 6;
+    var W = pageW(), Hh = pageH();
+    if (compact && upright) { deskTfs = clampN(Math.round(W * 0.075), 24, 40); return 6; }
+    if (compact) { deskTfs = 19; return 42; }
+    deskTfs = clampN(Math.round(Hh * 0.062), 28, 64);
+    return Math.round(deskTfs + 28);
+  }
+  function rectOf(b) {   // where a box of the scene (book px) lands on the screen once framed (as placeFit)
+    var bw = b[2] - b[0], bh = b[3] - b[1], k = fitK(bw, bh, 0), wr = wrap.getBoundingClientRect();
+    var x = wr.left + (VW - bw * k) / 2, y = wr.top + PAD_T + (VH - PAD_T - PAD_B - bh * k) / 2;
+    return [x, y, x + bw * k, y + bh * k];
+  }
+  function put(el, x, y, w, h) {
+    var s = el.style;
+    s.left = Math.round(x) + 'px'; s.top = Math.round(y) + 'px';
+    if (w != null) s.width = Math.round(w) + 'px';
+    if (h != null) s.height = Math.round(h) + 'px';
+  }
+  function arrowAt(el, x, y, aw, band) { put(el, x, y, aw); el.style.setProperty('--aw', Math.round(aw) + 'px'); el.classList.toggle('band', !!band); }
+  function helpAt(x, y, hw) { put(DK.help, x, y, hw, hw); DK.help.style.setProperty('--hw', Math.round(hw) + 'px'); DL.help = { x: x, y: y, w: hw }; }
+  function placeDesk() {
+    if (!DESK || !full || !BOX || !DK.title) return;
+    var W = pageW(), Hh = pageH();
+    var open = rectOf(BOX.open), zone = [BOX.closed, BOX.turn1, BOX.turn2].map(rectOf).reduce(union, open);
+    var ML = zone[0], MR = W - zone[2], M = Math.min(ML, MR), oh = open[3] - open[1];
+    var mode = compact ? (upright ? 'tall' : 'side') : M >= 150 ? 'desk' : 'slim';
+    deskMode = mode;
+    document.body.setAttribute('data-desk', mode);
+    closePicker(false); hideHand();
+    DL = {};
+    var on = {}, hr = headerEl.getBoundingClientRect(), hb = hr.bottom, sc = 1, aw, ay, hw, c, pd, bm, below = hb + 10;
+    // the open day's sky card and sign, on screen (measured in book px once, see measure)
+    var ko = fitK(BOX.open[2] - BOX.open[0], BOX.open[3] - BOX.open[1], 0);
+    function onScreen(b) { return [open[0] + (b[0] - BOX.open[0]) * ko, open[1] + (b[1] - BOX.open[1]) * ko, open[0] + (b[2] - BOX.open[0]) * ko, open[1] + (b[3] - BOX.open[1]) * ko]; }
+    var sky = onScreen(BOX.sky), sign = onScreen(BOX.sign);
+    // the stamps in the corner beside the sign, where there is room: the passport stamp, and the
+    // postage stamp overlapping it a little (or only the passport stamp in a tight corner)
+    function cornerStamps() {
+      var cw = W - sign[2] - 24, ch = Math.min(sky[1] + 20, help0());   // (the sign sways a little as it pops up)
+      if (cw < 100 || ch < 100) return;
+      var pd = clampN(cw * 0.56, 96, 132), pw = clampN(cw * 0.38, 72, 98);
+      if (cw < pd * 0.86 + pw + 8) { put(DK.passport, W - pd - 16, 12, pd, pd); on.passport = 1; return; }
+      put(DK.passport, W - pw - 20 - pd * 0.86, 12, pd, pd); on.passport = 1;
+      put(DK.postage, W - pw - 20, 22, pw, pw * 132 / 108); on.postage = 1;
+    }
+    function help0() { return DL.help ? DL.help.y - 12 : Hh; }
+    if (mode === 'desk' || mode === 'slim') {
+      /* the flight path: across the cloth above the open day's sky if there is room there (the pages
+         sweep through it as they turn, so it lies there only while a day is open), else down the left margin */
+      var fx0 = hr.right + 22, fx1 = Math.min(sky[0] + (sky[2] - sky[0]) * 0.6, sign[0] - 40), fy1 = sky[1] - 10;
+      var fh = Math.min(fy1 - 10, 170), fw = Math.min(fx1 - fx0, fh * 4.2);
+      if (fw >= 220 && fh >= 64) { buildFlight('wide'); put(DK.flight, fx0, 10 + (fy1 - 10 - fh) / 2, fw, fh); on.flight = 1; }
+      else if (mode === 'desk') {
+        buildFlight('tall');
+        fw = Math.min(ML - 40, 236); fh = fw * 196 / 230;
+        put(DK.flight, 20, hb + 8, fw, fh); on.flight = 1; below = hb + 8 + fh + 10;
+      }
+    }
+    if (mode === 'desk') {   // a big window with room each side of the book
+      sc = clampN(Math.min(M / 215, Hh / 742), 0.78, 1.3);
+      c = 96 * sc; put(DK.compass, 22 * sc, Hh - c - 20 * sc, c, c); on.compass = 1;
+      aw = 50 * sc; ay = open[1] + 0.7 * oh - aw / 2;
+      arrowAt(DK.prev, ML - aw - 18 * sc, ay, aw); arrowAt(DK.next, zone[2] + 18 * sc, ay, aw); on.prev = on.next = 1;
+      DL.tip = { side: 'r', t: 16, ax: ML - 10, ay: open[1] + 0.3 * oh, w: Math.min(ML - 46, 250 * sc), fs: 14 * clampN(sc, 0.95, 1.15), minY: below, maxY: ay - 14 };
+      cornerStamps();
+      hw = 62 * sc; helpAt(W - MR / 2 - hw / 2 + 8 * sc, open[1] + 0.46 * oh - hw / 2, hw); on.help = 1;
+      var sw = 122 * sc; put(DK.sticker, W - sw - 18 * sc, Hh - sw * 124 / 140 - 14 * sc, sw, sw * 124 / 140); on.sticker = 1;
+      DL.title = { cx: W / 2, cy: Hh - PAD_B / 2, max: W - 2 * (Math.max(22 * sc + c, 18 * sc + sw) + 24) };
+      DL.askW = Math.min(MR - 30, 214 * sc); DL.askFs = 14 * Math.min(1.1, sc);
+    } else if (mode === 'slim') {   // a big window the book fills edge to edge: the desk lives in the title's band
+      bm = Hh - PAD_B / 2;
+      c = Math.min(PAD_B - 8, 66); put(DK.compass, 16, bm - c / 2, c, c); on.compass = 1;
+      hw = Math.min(PAD_B - 14, 56); helpAt(W - hw - 20, bm - hw / 2, hw); on.help = 1;
+      DL.title = { cx: W / 2, cy: bm, max: W - 2 * (c + 44) };
+      if (M >= 70) { aw = 44; ay = open[1] + 0.7 * oh - aw / 2; arrowAt(DK.prev, ML - aw - 12, ay, aw); arrowAt(DK.next, zone[2] + 12, ay, aw); }
+      else { aw = Math.min(PAD_B - 18, 46); DL.band = { aw: aw, cy: bm }; DL.title.max -= 2 * (aw + 22); }
+      on.prev = on.next = 1;
+      cornerStamps();
+      DL.askW = 220; DL.askFs = 13.5;
+    } else if (mode === 'side') {   // a phone on its side: the title in a slim band, the arrows beside the book
+      bm = Hh - PAD_B / 2;
+      hw = 44; helpAt(W - hw - 14, Hh - hw - 10, hw); on.help = 1;   // (in the corner, clear of the book)
+      if (MR >= 92) { pd = Math.min(MR - 20, 84); put(DK.passport, W - pd - 10, 8, pd, pd); on.passport = 1; }
+      DL.title = { cx: W / 2, cy: bm, max: W - 2 * (hw + 30) };
+      if (M >= 60) { aw = 44; ay = open[1] + 0.5 * oh - aw / 2; arrowAt(DK.prev, ML - aw - 8, ay, aw); arrowAt(DK.next, zone[2] + 8, ay, aw); }
+      else { aw = 34; DL.band = { aw: aw, cy: bm }; DL.title.max -= 2 * (aw + 18); }
+      on.prev = on.next = 1;
+      DL.askW = 220; DL.askFs = 13;
+    } else {   // a phone held upright: the book in its band at the top, the desk under it
+      var top = wrap.getBoundingClientRect().bottom;
+      pd = clampN(W * 0.22, 72, 112); put(DK.passport, W - pd - 12, top + 10, pd, pd); on.passport = 1;
+      aw = 52; hw = 62;
+      var rowY = Hh - 22 - 20 - aw;   // the arrows' discs, their captions under them
+      arrowAt(DK.prev, 22, rowY, aw); arrowAt(DK.next, W - 22 - aw, rowY, aw); on.prev = on.next = 1;
+      helpAt(W / 2 - hw / 2, rowY + aw / 2 - hw / 2, hw); on.help = 1;
+      DL.title = { tall: true, x: 20, y: top + 18, w: W - 20 - pd - 26 };
+      DL.tip = { side: 't', t: 14, x: 16, w: W - 32, ax: 54, fs: 14, maxY: rowY - 18 };
+      DL.askW = Math.min(250, W - 40); DL.askFs = 14;
+    }
+    DL.ask = { side: 'b', t: 14, ax: DL.help.x + DL.help.w * 0.45, ay: DL.help.y - 4, w: DL.askW, fs: DL.askFs, minY: 6, maxY: DL.help.y };
+    ['flight', 'passport', 'postage', 'sticker', 'compass', 'prev', 'next', 'help'].forEach(function (n) { DK[n].hidden = !on[n]; });
+    placeTitle();
+    if (bubbleOn) showBubble(bubbleOn, true);
+  }
+  // the title: centred in its band (tall: left, under the book), shrunk to fit if a route is long
+  function placeTitle() {
+    var T = DL.title, st = DK.title.style;
+    if (!T) return;
+    DK.h.style.fontSize = deskTfs + 'px';
+    if (T.tall) {
+      st.transform = 'none'; put(DK.title, T.x, T.y, T.w);
+      if (DK.h.scrollWidth > T.w) DK.h.style.fontSize = Math.max(16, deskTfs * T.w / DK.h.scrollWidth) + 'px';
+      DL.titleBottom = T.y + DK.title.offsetHeight;
+      return;
+    }
+    st.width = ''; st.transform = 'translate(-50%, -50%)'; put(DK.title, T.cx, T.cy);
+    var w = DK.title.offsetWidth;
+    if (w > T.max) { DK.h.style.fontSize = Math.max(deskTfs * 0.45, deskTfs * T.max / w) + 'px'; w = DK.title.offsetWidth; }
+    if (DL.band) {   // no room beside the book: ‹ › flank the title
+      var a = DL.band.aw;
+      arrowAt(DK.prev, T.cx - w / 2 - a - 18, DL.band.cy - a / 2, a, true);
+      arrowAt(DK.next, T.cx + w / 2 + 18, DL.band.cy - a / 2, a, true);
+    }
+  }
+
+  /* ---------- the open day's words ---------- */
+  function setArrow(el, show, cap, label, icon) {
+    el.classList.toggle('off', !show);
+    el.setAttribute('aria-label', label);
+    if (FINE) el.title = label;
+    el.querySelector('.cap').textContent = cap;
+    var disc = el.querySelector('.disc');
+    if (disc.getAttribute('data-icon') !== icon) { disc.innerHTML = ICONS[icon]; disc.setAttribute('data-icon', icon); }
+  }
+  function renderDesk(d) {
+    if (!DESK || !DK.title) return;
+    var parts = d.h.split('→'), html = esc(parts[0].trim());
+    if (parts.length > 1) html += ' <span class="sr-only">to</span>' + TITLE_ARROW + ' ' + esc(parts.slice(1).join('→').trim());   // (spaces: a narrow title may wrap there)
+    DK.kick.textContent = d.k;
+    if (DK.h.innerHTML !== html) {
+      DK.h.innerHTML = html;
+      DK.title.classList.remove('in'); void DK.title.offsetWidth; DK.title.classList.add('in');
+      placeTitle();
+    }
+    var prevDay = state > 1 ? SPREADS[state - 2].day : 0, nextDay = state < NS ? SPREADS[state].day : 0;
+    setArrow(DK.prev, state > 0, state === 1 ? 'Close' : 'Day ' + prevDay, state === 1 ? 'Close the book' : 'Back to Day ' + prevDay, 'prev');
+    if (!state) setArrow(DK.next, true, 'Open', 'Open the book', 'next');
+    else if (nextDay) setArrow(DK.next, true, 'Day ' + nextDay, 'Turn to Day ' + nextDay, 'next');
+    else setArrow(DK.next, true, 'Start again', 'Start again: back to the cover', 'again');
+    renderFlight(d.day);
+  }
+  function tipFor(s) { var sd = s ? SPREADS[s - 1].data : null, t = sd && sd.tip; return t && t.text ? t : null; }
+  function dayDate(day) {   // a real date for day n, only if the book has the client's start date (data startDate, YYYY-MM-DD)
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec((BOOK && BOOK.startDate) || '');
+    if (!m || !day) return '';
+    var t = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3] + day - 1));
+    return t.getUTCDate() + ' ' + 'JAN FEB MAR APR MAY JUN JUL AUG SEP OCT NOV DEC'.split(' ')[t.getUTCMonth()] + ' ' + t.getUTCFullYear();
+  }
+  // the passport stamp: stamped afresh (thunk) when a day opens
+  function stampDay() {
+    var d = infoFor(state), place = String(d.place || '').toUpperCase();
+    var top = d.day ? place || 'SRI LANKA' : 'SRI LANKA', bottom = d.day ? (place === 'SRI LANKA' ? 'CEYLON' : 'SRI LANKA') : 'AYUBOWAN';
+    var mid = d.day ? dayDate(d.day) || 'DAY ' + d.day : TOUR_DAYS + ' DAYS', sub = d.day ? String(d.kicker || '').toUpperCase() : 'WELCOME';
+    var key = [top, bottom, mid, sub].join('|');
+    if (key === stampKey) return;
+    stampKey = key;
+    DK.ink.innerHTML = passportInk(top, bottom, mid, sub);
+    DK.ink.style.setProperty('--ink-rot', (-15 + (d.day * 37) % 11) + 'deg');
+    DK.passport.setAttribute('aria-label', 'Passport stamp: ' + (d.day ? (d.place || 'Sri Lanka') + ', day ' + d.day : 'Sri Lanka'));
+    thunk();
+  }
+  function thunk() {
+    if (DK.passport.hidden) return;
+    DK.ink.classList.remove('thunk'); DK.passport.classList.remove('jolt');
+    void DK.ink.offsetWidth;
+    DK.ink.classList.add('thunk'); DK.passport.classList.add('jolt');
+  }
+
+  /* ---------- bubbles: the guide's tip, and the ?'s own on a first visit; one at a time ---------- */
+  function hideBubbles() { DK.ask.hidden = DK.tip.hidden = true; bubbleOn = ''; }
+  function showBubble(kind, again) {
+    var el = kind === 'ask' ? DK.ask : DK.tip, L = DL[kind], W = pageW();
+    if (!again) hideBubbles();
+    if (kind === 'tip') {
+      var t = tipFor(state);
+      if (!t || tipHidden[state]) { el.hidden = true; return; }
+      if (el.getAttribute('data-for') !== String(state)) {
+        el.innerHTML = '<p>' + esc(t.text) + (t.by ? '<span class="by">' + esc(t.by) + '</span>' : '') + '</p>';
+        el.setAttribute('data-for', state);
+      }
+    }
+    var bg = el.querySelector('svg.bg');
+    if (bg) bg.parentNode.removeChild(bg);
+    if (!L || L.w < 120) { el.hidden = true; if (bubbleOn === kind) bubbleOn = ''; return; }
+    el.hidden = false; el.style.visibility = 'hidden';
+    el.style.width = Math.round(L.w) + 'px';
+    el.style.setProperty('--bfs', L.fs.toFixed(1) + 'px');
+    var w = el.offsetWidth, h = el.offsetHeight, x, y, a, ox, oy, minY = L.minY || 0;
+    if (L.side === 'r') { x = L.ax - L.t - w; y = clampN(L.ay - h * 0.4, minY, L.maxY - h); a = L.ay - y; ox = w + L.t; oy = a; }
+    else if (L.side === 'b') { x = clampN(L.ax - w * 0.68, 12, W - w - 12); y = L.ay - L.t - h; a = L.ax - x; ox = a; oy = h + L.t; }
+    else { x = L.x; y = (DL.titleBottom || 0) + 6 + L.t; minY = y; a = L.ax; ox = a; oy = -L.t; }
+    // no room for it on this screen (the tip is on the ola leaves too)
+    if (x < 8 || y < minY - 0.5 || y + h > L.maxY + 0.5) { el.hidden = true; el.style.visibility = ''; if (bubbleOn === kind) bubbleOn = ''; return; }
+    var d = bubblePath(w, h, L.side, a, L.t);
+    el.insertAdjacentHTML('afterbegin', '<svg class="bg" width="' + w + '" height="' + h + '" aria-hidden="true">' + cutEdge(d, 5) + '<path d="' + d + '" fill="#FFF8EC"/></svg>');
+    put(el, x, y);
+    el.style.setProperty('--ox', ox.toFixed(0) + 'px'); el.style.setProperty('--oy', oy.toFixed(0) + 'px');
+    el.style.visibility = '';
+    if (!again) { el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
+    bubbleOn = kind;
+  }
+
+  /* ---------- first-visit hints: a hand at the PULL tab, then at the Attractions bookmark ---------- */
+  var HINTS = [
+    { key: 'popup-hint-pull', label: 'Pull me', cls: 'pull', rot: -28,
+      when: function (sp) { return sp.pulls; },
+      at: function (sp) {
+        var el = sp.layers[0].L.el && sp.layers[0].L.el.children[0].querySelector('.pulltab'), r = el && el.getBoundingClientRect();
+        return r && r.width ? [r.left + r.width * 0.32, r.top + r.height * 0.62] : null;
+      } },
+    { key: 'popup-hint-attr', label: 'Things to do', cls: 'tap', rot: -12,
+      when: function (sp, si) { return !!DRAWERS[si]; },
+      at: function (sp, si) {
+        var el = DRAWERS[si].el.children[0].querySelector('.attrtab'), r = el && el.getBoundingClientRect();
+        return r && r.width ? [r.right - r.width * 0.3, r.top + r.height * 0.34] : null;
+      } }
+  ];
+  function nextHint() {
+    if (!DESK || !state || busy || olaOpen || (FLAP && FLAP.open) || !DK.picker.hidden) return;
+    var sp = SPREADS[state - 1], si = state - 1;
+    for (var i = 0; i < HINTS.length; i++) {
+      var hn = HINTS[i];
+      if (lsGet(hn.key) === '1' || !hn.when(sp, si)) continue;
+      var p = hn.at(sp, si);
+      if (!p || p[0] < 4 || p[1] < 4 || p[0] > pageW() - 4 || p[1] > pageH() - 4) continue;
+      lsSet(hn.key, '1');
+      showHand(p, hn);
+      clearTimeout(handTimer);
+      handTimer = setTimeout(function () { hideHand(); handTimer = setTimeout(nextHint, 700); }, 5600);
+      return;
+    }
+  }
+  function showHand(p, hn) {
+    var s = compact ? 34 : 42, el = DK.hand;
+    el.style.setProperty('--hs', s + 'px');
+    el.style.setProperty('--unrot', -hn.rot + 'deg');
+    el.className = 'dk hand ' + hn.cls;
+    el.querySelector('.tag').textContent = hn.label;
+    put(el, p[0] - s * 0.44, p[1] - s * 1.2 * 0.07);
+    el.style.transform = 'rotate(' + hn.rot + 'deg)';
+    el.hidden = false;
+    requestAnimationFrame(function () { el.classList.add('on'); });
+  }
+  function hideHand() { if (DK.hand) { DK.hand.classList.remove('on'); DK.hand.hidden = true; } }
+
+  /* ---------- when the day changes ---------- */
+  function deskLeave() {   // a page starts to turn: the day's bubbles and hints go, and the picker
+    if (!DESK) return;
+    clearTimeout(tipTimer); clearTimeout(handTimer);
+    if (bubbleOn === 'ask') askPending = false;
+    hideBubbles(); hideHand(); closePicker(false);
+    DK.flight.classList.add('away');   // the turning pages sweep through where it lies
+  }
+  function deskSettle(first) {   // a day lies open (or the book is shut): stamp it, then its tip and hints
+    if (!DESK) return;
+    stampDay();
+    DK.flight.classList.toggle('away', !state);   // over the shut cover there is no journey yet (and no room)
+    clearTimeout(tipTimer); clearTimeout(handTimer);
+    if (askPending) {
+      tipTimer = setTimeout(function () {
+        if (!askPending || olaOpen) return;
+        askPending = false; lsSet('popup-ask-seen', '1');
+        showBubble('ask');
+        if (state) tipTimer = setTimeout(function () { if (bubbleOn === 'ask' || !bubbleOn) showBubble('tip'); }, 9000);
+      }, first ? 800 : 500);
+    } else if (state) tipTimer = setTimeout(function () { if (!olaOpen) showBubble('tip'); }, first ? 700 : 1300);
+    if (state) handTimer = setTimeout(nextHint, first ? 2400 : 2600);
+  }
+  function deskFlap(on) {   // the Attractions close-up has the screen; the desk fades away under it
+    if (!DESK) return;
+    document.body.classList.toggle('flap-zoom', on);
+    if (on) { hideHand(); closePicker(false); }
+  }
+
+  /* ---------- the compass's day picker ---------- */
+  function openPicker(centred) {
+    if (!DESK) return;
+    hideHand();
+    Array.prototype.forEach.call(DK.picker.querySelectorAll('button[data-go]'), function (b) { b.setAttribute('aria-current', +b.getAttribute('data-go') === state ? 'true' : 'false'); });
+    DK.picker.hidden = false;
+    var W = pageW(), pw = DK.picker.offsetWidth, ph = DK.picker.offsetHeight, x, y, ox, useCompass = !centred && !DK.compass.hidden;
+    if (useCompass) {
+      var r = DK.compass.getBoundingClientRect();
+      x = clampN(r.left, 10, W - pw - 10); y = r.top - ph - 16;
+      if (y < 10) y = Math.min(r.bottom + 16, pageH() - ph - 10);
+      ox = r.left + r.width / 2 - x;
+    } else {
+      x = (W - pw) / 2; y = Math.max(10, (DL.help ? DL.help.y : pageH() - 20) - ph - 16); ox = pw / 2;
+    }
+    put(DK.picker, x, y);
+    DK.picker.style.setProperty('--ox', ox.toFixed(0) + 'px');
+    DK.picker.classList.remove('pop'); void DK.picker.offsetWidth; DK.picker.classList.add('pop');
+    pickerFrom = useCompass ? DK.compass : DK.help;
+    DK.compass.setAttribute('aria-expanded', 'true');
+    var cur = DK.picker.querySelector('[aria-current="true"]') || DK.picker.querySelector('button');
+    if (cur) cur.focus({ preventScroll: true });
+  }
+  function closePicker(focusBack) {
+    if (!DK.picker || DK.picker.hidden) return;
+    DK.picker.hidden = true;
+    DK.compass.setAttribute('aria-expanded', 'false');
+    if (focusBack && pickerFrom && !pickerFrom.hidden) pickerFrom.focus({ preventScroll: true });
+  }
+
+  /* ---------- the postage stamp: send this day as a postcard ---------- */
+  function shareLink() {
+    var u = new URL(location.href);
+    u.search = ''; u.hash = '';
+    if (state) u.searchParams.set('state', state);
+    return u.toString();
+  }
+  function shareDay(from) {
+    var d = infoFor(state), url = shareLink();
+    var title = d.day ? 'Sri Lanka, day ' + d.day + ': ' + d.h.replace(/\s*→\s*/g, ' to ') : 'Sri Lanka, as a pop-up book';
+    var data = { title: title, text: title + ' (a page of our pop-up itinerary)', url: url };
+    if (navigator.share && (!navigator.canShare || navigator.canShare(data))) {
+      navigator.share(data).catch(function (e) { if (!e || e.name !== 'AbortError') copyLink(url, from); });
+      return;
+    }
+    copyLink(url, from);
+  }
+  function copyLink(url, from) {
+    function done() { toast('Link copied', from); }
+    function fallback() { if (legacyCopy(url)) done(); else toast('Couldn’t copy the link: copy it from the address bar', from); }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, fallback);
+    else fallback();
+  }
+  function legacyCopy(text) {
+    var ta = document.createElement('textarea'), ok = false;
+    ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0'; ta.style.top = '0';
+    document.body.appendChild(ta); ta.select();
+    try { ok = document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    return ok;
+  }
+  function toast(msg, from) {
+    var el = toastEl, W = pageW();
+    el.textContent = msg; el.hidden = false; el.classList.remove('show');
+    var w = el.offsetWidth, h = el.offsetHeight, r = from && from.getBoundingClientRect ? from.getBoundingClientRect() : null, x, y;
+    if (r && r.width) {
+      x = clampN(r.left + r.width / 2 - w / 2, 10, W - w - 10);
+      y = r.top > pageH() / 2 ? r.top - h - 12 : r.bottom + 12;   // above a thing low on the screen, else under it
+    } else { x = (W - w) / 2; y = pageH() - h - 90; }
+    put(el, x, y);
+    requestAnimationFrame(function () { el.classList.add('show'); });
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.classList.remove('show'); }, 2400);
+  }
+
+  /* ---------- the ? : the day's plan on ola leaves ---------- */
+  function olaHTML(sheet) {
+    var d = infoFor(state), sp = d.sp, leaves = [], n = 0;
+    function leaf(cls, lab, body) {
+      var fx = sheet ? 0 : [-3, 4, -1, 5, -4, 2][n % 6], fr = sheet ? 0 : [-0.5, 0.4, -0.25, 0.5, -0.4, 0.2][n % 6];
+      leaves.push('<li class="ola-leaf ' + cls + '" style="--i:' + n + ';--fx:' + fx + 'px;--fr:' + fr + 'deg"><span class="ol-lab">' + lab + '</span><span class="ol-txt">' + body + '</span></li>');
+      n++;
+    }
+    if (state) {
+      d.plan.forEach(function (x) {
+        var lab = String(x[0] || ''), opt = /option/i.test(lab), stay = /stay|overnight|night/i.test(lab);
+        leaf((opt ? 'opt' : '') + (stay ? ' stay' : ''), esc(lab), '<b>' + esc(x[1]) + '</b>' + (x[2] ? '<span class="ol-det">' + esc(x[2]) + '</span>' : ''));
+      });
+      if (!d.plan.length) leaf('none', 'Today', '<span class="ol-det">This day’s plan is still being written.</span>');
+      var t = tipFor(state);
+      if (t) leaf('tip', 'Tip', '“' + esc(t.text) + '”' + (t.by ? '<span class="ol-by">' + esc(t.by) + '</span>' : ''));
+      // what to try on this page: the day's own words (data notes.text), or made from what it has; and buttons that do it
+      var acts = [], words = [];
+      if (sp.pulls) { acts.push(['pull', 'Pull the tab']); words.push('pull the PULL tab'); }
+      if (sp.flaps) { acts.push(['flap', 'Lift the flap']); words.push('lift the flap'); }
+      acts.push(['wave', 'Wave the sign']); words.push('tap the Day ' + d.day + ' sign');
+      if (DRAWERS[state - 1]) { acts.push(['attr', 'Attractions']); words.push('open Attractions on the right for everything you can do today'); }
+      var how = d.p || (words.length > 1 ? words.slice(0, -1).join(', ') + ' or ' + words[words.length - 1] : words[0]);
+      how = how.charAt(0).toUpperCase() + how.slice(1) + (/[.!?]$/.test(how) ? '' : '.');
+      leaf('how', 'In the book', esc(how) + '<span class="ol-acts">' + acts.map(function (a) { return '<button type="button" data-act="' + a[0] + '">' + a[1] + '</button>'; }).join('') + '</span>');
+      leaf('how', 'Turn', 'Tap or swipe the page, or use ‹ › and the arrow keys.');
+    } else leaf('how', 'Open', 'Tap the book, swipe it, or use the › arrow. Each page is one day of the trip.');
+    leaf('how', 'On the desk', 'The compass jumps to any day, the postage stamp sends this page as a postcard, the sticker opens the enquiry form.');
+    return '<div class="ola-tie" aria-hidden="true">' + TIE_SVG + '</div><div class="ola-thread" aria-hidden="true"></div>' +
+      '<div class="ola-board top"><span class="ok">' + esc(d.k) + '</span><h2 id="ola-h">' + esc(d.h) + '</h2>' +
+        '<button type="button" class="ola-x" aria-label="Close the plan">×</button></div>' +
+      '<ol class="ola-leaves" aria-label="' + (state ? 'The day’s plan' : 'How it works') + '">' + leaves.join('') + '</ol>' +
+      '<div class="ola-board bottom"><span class="ola-tail" aria-hidden="true">' + TAIL_SVG + '</span>' +
+        '<button type="button" data-act="days">Jump to a day</button><button type="button" data-act="share">Send as a postcard</button>' +
+        '<a data-act="enquire" href="' + esc(enquireHref()) + '">Enquire about this trip</a></div>';
+  }
+  function openOla() {
+    if (!DESK || olaOpen) return;
+    deskLeave(); clearTimeout(tipTimer);
+    var sheet = deskMode === 'tall';
+    olaT.forEach(clearTimeout); olaT = [];
+    olaWrap.className = 'ola-wrap' + (sheet ? ' sheet' : '');
+    olaWrap.innerHTML = '<div class="ola-back" data-close></div><div class="ola" role="dialog" aria-modal="true" aria-labelledby="ola-h" tabindex="-1">' + olaHTML(sheet) + '</div>';
+    olaWrap.hidden = false;
+    olaOpen = true; olaFocus = document.activeElement;
+    /* tied up: every leaf (and the bottom cover) stacked just under the top cover, each peeking out
+       a little below the one before; the cord wound round the bundle */
+    var ola = olaWrap.querySelector('.ola'), topB = ola.querySelector('.ola-board.top'), botB = ola.querySelector('.ola-board.bottom');
+    var stack = ola.querySelectorAll('.ola-leaf'), base = topB.offsetTop + topB.offsetHeight, nL = stack.length;
+    Array.prototype.forEach.call(stack, function (el, i) {
+      el.style.setProperty('--dy', (base + 3 * (i + 1) - el.offsetTop - el.offsetHeight - 8).toFixed(1) + 'px');
+      el.style.zIndex = nL - i;
+    });
+    botB.style.setProperty('--dy', (base + 3 * nL - 6 - botB.offsetTop).toFixed(1) + 'px');
+    botB.style.setProperty('--i', nL);
+    var tie = ola.querySelector('.ola-tie'), th = ola.querySelector('.ola-thread');
+    tie.style.top = (topB.offsetTop - 6) + 'px';
+    tie.style.height = (topB.offsetHeight + 3 * nL + botB.offsetHeight + 6) + 'px';
+    th.style.top = (topB.offsetTop + topB.offsetHeight / 2) + 'px';
+    th.style.height = (botB.offsetTop + botB.offsetHeight / 2 - topB.offsetTop - topB.offsetHeight / 2) + 'px';
+    ola.querySelector('.ola-x').focus({ preventScroll: true });
+    if (reduceMotion) { olaWrap.classList.add('st-in', 'st-loose', 'st-fan'); return; }
+    void olaWrap.offsetWidth;
+    olaWrap.classList.add('st-in');                                                                   // it slides in, tied
+    olaT.push(setTimeout(function () { olaWrap.classList.add('st-loose'); }, 520));                    // the cord loosens
+    olaT.push(setTimeout(function () { olaWrap.classList.add('st-fan'); }, 700));                      // the leaves fan out
+  }
+  function closeOla() {
+    if (!olaOpen) return;
+    olaOpen = false;
+    olaT.forEach(clearTimeout); olaT = [];
+    olaWrap.classList.add('st-closing');
+    olaWrap.classList.remove('st-fan');
+    var t = reduceMotion ? 0 : 260;
+    olaT.push(setTimeout(function () { olaWrap.classList.remove('st-loose', 'st-in'); }, t));
+    olaT.push(setTimeout(function () { olaWrap.hidden = true; olaWrap.innerHTML = ''; olaWrap.className = 'ola-wrap'; }, reduceMotion ? 0 : t + 450));
+    var f = olaFocus && olaFocus.focus && document.contains(olaFocus) && olaFocus !== document.body ? olaFocus : DK.help;
+    f.focus({ preventScroll: true });
+  }
+  function olaClick(e) {
+    var t = e.target.closest('[data-close], .ola-x, [data-act]');
+    if (!t) return;
+    var act = t.getAttribute('data-act');
+    if (!act) { closeOla(); return; }
+    if (act === 'share') { shareDay(t); return; }
+    if (act === 'enquire') { if (!backTo) { e.preventDefault(); toast(ENQUIRE_LOCAL, t); } return; }
+    closeOla();
+    setTimeout(function () {
+      if (act === 'pull') togglePull();
+      else if (act === 'flap') toggleFlap();
+      else if (act === 'wave') waveSign();
+      else if (act === 'attr') openFlap();
+      else if (act === 'days') openPicker(DK.compass.hidden);
+    }, reduceMotion ? 0 : 450);
+  }
+  function olaKey(e) {
+    if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closeOla(); return; }
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.stopPropagation(); return; }
+    if (e.key !== 'Tab') return;
+    var f = Array.prototype.filter.call(olaWrap.querySelectorAll('button, a[href]'), function (el) { return !el.disabled && el.offsetParent !== null; });
+    if (!f.length) return;
+    var i = f.indexOf(document.activeElement);
+    if (e.shiftKey && i <= 0) { e.preventDefault(); f[f.length - 1].focus(); }
+    else if (!e.shiftKey && i === f.length - 1) { e.preventDefault(); f[0].focus(); }
+  }
+  if (DESK) buildDesk();
 
   /* the view-tuning panel opens from its button, and remembers that in this browser */
   var tuneBtn = document.getElementById('tune-btn');
@@ -1892,12 +2758,16 @@ PopupBookData.load().then(function (BOOK) {
   if (state >= 1 && FLAP && !isNaN(flapQ[0])) {
     FLAP.open = true; FLAP.i = Math.max(0, Math.min(FLAP.day.items.length - 1, flapQ[0] | 0));
     FLAP.s = isNaN(flapQ[1]) ? 1 : Math.max(0, Math.min(1.1, flapQ[1])); FLAP.z = Math.min(1, FLAP.s);
-    flapFill(FLAP.i, 0); book.classList.add('flap-open'); render();
+    flapFill(FLAP.i, 0); book.classList.add('flap-open'); deskFlap(true); render();
   }
+  deskSettle(true);   // the open day's stamp, its tip and (on a first visit) the hints
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(size);   // the notes strip's height depends on the fonts
   window.popupBook = { CAM: CAM, pose: pose, render: render, SPREADS: SPREADS, // handy for tuning from the console
     NS: NS, SIGNS: SIGNS, DRAWERS: DRAWERS, PILE: PILE, setPull: setPull, setFlap: setFlap, pageZ: pageZ, pageAngle: pageAngle, poseFor: poseFor, go: go,
     state: function () { return state; },
+    // the travel desk, for checking: its layout, the ola leaves, the day picker, the postcard
+    desk: { mode: function () { return deskMode; }, layout: function () { return DL; }, box: function () { return BOX; },
+            openPlan: openOla, closePlan: closeOla, openPicker: openPicker, closePicker: closePicker, share: shareDay, place: placeDesk },
     setPose: function (a) { for (var k = 0; k < pose.a.length; k++) pose.a[k] = a[k] || 0; render(); },
     // for the editor's live preview: the Attractions drawer opened on item i (or shut: -1), and shadow masks
     SEE_DO: SEE_DO, maskOf: maskOf, flapFill: flapFill,
