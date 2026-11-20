@@ -387,6 +387,56 @@
   @media (hover:hover) { .dk.compass:hover .rose { transform:rotate(-24deg); } }
   .dk.compass[aria-expanded="true"] .rose { transform:rotate(200deg); }
 
+  /* ---------- the desk's things on the table (body.on-table: a big window with room round the book) ----------
+     The passport stamp, the postage stamp, the compass and the Sri Lanka sticker lie on the cloth in
+     the 3D scene (.tp, children of .book: built by buildTable, laid by layTable in book px), so the
+     camera that tilts the book tilts them too and they move with it. The paper ones lie a hair under
+     the book's own shadows (z -3.7: the soft shadow is at -3.6, the contact shadow at -3.2), so those
+     darken them as they darken the cloth, and an edge of each tucks under a board. The compass is a
+     brass case 7 px tall: a base, a wall facing the camera, its face on top. Shadows fall away from
+     the sun (front right): back and to the left. Each is drawn TPS times as big and shrunk back, so it
+     stays sharp under the camera's zoom. The desk keeps their buttons, as clear hit areas over where
+     each one shows while the book is at rest (syncTable). Nothing here moves while the book turns but
+     the camera. */
+  .tp { position:absolute; left:0; top:0; display:none; pointer-events:none; transform-origin:50% 50%;
+    transform:translate3d(var(--tx, 0px), var(--ty, 0px), var(--z, -3.7px)) rotate(var(--rot, 0deg)) scale(calc(var(--s, 1) * var(--press, 1)));
+    transition:transform .35s cubic-bezier(.3,1.4,.5,1); }
+  body.on-table .tp { display:block; }
+  body.tp-still .tp { transition:none; }
+  .tp[hidden] { display:none !important; }
+  .tp.hov { --tx:var(--hx, 0px); --ty:var(--hy, 0px); }   /* a finger draws it a little out from under the book */
+  .tp.press { --press:.97; }
+  .tp .art, .tp .ink { position:absolute; inset:0; --rot:0deg; }
+  .tp .art > img, .tp .art > svg { display:block; width:100%; height:100%; overflow:visible; }
+  .tp.thin .art { filter:var(--shd, none); }   /* its shadow, in its own plane: painted once */
+  body.lite .tp.thin .art { filter:none; }
+  .tp.passport .ink { opacity:.92; transform:rotate(var(--ink-rot, -10deg));
+    -webkit-mask:url(desk/stamp-ink.webp?v=1) center / 100% 100% no-repeat; mask:url(desk/stamp-ink.webp?v=1) center / 100% 100% no-repeat; }
+  .tp.passport .ink svg { display:block; width:100%; height:100%; overflow:visible; }
+  .tp.passport .ink.thunk { animation:dk-thunk .55s cubic-bezier(.4,0,.3,1) both; }
+  .tp.passport.jolt .art { animation:dk-jolt .32s .24s ease-out; }
+  /* its side is brass, lit from the right: from the camera, the side seen under the face is the base's
+     front half (and, from very low, the wall above it), so both wear it */
+  .tp.compass { transform-style:preserve-3d; --brass:linear-gradient(90deg, #2A1D0C 0%, #574020 13%, #86683A 38%, #B39058 64%, #DDBB78 78%, #9A7640 91%, #3A2911 100%); }
+  .tp.compass > i { position:absolute; display:block; }
+  /* the case's shadow on the cloth (falls back and to the left), and the dark line where it touches */
+  .tp.compass .c-shd { border-radius:50%; background:radial-gradient(closest-side, rgba(2,9,22,.62), rgba(2,9,22,.4) 52%, rgba(2,9,22,0)); transform:translateZ(.04px); }
+  .tp.compass .c-base { inset:0; border-radius:50%; transform:translateZ(.1px);
+    background:radial-gradient(closest-side, rgba(12,7,0,0) 72%, rgba(12,7,0,.5) 100%), var(--brass);
+    box-shadow:0 0 calc(var(--u) * 1.4) calc(var(--u) * .7) rgba(2,9,22,.6); }
+  .tp.compass .c-wall { left:0; width:100%; top:calc(50% - var(--h)); height:var(--h); transform-origin:50% 100%; transform:rotateX(-90deg);
+    background:linear-gradient(to bottom, rgba(255,236,190,.35), rgba(255,236,190,0) 35%, rgba(12,7,0,0) 60%, rgba(12,7,0,.4)), var(--brass); }
+  .tp.compass .c-top { position:absolute; inset:0; transform:translateZ(var(--h)) rotate(var(--frot, 0deg)); }
+  .tp.compass .c-top .art { --rot:0deg; }
+  .tp.compass .case { position:absolute; left:0; top:-24.75%; width:100%; height:125%; }
+  .tp.compass .rose { position:absolute; left:44.95%; top:19%; width:10.1%; height:62%; transform-origin:50% 50%; transition:transform .7s cubic-bezier(.3,1.6,.5,1); }
+  .tp.compass.hov .rose { transform:rotate(-24deg); }
+  .tp.compass.open .rose { transform:rotate(200deg); }
+  /* their buttons on the desk: clear, over where each thing shows; only its label and focus ring are seen */
+  body.on-table .dk.tph > .art, body.on-table .dk.tph > .ink { visibility:hidden; }
+  body.on-table .dk.tph.away { visibility:hidden; pointer-events:none; }
+  .tprobe { position:absolute; width:1px; height:1px; visibility:hidden; pointer-events:none; }
+
   /* the flight path: one dot a day, today's a yellow disc with the plane (pointer-events off: it is a picture) */
   .dk.flight { pointer-events:none; }
   .dk.flight.away { opacity:0; visibility:hidden; transition-duration:.2s; }   /* while pages turn, and over the shut cover */
@@ -518,8 +568,8 @@
   @media (max-width:520px) { .ola-leaf { grid-template-columns:1fr; row-gap:3px; } .ola-wrap.sheet .ola-leaf { grid-template-columns:1fr; } }
 
   @media (prefers-reduced-motion: reduce) {
-    .ola, .ola-leaf, .ola-back, .ola-thread, .ola-tie, .ola-tail, .ola-board.bottom, .dk .art, .dk.compass .rose { transition:none !important; }
-    .dk.bubble.pop, .dk.picker.pop, .dk .ink.thunk, .dk.passport.jolt .art, .dk.title.in h2, .dk.hand .fing, .dk.help .disc { animation:none !important; }
+    .ola, .ola-leaf, .ola-back, .ola-thread, .ola-tie, .ola-tail, .ola-board.bottom, .dk .art, .dk.compass .rose, .tp, .tp.compass .rose { transition:none !important; }
+    .dk.bubble.pop, .dk.picker.pop, .dk .ink.thunk, .dk.passport.jolt .art, .tp .ink.thunk, .tp.passport.jolt .art, .dk.title.in h2, .dk.hand .fing, .dk.help .disc { animation:none !important; }
   }
 </style>
 </head>
@@ -1390,6 +1440,7 @@ PopupBookData.load().then(function (BOOK) {
     SPREADS.forEach(layoutSpread);
     layoutFlap();
     placeFit();
+    if (tableStale && tableOn && tableAtRest()) syncTable();   // the camera has come to rest: the desk's buttons go back over its things
   }
 
   /* ================= the moving parts: PULL tab, flaps =================
@@ -1850,10 +1901,12 @@ PopupBookData.load().then(function (BOOK) {
     var skyEl = SPREADS[0].layers[0].L.el, signEl = book.querySelector('.vp > .face.front > .placard-0');
     var rectIn = function (el) { var r = el.getBoundingClientRect(); return [r.left - o.left, r.top - o.top, r.right - o.left, r.bottom - o.top]; };
     var skyBox = rectIn(skyEl), signBox = signEl ? rectIn(signEl) : skyBox;
+    // and where the table's four probes land: the cloth's perspective, for laying the desk's things on it (layTable)
+    var tableQuad = PROBES.length ? PROBES.map(function (el) { var r = el.getBoundingClientRect(); return [r.left - o.left, r.top - o.top]; }) : null;
     var turn1 = union(closed, open), turn2 = open;
     for (a = 15; a < 180; a += 15) { p = poseFor(0); p[0] = a; turn1 = union(turn1, at(p, 0)); }
     for (s = 1; s < MS; s++) for (a = 15; a < 180; a += (NS > 3 ? 30 : 15)) { p = poseFor(s); p[s] = a; turn2 = union(turn2, at(p, 0)); }
-    BOX = { closed: closed, open: open, turn1: turn1, turn2: turn2, sky: skyBox, sign: signBox };
+    BOX = { closed: closed, open: open, turn1: turn1, turn2: turn2, sky: skyBox, sign: signBox, table: tableQuad };
     // the close-up for each Attractions panel: the panel itself, with some of the book beside it
     // (on a phone held upright, the panel alone, as big as it goes: its print is small)
     var tight = compact && upright, first = null;
@@ -2169,6 +2222,7 @@ PopupBookData.load().then(function (BOOK) {
     });
     olaWrap.addEventListener('click', olaClick);
     olaWrap.addEventListener('keydown', olaKey);
+    buildTable();
   }
   // the flight path: a looping dotted route, one dot per day of the tour
   function buildFlight(shape) {
@@ -2204,6 +2258,157 @@ PopupBookData.load().then(function (BOOK) {
     var last = SPREADS.length ? SPREADS[SPREADS.length - 1].day : 0;
     if (last < TOUR_DAYS) html += '<p class="soon">Days ' + (last + 1) + '–' + TOUR_DAYS + ' are still being made.</p>';
     DK.picker.innerHTML = html;
+  }
+
+  /* ---------- the desk's things on the table (see .tp in the styles) ----------
+     In a big window (desk mode) the passport stamp, the postage stamp, the compass and the sticker
+     are built a second time in the book's 3D scene, lying on the cloth (z = -TB) round the open book.
+     Laid out once per window size for the open book's camera (layTable); the shut book's camera, and
+     every camera in between, sees them where they lie. Their desk buttons stay, clear, over where
+     each shows while the book is at rest (syncTable), and lend them their hover. */
+  var TP = {}, TP_NAMES = ['passport', 'postage', 'compass', 'sticker'], TPS = LITE ? 1 : 2;
+  var PROBES = [], tableOn = false, tableStale = true;
+  var TBL_RECT = [-400, -300, 1650, 1200];   // the table's probes: a rectangle round the book, x, y, w, h (book px)
+  var Z_PAPER = -TB - 0.7;   // paper on the cloth: under the book's soft (-3.6) and contact (-3.2) shadows, over the light's pool (-3.8)
+  function buildTable() {
+    var t = TBL_RECT;
+    PROBES = [[0, 0], [t[2], 0], [t[2], t[3]], [0, t[3]]].map(function (p) {
+      var el = document.createElement('i');
+      el.className = 'tprobe'; el.setAttribute('aria-hidden', 'true');
+      el.style.left = (t[0] + p[0]) + 'px'; el.style.top = (t[1] + p[1]) + 'px'; el.style.transform = 'translateZ(' + (-TB) + 'px)';
+      book.appendChild(el);
+      return el;
+    });
+    // (the sticker's and the ink's SVG ids are made their own, so they never resolve to the desk's copies)
+    function img(n, c) { return deskImg(n, c).replace('loading="lazy"', 'loading="eager"'); }
+    book.insertAdjacentHTML('afterbegin',
+      '<div class="tp thin passport" id="tp-passport" aria-hidden="true"><div class="art">' + img('passport-paper') + '</div><div class="ink" id="tp-ink"></div></div>' +
+      '<div class="tp thin postage" id="tp-postage" aria-hidden="true"><div class="art">' + img('postage') + '</div></div>' +
+      '<div class="tp thin sticker" id="tp-sticker" aria-hidden="true"><div class="art">' + STICKER_SVG.replace(/dk-(hex|hsky)/g, 'tp-$1') + '</div></div>' +
+      '<div class="tp compass" id="tp-compass" aria-hidden="true"><i class="c-shd"></i><i class="c-base"></i><i class="c-wall"></i>' +
+        '<div class="c-top"><div class="art">' + img('compass', 'case') + img('compass-needle', 'rose') + '</div></div></div>');
+    TP.ink = document.getElementById('tp-ink');
+    TP_NAMES.forEach(function (n) {
+      var hit = DK[n], tp = TP[n] = document.getElementById('tp-' + n);
+      function on() { tp.classList.add('hov'); }
+      function off() { tp.classList.remove('hov', 'press'); }
+      hit.addEventListener('pointerenter', on);
+      hit.addEventListener('pointerleave', off);
+      hit.addEventListener('focus', function () { if (hit.matches(':focus-visible')) on(); });
+      hit.addEventListener('blur', off);
+      hit.addEventListener('pointerdown', function () { tp.classList.add('press'); });
+      hit.addEventListener('pointerup', function () { tp.classList.remove('press'); });
+    });
+  }
+  // a plane's homography from four points (Heckbert: the w x h rectangle to the quad s), and its use
+  function quadH(s, w, h) {
+    var x0 = s[0][0], y0 = s[0][1], x1 = s[1][0], y1 = s[1][1], x2 = s[2][0], y2 = s[2][1], x3 = s[3][0], y3 = s[3][1];
+    var dx1 = x1 - x2, dx2 = x3 - x2, dx3 = x0 - x1 + x2 - x3, dy1 = y1 - y2, dy2 = y3 - y2, dy3 = y0 - y1 + y2 - y3;
+    var den = dx1 * dy2 - dx2 * dy1, g = 0, k = 0;
+    if (Math.abs(den) > 1e-9) { g = (dx3 * dy2 - dx2 * dy3) / den; k = (dx1 * dy3 - dx3 * dy1) / den; }
+    return [(x1 - x0 + g * x1) / w, (x3 - x0 + k * x3) / h, x0, (y1 - y0 + g * y1) / w, (y3 - y0 + k * y3) / h, y0, g / w, k / h, 1];
+  }
+  function apply3(M, x, y) { var z = M[6] * x + M[7] * y + M[8]; return [(M[0] * x + M[1] * y + M[2]) / z, (M[3] * x + M[4] * y + M[5]) / z]; }
+  /* Where each thing lies (book px, on the table): beside a board, an edge tucked under it (tuck > 0)
+     or clear of it (tuck < 0); the left ones by the open cover (its edge at x -6), the right ones by
+     the back board (x 846). Then, seen through the open book's camera, each is kept on the screen
+     (tucked further under, then made smaller) and clear of the ‹ › arrows, the ? and the title
+     (moved forward, or back from the screen's foot). */
+  var TABLE = {
+    passport: { side: -1, w: 106, h: 106, tuck: 22, maxTuck: 0.42, y: 400, ymin: 300, ymax: 470, rot: -10, hx: -5 },
+    compass: { side: -1, w: 84, h: 84, tuck: -16, maxTuck: -0.05, y: 604, ymin: 540, ymax: 690, rot: -20, tall: 7, ring: 0.2475 },
+    postage: { side: 1, w: 76, h: 76 * 380 / 334, tuck: 9, maxTuck: 0.4, y: 300, ymin: 150, ymax: 420, rot: 11, hx: 5 },
+    sticker: { side: 1, w: 110, h: 110 * 124 / 140, tuck: 10, maxTuck: 0.4, y: 505, ymin: 430, ymax: 610, rot: -8, hx: 4, hy: 2 }
+  };
+  function layTable(open, ko) {
+    var t = TBL_RECT, W = pageW(), Hh = pageH(), M = 8;
+    function scr(p) { return [open[0] + (p[0] - BOX.open[0]) * ko, open[1] + (p[1] - BOX.open[1]) * ko]; }
+    var H = quadH(BOX.table.map(scr), t[2], t[3]);
+    function toS(x, y) { return apply3(H, x - t[0], y - t[1]); }
+    function box(P) {   // P's box on the screen (its corners; the compass's ring and its top too)
+      var r = P.rot * Math.PI / 180, c = Math.cos(r), s = Math.sin(r), b = [1e9, 1e9, -1e9, -1e9], y0 = -P.h / 2 - (P.ring || 0) * P.h;
+      [[-P.w / 2, y0], [P.w / 2, y0], [P.w / 2, P.h / 2], [-P.w / 2, P.h / 2]].forEach(function (q) {
+        var p = toS(P.x + q[0] * c - q[1] * s, P.y + q[0] * s + q[1] * c);
+        b[0] = Math.min(b[0], p[0]); b[1] = Math.min(b[1], p[1]); b[2] = Math.max(b[2], p[0]); b[3] = Math.max(b[3], p[1]);
+      });
+      if (P.tall) { var a = toS(P.x, P.y), e = toS(P.x + 1, P.y); b[1] -= P.tall * Math.hypot(e[0] - a[0], e[1] - a[1]); }
+      return b;
+    }
+    function hits(b, r) { return b[0] < r[2] && b[2] > r[0] && b[1] < r[3] && b[3] > r[1]; }
+    function rectOfEl(el, pad, below) { var x = parseFloat(el.style.left), y = parseFloat(el.style.top), w = parseFloat(el.style.width) || el.offsetWidth; return [x - pad, y - pad, x + w + pad, y + w + pad + (below || 0)]; }
+    var tr = DK.title.getBoundingClientRect(), title = [tr.left - 12, tr.top - 4, tr.right + 12, tr.bottom + 4];
+    var keep = { '-1': [rectOfEl(DK.prev, 6, 24), title], '1': [rectOfEl(DK.next, 6, 24), title] };
+    if (DL.help) keep['1'].push([DL.help.x - 6, DL.help.y - 6, DL.help.x + DL.help.w + 6, DL.help.y + DL.help.w + 6]);
+    /* the first clear place, trying its full size first, then nearest its own spot along the book
+       (y), then the least tucked under it; wholly in front of the book (past its foot) it may slide
+       along in front of it as far as it needs */
+    function fit(P) {
+      var edge = P.side < 0 ? -6 : 846, avoid = keep[String(P.side)], ys = [P.y], d, sc, i, tk, Q, b;
+      for (d = 6; d <= 300; d += 6) { if (P.y + d <= P.ymax) ys.push(P.y + d); if (P.y - d >= P.ymin) ys.push(P.y - d); }
+      for (sc = 1; sc > 0.68; sc -= 0.05) {
+        for (i = 0; i < ys.length; i++) {
+          Q = Object.assign({}, P, { w: P.w * sc, h: P.h * sc, y: ys[i] });
+          var maxT = Q.y - Q.h / 2 > FOOT + 4 ? 600 : Q.maxTuck * Q.w;
+          for (tk = P.tuck; tk <= maxT; tk += 3) {
+            Q.tuck = tk; Q.x = edge + Q.side * (Q.w / 2 - tk);
+            b = box(Q);
+            if (b[1] < M || b[3] > Hh - 4) break;   // off the top or the foot of the screen: not at this y
+            if ((Q.side < 0 ? b[0] < M : b[2] > W - M) || avoid.some(function (r) { return hits(b, r); })) continue;   // further in
+            avoid.push([b[0] - 4, b[1] - 4, b[2] + 4, b[3] + 4]);   // the next one on this side keeps clear of it
+            return Q;
+          }
+        }
+      }
+      return { fail: true };   // no clear place for it on this screen: it stays off the table (its job is on the ola leaves too)
+    }
+    var D = LIGHT[2] || 1, sun = [-LIGHT[0] / D, -LIGHT[1] / D], failed = [];   // a shadow's way across the cloth, per px of height
+    document.body.classList.add('tp-still');   // laid at once, not eased there (syncTable reads where they are)
+    TP_NAMES.forEach(function (n) {
+      if (DK[n].hidden) { TP[n].hidden = true; return; }
+      var P = fit(TABLE[n]), el = TP[n], s = el.style, w = P.w * TPS, h = P.h * TPS;
+      el.hidden = !!P.fail;
+      if (P.fail) { failed.push(n); return; }
+      s.left = (P.x - w / 2).toFixed(2) + 'px'; s.top = (P.y - h / 2).toFixed(2) + 'px';
+      s.width = w.toFixed(1) + 'px'; s.height = h.toFixed(1) + 'px';
+      s.setProperty('--s', (1 / TPS).toFixed(4));
+      s.setProperty('--z', Z_PAPER + 'px');
+      s.setProperty('--hx', (P.hx || 0) + 'px'); s.setProperty('--hy', (P.hy || 0) + 'px');
+      if (n === 'compass') {   // round: only its face turns; its shadow falls tall px of height away from the sun
+        var sh = [sun[0] * P.tall, sun[1] * P.tall], sz = (P.w + Math.hypot(sh[0], sh[1])) * 1.3 * TPS;
+        s.setProperty('--frot', P.rot + 'deg'); s.setProperty('--h', P.tall * TPS + 'px'); s.setProperty('--u', TPS + 'px');
+        var cs = el.querySelector('.c-shd').style;
+        cs.width = cs.height = sz.toFixed(1) + 'px';
+        cs.left = (w / 2 + sh[0] * TPS / 2 - sz / 2).toFixed(1) + 'px'; cs.top = (h / 2 + sh[1] * TPS / 2 - sz / 2).toFixed(1) + 'px';
+      } else {   // paper, its edges lifted a hair off the cloth: a crisp contact shadow and a soft one, away from the sun
+        s.setProperty('--rot', P.rot + 'deg');
+        var r = -P.rot * Math.PI / 180, lx = (sun[0] * Math.cos(r) - sun[1] * Math.sin(r)) * 1.1 * TPS, ly = (sun[0] * Math.sin(r) + sun[1] * Math.cos(r)) * 1.1 * TPS;
+        s.setProperty('--shd', 'drop-shadow(' + lx.toFixed(2) + 'px ' + ly.toFixed(2) + 'px ' + (0.8 * TPS) + 'px rgba(2,9,22,.55)) drop-shadow(' +
+          (2.6 * lx).toFixed(2) + 'px ' + (2.6 * ly).toFixed(2) + 'px ' + (3 * TPS) + 'px rgba(2,9,22,.26))');
+      }
+    });
+    void TP.passport.offsetWidth;
+    document.body.classList.remove('tp-still');
+    return failed;
+  }
+  function tableAtRest() { return !busy && !measuring && !(FLAP && (FLAP.open || FLAP.z > 0)); }
+  function tableAway() {   // the camera moves: the buttons wait until it rests again
+    tableStale = true;
+    TP_NAMES.forEach(function (n) { if (DK[n]) DK[n].classList.add('away'); if (TP[n]) TP[n].classList.remove('hov', 'press'); });
+  }
+  // the buttons over the things, where the camera shows them now (one that is mostly off the screen, as by the shut book, waits)
+  function syncTable() {
+    if (!tableOn) return;
+    if (!tableAtRest()) { tableAway(); return; }
+    tableStale = false;
+    var W = pageW(), Hh = pageH();
+    TP_NAMES.forEach(function (n) {
+      if (DK[n].hidden) return;
+      var r = (n === 'compass' ? TP.compass.querySelector('.case') : TP[n]).getBoundingClientRect(), l = r.left, tp = r.top, rt = r.right, bt = r.bottom;
+      if (n === 'compass') { var b = TP.compass.querySelector('.c-base').getBoundingClientRect(); l = Math.min(l, b.left); tp = Math.min(tp, b.top); rt = Math.max(rt, b.right); bt = Math.max(bt, b.bottom); }
+      var seen = Math.max(0, Math.min(rt, W) - Math.max(l, 0)) * Math.max(0, Math.min(bt, Hh) - Math.max(tp, 0)), away = !(rt - l > 4 && seen > 0.55 * (rt - l) * (bt - tp));
+      DK[n].classList.toggle('away', away);
+      if (!away) put(DK[n], l, tp, rt - l, bt - tp);
+    });
   }
 
   /* ---------- where everything goes: once per window size ---------- */
@@ -2309,8 +2514,14 @@ PopupBookData.load().then(function (BOOK) {
       DL.askW = Math.min(250, W - 40); DL.askFs = 14;
     }
     DL.ask = { side: 'b', t: 14, ax: DL.help.x + DL.help.w * 0.45, ay: DL.help.y - 4, w: DL.askW, fs: DL.askFs, minY: 6, maxY: DL.help.y };
+    /* in a big window, the stamps, the compass and the sticker lie on the table in the 3D scene (in a
+       slim one, as before, without the sticker); any that finds no clear place there stays away */
+    tableOn = (mode === 'desk' || mode === 'slim') && !!(BOX.table && TP.passport);
+    document.body.classList.toggle('on-table', tableOn);
+    TP_NAMES.forEach(function (n) { DK[n].classList.toggle('tph', tableOn); DK[n].classList.remove('away'); if (tableOn) on[n] = n !== 'sticker' || mode === 'desk'; });
     ['flight', 'passport', 'postage', 'sticker', 'compass', 'prev', 'next', 'help'].forEach(function (n) { DK[n].hidden = !on[n]; });
     placeTitle();
+    if (tableOn) { layTable(open, ko).forEach(function (n) { DK[n].hidden = true; }); syncTable(); }
     if (bubbleOn) showBubble(bubbleOn, true);
   }
   // the title: centred in its band (tall: left, under the book), shrunk to fit if a route is long
@@ -2375,16 +2586,19 @@ PopupBookData.load().then(function (BOOK) {
     var key = [top, bottom, mid, sub].join('|');
     if (key === stampKey) return;
     stampKey = key;
-    DK.ink.innerHTML = passportInk(top, bottom, mid, sub);
-    DK.ink.style.setProperty('--ink-rot', (-15 + (d.day * 37) % 11) + 'deg');
+    var ink = passportInk(top, bottom, mid, sub), rot = (-15 + (d.day * 37) % 11) + 'deg';
+    DK.ink.innerHTML = ink;
+    DK.ink.style.setProperty('--ink-rot', rot);
+    if (TP.ink) { TP.ink.innerHTML = ink.replace(/dk-pp-/g, 'tp-pp-'); TP.ink.style.setProperty('--ink-rot', rot); }
     DK.passport.setAttribute('aria-label', 'Passport stamp: ' + (d.day ? (d.place || 'Sri Lanka') + ', day ' + d.day : 'Sri Lanka'));
     thunk();
   }
   function thunk() {
     if (DK.passport.hidden) return;
-    DK.ink.classList.remove('thunk'); DK.passport.classList.remove('jolt');
-    void DK.ink.offsetWidth;
-    DK.ink.classList.add('thunk'); DK.passport.classList.add('jolt');
+    var ink = tableOn ? TP.ink : DK.ink, card = tableOn ? TP.passport : DK.passport;   // (on the table: its copy there)
+    ink.classList.remove('thunk'); card.classList.remove('jolt');
+    void ink.offsetWidth;
+    ink.classList.add('thunk'); card.classList.add('jolt');
   }
 
   /* ---------- bubbles: the guide's tip, and the ?'s own on a first visit; one at a time ---------- */
@@ -2471,9 +2685,11 @@ PopupBookData.load().then(function (BOOK) {
     if (bubbleOn === 'ask') askPending = false;
     hideBubbles(); hideHand(); closePicker(false);
     DK.flight.classList.add('away');   // the turning pages sweep through where it lies
+    if (tableOn) tableAway();   // the camera moves, and the things on the table with it
   }
   function deskSettle(first) {   // a day lies open (or the book is shut): stamp it, then its tip and hints
     if (!DESK) return;
+    syncTable();
     stampDay();
     DK.flight.classList.toggle('away', !state);   // over the shut cover there is no journey yet (and no room)
     clearTimeout(tipTimer); clearTimeout(handTimer);
@@ -2490,7 +2706,7 @@ PopupBookData.load().then(function (BOOK) {
   function deskFlap(on) {   // the Attractions close-up has the screen; the desk fades away under it
     if (!DESK) return;
     document.body.classList.toggle('flap-zoom', on);
-    if (on) { hideHand(); closePicker(false); }
+    if (on) { hideHand(); closePicker(false); if (tableOn) tableAway(); }
   }
 
   /* ---------- the compass's day picker ---------- */
@@ -2513,6 +2729,7 @@ PopupBookData.load().then(function (BOOK) {
     DK.picker.classList.remove('pop'); void DK.picker.offsetWidth; DK.picker.classList.add('pop');
     pickerFrom = useCompass ? DK.compass : DK.help;
     DK.compass.setAttribute('aria-expanded', 'true');
+    if (TP.compass) TP.compass.classList.add('open');
     var cur = DK.picker.querySelector('[aria-current="true"]') || DK.picker.querySelector('button');
     if (cur) cur.focus({ preventScroll: true });
   }
@@ -2520,6 +2737,7 @@ PopupBookData.load().then(function (BOOK) {
     if (!DK.picker || DK.picker.hidden) return;
     DK.picker.hidden = true;
     DK.compass.setAttribute('aria-expanded', 'false');
+    if (TP.compass) TP.compass.classList.remove('open');
     if (focusBack && pickerFrom && !pickerFrom.hidden) pickerFrom.focus({ preventScroll: true });
   }
 
