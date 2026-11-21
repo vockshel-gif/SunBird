@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The train to Ella | Sunbird Lanka Tours</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="Ride the hill-country train from Kandy to Ella, one scroll at a time.">
+<meta name="theme-color" content="#14304A">
+<link rel="icon" type="image/png" href="../favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Manrope:wght@600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<!-- only the letters on the station board, in Sinhala and Tamil -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Sinhala:wght@700&family=Noto+Sans+Tamil:wght@700&text=%E0%B6%87%E0%B6%BD%E0%B7%8A%E0%B6%BD%E0%AE%8E%E0%AE%B2%E0%AF%8D%E0%AE%B2&display=swap" rel="stylesheet">
+<style>
+  /* brand colours and type, the same as the rest of the site (static/css/site.css): logo blue, logo light blue,
+     logo yellow; Inter for text, Manrope for labels and buttons, Instrument Serif for titles */
+  :root { --ink:#1f3a4a; --muted:#4a6170; --blue:#1f74ba; --sky:#29abe2; --sun:#fbdc03;
+          --panel:#14304A;   /* the carriage's lower blue panel, carried on below the picture */
+          --paper:#F6F0E2;
+          --serif:'Instrument Serif', 'Times New Roman', serif;
+          --sans:'Inter', system-ui, sans-serif;
+          --ui:'Manrope', system-ui, sans-serif; }
+  * { box-sizing:border-box; }
+  html, body { margin:0; }
+  body { font-family:var(--sans); color:var(--ink); background:var(--panel); -webkit-font-smoothing:antialiased; }
+
+  /* ---------- the ride: a tall section, with the carriage pinned on screen while it scrolls ---------- */
+  .ride { position:relative; height:700vh; height:700svh; background:var(--panel); }
+  .stage { position:sticky; top:0; height:100vh; height:100svh; overflow:hidden; background:#A9BFCF; }
+
+  /* outside: everything that passes the windows. Each piece sits on a plane that moves at its own speed. */
+  .world { position:absolute; inset:0; will-change:transform; }
+  .o { position:absolute; left:0; top:0; will-change:transform; backface-visibility:hidden; visibility:hidden; }
+  .o img { position:absolute; inset:0; display:block; width:100%; height:100%; pointer-events:none; user-select:none; -webkit-user-drag:none; }
+  .o.flip img { transform:scaleX(-1); }
+  .o img.blur { opacity:0; }
+  .o.fadeL  { -webkit-mask-image:linear-gradient(90deg, transparent, #000 18%); mask-image:linear-gradient(90deg, transparent, #000 18%); }
+  .o.fadeR  { -webkit-mask-image:linear-gradient(270deg, transparent, #000 18%); mask-image:linear-gradient(270deg, transparent, #000 18%); }
+  .o.fadeLR { -webkit-mask-image:linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent); mask-image:linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent); }
+
+  /* the tunnel: a dark stone wall right outside the glass, with soft ribs of slightly lighter rock */
+  .tunnel { background:
+      linear-gradient(180deg, rgba(0,0,0,.55), rgba(0,0,0,0) 30%, rgba(0,0,0,0) 70%, rgba(0,0,0,.6)),
+      repeating-linear-gradient(90deg, #0B0A09 0 120px, #17140F 150px, #0B0A09 185px, #0B0A09 260px);
+    -webkit-mask-image:linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent);
+            mask-image:linear-gradient(90deg, transparent, #000 3%, #000 97%, transparent); }
+
+  /* the platform at Ella: worn concrete with the yellow line along its edge */
+  .platform { background:
+      linear-gradient(180deg, rgba(0,0,0,0) 0 3%, #D9C24A 3% 6%, rgba(0,0,0,0) 6%),
+      linear-gradient(180deg, #CFC7B6, #A49B8A 14%, #8E8676 50%, #6F695D);
+    -webkit-mask-image:linear-gradient(90deg, transparent, #000 4%); mask-image:linear-gradient(90deg, transparent, #000 4%); }
+
+  /* the station board's lettering, printed on the yellow board of the sign picture */
+  .board { position:absolute; left:10.4%; top:6.6%; width:79%; height:27.6%; display:flex; flex-direction:column;
+           align-items:center; justify-content:center; gap:.04em; color:#1A1712; mix-blend-mode:multiply; opacity:.92; line-height:1; }
+  .board .si { font:700 1em/1 'Noto Sans Sinhala', var(--sans); }
+  .board .ta { font:700 .82em/1 'Noto Sans Tamil', var(--sans); }
+  .board .en { font:800 1.32em/1 var(--sans); letter-spacing:.1em; margin-top:.06em; }
+
+  /* inside: the carriage, with the windows cut out of it */
+  .car { position:absolute; left:0; top:0; will-change:transform; transform-origin:50% 70%; }
+  .car img { display:block; width:100%; height:100%; user-select:none; -webkit-user-drag:none; }
+  /* in the tunnel the carriage goes dim, lit by its own warm lamps */
+  .shade { position:absolute; inset:0; background:#06080B; opacity:0; pointer-events:none; }
+  .lamp { position:absolute; inset:0; opacity:0; pointer-events:none;
+          background:radial-gradient(ellipse 60% 38% at 50% 0%, rgba(255,196,120,.32), rgba(255,170,90,.08) 60%, rgba(255,170,90,0) 80%); }
+
+  /* ---------- on top: the ticket, the notes on the wall, the route ---------- */
+  .hud { position:absolute; inset:0; pointer-events:none; }
+  .top { position:absolute; top:max(12px, env(safe-area-inset-top)); left:12px; right:12px; display:flex; justify-content:space-between; align-items:center; z-index:5; }
+  .pill { pointer-events:auto; display:inline-flex; align-items:center; gap:6px; height:38px; padding:0 14px; border-radius:999px;
+          background:rgba(255,255,255,.88); box-shadow:0 2px 10px rgba(10,30,50,.18); color:var(--ink); text-decoration:none;
+          font:700 13px/1 var(--ui); -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); }
+  .pill img { height:24px; width:auto; display:block; }
+  .pill svg { width:16px; height:16px; }
+
+  .ticket { position:absolute; left:50%; top:50%; width:min(440px, calc(100% - 40px)); padding:20px 26px 20px;
+            transform:translate(-50%, -50%) rotate(-1.4deg); color:#2A2418; border-radius:6px;
+            background:
+              radial-gradient(circle at 0 50%, transparent 9px, rgba(0,0,0,0) 9.5px),
+              linear-gradient(180deg, #F5EDD7, #EDE2C6);
+            box-shadow:0 22px 50px rgba(8,18,28,.45), 0 2px 6px rgba(0,0,0,.25); }
+  /* the punched notches on each side of the ticket */
+  .ticket::before, .ticket::after { content:""; position:absolute; top:50%; width:18px; height:18px; margin-top:-9px; border-radius:50%; background:rgba(20,48,74,.55); }
+  .ticket::before { left:-9px; } .ticket::after { right:-9px; }
+  .tk-top { display:flex; justify-content:space-between; gap:12px; padding-bottom:10px; border-bottom:1.5px dashed rgba(60,50,30,.3);
+            font:600 10.5px/1.2 var(--sans); letter-spacing:.18em; text-transform:uppercase; color:#8A7A55; }
+  .tk-route { display:flex; align-items:center; gap:12px; margin:16px 0 4px; font:800 26px/1 var(--ui); letter-spacing:.06em; }
+  .tk-route i { flex:1; height:2px; position:relative; background:repeating-linear-gradient(90deg, #2A2418 0 6px, transparent 6px 11px); }
+  .tk-route i::after { content:""; position:absolute; right:-2px; top:-4px; border:5px solid transparent; border-left:7px solid #2A2418; border-right:0; }
+  .ticket h1 { font-family:var(--serif); font-weight:400; font-size:clamp(32px, 6vw, 44px); line-height:1; letter-spacing:-.01em; margin:10px 0 8px; }
+  .ticket p { margin:0; font-size:15px; line-height:1.45; color:#4A4232; }
+  .tk-hint { margin-top:16px; display:flex; align-items:center; gap:8px; color:var(--blue); font:600 11px/1 var(--sans); letter-spacing:.2em; text-transform:uppercase; }
+  .tk-hint svg { width:16px; height:16px; animation:nudge 1.6s ease-in-out infinite; }
+  @keyframes nudge { 0%,100% { transform:translateY(0); } 50% { transform:translateY(4px); } }
+
+  /* notes pinned to the carriage wall, one per stretch of the line */
+  .note { position:absolute; left:var(--nx); top:var(--ny); width:var(--nw); padding:18px 18px 16px; border-radius:3px;
+          background:var(--paper); color:var(--ink); opacity:0; visibility:hidden;
+          transform:translate(-50%, 0) rotate(var(--r, -1.2deg));
+          box-shadow:0 12px 26px rgba(16,26,18,.3), 0 1px 3px rgba(0,0,0,.18);
+          filter:brightness(var(--lit, 1)); }
+  .note::before { content:""; position:absolute; left:50%; top:-6px; width:13px; height:13px; margin-left:-6.5px; border-radius:50%;
+                  background:radial-gradient(circle at 35% 30%, #F2D27A, #B88A2A 60%, #7A5A18); box-shadow:0 2px 3px rgba(0,0,0,.35); }
+  .m-float .note { transform:translate(-50%, -100%) rotate(var(--r, -1.2deg)); }
+  .note .tag { display:inline-block; padding:5px 8px 4px; border-radius:2px; background:var(--sun); color:var(--ink);
+               font:800 10.5px/1 var(--ui); letter-spacing:.14em; text-transform:uppercase; }
+  .note h3 { font-family:var(--serif); font-weight:400; font-size:25px; line-height:1.04; margin:10px 0 6px; }
+  .note p { margin:0; font-size:13.5px; line-height:1.45; color:var(--muted); }
+  .note.arrive h3 { font-size:32px; }
+  .btns { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+  /* buttons, as on the rest of the site: the main action is the yellow "sun pill" (a light-blue sun holds the arrow
+     and spreads over the button when pointed at); the others are outline pills ("alt") */
+  .btn { pointer-events:auto; position:relative; isolation:isolate; overflow:hidden; display:inline-flex; align-items:center;
+         justify-content:space-between; gap:14px; min-height:46px; padding:4px 4px 4px 18px; border-radius:999px;
+         background:var(--sun); color:#0c3460; font:700 13.5px/1.2 var(--ui); text-decoration:none; transition:color .4s, transform .2s; }
+  .btn::before { content:""; position:absolute; inset:0; z-index:-1; background:var(--sky);
+                 clip-path:circle(19px at calc(100% - 23px) 50%); transition:clip-path .6s cubic-bezier(.2,.7,.2,1), background-color .45s; }
+  .btn::after { content:""; flex:none; width:38px; height:38px; border-radius:50%; background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14M13 6l6 6-6 6'/%3E%3C/svg%3E") center / 46% no-repeat;
+                transition:transform .45s cubic-bezier(.2,.7,.2,1); }
+  .btn:hover { color:#fff; }
+  .btn:hover::before { background:var(--blue); clip-path:circle(160% at calc(100% - 23px) 50%); }
+  .btn:hover::after { transform:rotate(-45deg); }
+  .btn:active { transform:scale(.98); }
+  .btn.alt { justify-content:center; padding:0 18px; background:transparent; color:var(--ink); box-shadow:inset 0 0 0 1px rgba(31,58,74,.5);
+             transition:background .25s, color .25s, box-shadow .25s; }
+  .btn.alt::before, .btn.alt::after { display:none; }
+  .btn.alt:hover { background:var(--blue); color:#fff; box-shadow:inset 0 0 0 1px var(--blue); }
+  @media (prefers-reduced-motion:reduce) { .btn, .btn::before, .btn::after { transition:none; } }
+  .m-tall .note { padding:14px 16px 13px; }
+  /* on a phone, the welcome note takes the bottom of the screen, where the route was */
+  .m-tall .note.arrive { top:auto; bottom:max(14px, env(safe-area-inset-bottom)); }
+  .m-tall .note h3, .m-float .note h3 { font-size:21px; margin:8px 0 4px; }
+  .m-tall .note p, .m-float .note p { font-size:13px; }
+
+  /* the line from Kandy to Ella, along the bottom */
+  .route { position:absolute; left:50%; bottom:var(--rb, 14px); width:min(800px, calc(100% - 24px)); transform:translateX(-50%); color:#fff;
+           padding:15px 34px 2px; border-radius:999px; background:rgba(12,30,48,.72); box-shadow:0 4px 18px rgba(0,0,0,.25);
+           -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px); }
+  .route .track { position:relative; height:2px; background:rgba(255,255,255,.3); }
+  .route .fill { position:absolute; left:0; top:0; bottom:0; width:0; background:var(--sun); }
+  .route .loco { position:absolute; top:-6px; left:0; width:14px; height:14px; margin-left:-7px; border-radius:50%; background:var(--sun);
+                 box-shadow:0 0 0 4px rgba(254,221,0,.28), 0 1px 4px rgba(0,0,0,.4); }
+  .route ol { list-style:none; margin:0; padding:0; position:relative; height:28px; }
+  .route li { position:absolute; top:-6px; transform:translateX(-50%); padding-top:17px; white-space:nowrap;
+              font:600 10.5px/1 var(--sans); letter-spacing:.16em; text-transform:uppercase; color:rgba(255,255,255,.55); text-shadow:0 1px 3px rgba(0,0,0,.5); transition:color .3s; }
+  .route li::before { content:""; position:absolute; top:1px; left:50%; width:10px; height:10px; margin-left:-5px; border-radius:50%;
+                      background:var(--panel); border:2px solid rgba(255,255,255,.6); }
+  .route li.past::before { background:var(--sun); border-color:var(--sun); }
+  .route li.on { color:#fff; }
+  @media (max-width:600px) { .route li span { opacity:0; transition:opacity .3s; } .route li.on span { opacity:1; } }
+
+  /* while the pictures load */
+  .boarding { position:absolute; inset:0; display:grid; place-items:center; background:var(--panel); color:rgba(255,255,255,.8);
+              font:600 12px/1 var(--sans); letter-spacing:.22em; text-transform:uppercase; transition:opacity .6s, visibility .6s; z-index:30; }
+  .ready .boarding { opacity:0; visibility:hidden; }
+
+  /* ---------- after the ride ---------- */
+  .after { position:relative; padding:72px 20px 80px; color:#fff; text-align:center;
+           background:linear-gradient(180deg, var(--panel), #0E2235); }
+  .after .kicker { margin:0 auto; color:var(--sun); font:600 11.5px/1.4 var(--sans); letter-spacing:.22em; text-transform:uppercase; }
+  .after h2 { font-family:var(--serif); font-weight:400; font-size:clamp(34px, 6vw, 52px); line-height:1.02; margin:14px auto 12px; max-width:640px; }
+  .after p { margin:0 auto; max-width:520px; color:rgba(255,255,255,.78); line-height:1.6; }
+  .after .btns { justify-content:center; margin-top:26px; }
+  .after .btn { min-height:52px; padding-left:22px; font-size:14.5px; }
+  .after .btn::after { width:44px; height:44px; }
+  .after .btn::before { clip-path:circle(22px at calc(100% - 26px) 50%); }
+  .after .btn:hover::before { clip-path:circle(160% at calc(100% - 26px) 50%); }
+  .after .btn.alt { padding:0 22px; color:#fff; box-shadow:inset 0 0 0 1px rgba(255,255,255,.6); }
+  .after .btn.alt:hover { background:#fff; color:var(--ink); box-shadow:inset 0 0 0 1px #fff; }
+  .after small { display:block; margin-top:46px; color:rgba(255,255,255,.45); font-size:12px; }
+  .after small a { color:inherit; }
+
+  @media (prefers-reduced-motion:reduce) { .tk-hint svg { animation:none; } }
+</style>
+</head>
+<body>
+
+<section class="ride" aria-label="The train ride from Kandy to Ella">
+  <div class="stage">
+    <div class="world" aria-hidden="true"></div>
+    <div class="car" aria-hidden="true"><img alt="" draggable="false"></div>
+    <div class="shade"></div>
+    <div class="lamp"></div>
+
+    <div class="hud">
+      <div class="top">
+        <a class="pill" href="/SunBird/" aria-label="Sunbird Lanka Tours home"><img src="../img/logo.png" alt="Sunbird Lanka Tours"></a>
+        <a class="pill" href="/SunBird/destinations/ella/">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+          Ella
+        </a>
+      </div>
+
+      <div class="ticket" data-out="0.004 0.04">
+        <div class="tk-top"><span>Sunbird Lanka Tours</span><span>Hill country line</span></div>
+        <div class="tk-route"><b>Kandy</b><i></i><b>Ella</b></div>
+        <h1>Take the train to Ella</h1>
+        <p>About seven hours through tea country, mountains and misty tunnels. Scroll to ride it.</p>
+        <div class="tk-hint">Scroll to ride
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
+        </div>
+      </div>
+
+      <div class="note" data-show="0.13 0.27" style="--r:-1.4deg">
+        <span class="tag">Hatton</span>
+        <h3>The heart of tea country</h3>
+        <p>The slopes are combed with rows of tea bushes, still picked by hand.</p>
+      </div>
+      <div class="note" data-show="0.32 0.45" style="--r:1.1deg">
+        <span class="tag">Nanu Oya</span>
+        <h3>Change here for Nuwara Eliya</h3>
+        <p>The cool, misty hill town the British called Little England.</p>
+      </div>
+      <div class="note" data-show="0.49 0.585" style="--r:-.8deg">
+        <span class="tag">Pattipola</span>
+        <h3>The top of the line</h3>
+        <p>Almost 1,900 m up, the highest station in Sri Lanka and the closest stop to Horton Plains.</p>
+      </div>
+      <div class="note" data-show="0.6 0.71" style="--r:1.3deg">
+        <span class="tag">Ohiya</span>
+        <h3>Into the mountains</h3>
+        <p>Past Ohiya the line ducks through tunnel after tunnel.</p>
+      </div>
+      <div class="note" data-show="0.74 0.85" style="--r:-1.1deg">
+        <span class="tag">Haputale</span>
+        <h3>Lipton's tea country</h3>
+        <p>Sir Thomas Lipton's favourite lookout, Lipton's Seat, is just up the hill.</p>
+      </div>
+      <div class="note arrive" data-show="0.955 9" style="--r:-.6deg">
+        <span class="tag">Ella</span>
+        <h3>Welcome to Ella</h3>
+        <p>Waterfalls, the hike up Ella Rock and Little Adam's Peak, and the Nine Arches Bridge, all close to the station.</p>
+        <div class="btns">
+          <a class="btn" href="/SunBird/contact-us/#plan">Plan your trip</a>
+          <a class="btn alt" href="/SunBird/destinations/ella/">Explore Ella</a>
+        </div>
+      </div>
+
+      <nav class="route" aria-label="Stations on the line">
+        <div class="track"><i class="fill"></i><i class="loco"></i></div>
+        <ol>
+          <li data-p="0.02"><span>Kandy</span></li>
+          <li data-p="0.19"><span>Hatton</span></li>
+          <li data-p="0.38"><span>Nanu Oya</span></li>
+          <li data-p="0.53"><span>Pattipola</span></li>
+          <li data-p="0.79"><span>Haputale</span></li>
+          <li data-p="0.965"><span>Ella</span></li>
+        </ol>
+      </nav>
+    </div>
+
+    <div class="boarding">Boarding&hellip;</div>
+  </div>
+</section>
+
+<section class="after">
+  <p class="kicker">Ride it for real</p>
+  <h2>Put the train to Ella in your trip</h2>
+  <p>Tell us your dates and what you love, and we'll plan your days in the hill country around it.</p>
+  <div class="btns">
+    <a class="btn" href="/SunBird/contact-us/#plan">Plan your trip</a>
+    <a class="btn alt" href="/SunBird/tours/">See our tours</a>
+  </div>
+  <small><a href="/SunBird/">Sunbird Lanka Tours</a></small>
+</section>
+
+<script>
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const ride = $('.ride'), stage = $('.stage'), world = $('.world'), car = $('.car'), carImg = $('.car img');
+  const hud = $('.hud'), shade = $('.shade'), lamp = $('.lamp');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+  const ss = t => (t = clamp(t), t * t * (3 - 2 * t));
+
+  // The two carriages, and where their windows sit in the picture (pixels).
+  const CAR = {
+    wide: { src:'img/carriage-wide.webp', w:3584, h:1184, wins:[[171,711],[1061,1622],[1960,2516],[2858,3402]], y:[279,1032], panel:0.885 },
+    tall: { src:'img/carriage-tall.webp', w:1536, h:2752, wins:[[424,1121]], y:[862,1961], panel:0.75 },
+  };
+  // The pictures outside, and their width-to-height.
+  const IMG = {
+    sky:  { src:'img/sky.webp',  a:2400 / 1018 },
+    far:  { src:'img/far.webp',  a:2400 / 1018 },
+    mid:  { src:'img/mid.webp',  a:3168 / 1344 },
+    near: { src:'img/near.webp', blur:'img/near-blur.webp', a:2400 / 1018 },
+    rock: { src:'img/rock.webp', blur:'img/rock-blur.webp', a:2000 / 848 },
+    sign: { src:'img/sign.webp', a:1100 / 910 },
+  };
+
+  /* ---- how the train moves along the scroll ----
+     Distances are in "window heights" (bh), so the ride looks the same on every screen.
+     The train pulls away gently, runs at speed, and slows into Ella at the end. */
+  const XEND = 40;
+  function speedAt(p) {
+    if (p < 0.012) return 0;
+    if (p < 0.10)  return ss((p - 0.012) / 0.088);
+    if (p < 0.84)  return 1;
+    if (p < 0.962) return 1 - ss((p - 0.84) / 0.122);
+    return 0;
+  }
+  const N = 2400, XT = new Float32Array(N + 1);
+  { let acc = 0; for (let i = 1; i <= N; i++) { acc += speedAt((i - 0.5) / N); XT[i] = acc; }
+    for (let i = 0; i <= N; i++) XT[i] = XT[i] / acc * XEND; }
+  const X = p => { p = clamp(p) * N; const i = Math.floor(p); return i >= N ? XT[N] : XT[i] + (XT[i + 1] - XT[i]) * (p - i); };
+
+  // where things happen along the line (as scroll progress)
+  const EV = { rockIn:0.603, tunIn:0.632, tunOut:0.688, rockOut:0.716, platform:0.905 };
+
+  let L = null, objs = [], tunnel = null, blurObjs = [];
+
+  function addObj(o) {
+    const el = document.createElement('div');
+    el.className = 'o' + (o.flip ? ' flip' : '') + (o.cls ? ' ' + o.cls : '');
+    el.style.cssText = `width:${(o.w * L.bh).toFixed(1)}px;height:${(o.h * L.bh).toFixed(1)}px;top:${(L.by0 + o.top * L.bh).toFixed(1)}px;z-index:${o.z}`;
+    if (o.src) { const im = new Image(); im.alt = ''; im.decoding = 'async'; im.src = o.src; el.appendChild(im); }
+    if (o.blur) { const im = new Image(); im.alt = ''; im.className = 'blur'; im.decoding = 'async'; im.src = o.blur; el.appendChild(im); o.blurEl = im; blurObjs.push(o); }
+    if (o.html) el.insertAdjacentHTML('beforeend', o.html);
+    world.appendChild(el);
+    o.el = el; o.vis = false; o.sx = null;
+    objs.push(o);
+    return o;
+  }
+
+  // Lay pictures end to end on one plane, every other one mirrored so the joins always match.
+  // `at` pins one point of the picture (0..1 across it, unmirrored) to the middle of the screen at Ella.
+  function strip(kind, k, z, top, h, from, to, skip = [], at = null) {
+    const I = IMG[kind], w = h * I.a, list = [];
+    if (at !== null) {
+      const anchor = XEND * k - at * w;
+      let n = Math.ceil((anchor - from) / w); if (n % 2) n++;
+      from = anchor - n * w;
+    }
+    for (let x = from, i = 0; x < to; x += w, i++) {
+      const hit = skip.some(([a, b]) => x + w > a && x < b);
+      list.push(hit ? null : { k, z, top, h, w, x, flip:i % 2 === 1, src:I.src, blur:I.blur });
+    }
+    list.forEach((o, i) => {
+      if (!o) return;
+      const l = i > 0 && !list[i - 1], r = i < list.length - 1 && !list[i + 1];
+      o.cls = l && r ? 'fadeLR' : l ? 'fadeL' : r ? 'fadeR' : '';
+      addObj(o);
+    });
+  }
+
+  function layout() {
+    const vw = stage.clientWidth, vh = stage.clientHeight;
+    const C = vw / vh < 0.9 ? CAR.tall : CAR.wide;
+    const s = Math.max(vw / C.w, vh / C.h);
+    const cw = C.w * s, ch = C.h * s, ox = (vw - cw) / 2, oy = (vh - ch) / 2;
+    if (carImg.getAttribute('src') !== C.src) carImg.src = C.src;
+    Object.assign(car.style, { width:cw + 'px', height:ch + 'px', left:ox + 'px', top:oy + 'px' });
+
+    const by0 = oy + C.y[0] * s, by1 = oy + C.y[1] * s, bh = by1 - by0;
+    const wins = C.wins.map(([a, b]) => [ox + a * s, ox + b * s]);
+    L = { vw, vh, by0, by1, bh, wins, half:vw / 2 / bh };
+
+    world.replaceChildren(); objs = []; blurObjs = [];
+    const H = L.half, x = X;
+
+    // sky and distant mountains barely move; tea hills drift; the trackside rushes past
+    strip('sky',  0.012, 1, -by0 / bh - 0.06, vh / bh + 0.12, -H - 4, XEND * 0.012 + H + 1);
+    strip('far',  0.06,  2, -0.07, 1.08, -H - 3, XEND * 0.06 + H + 1);
+    // (the tea hills stop with the farmhouse and the waterfall in view, away from a mirrored join)
+    strip('mid',  0.24,  3,  0.27, 0.96, -H - 3, XEND * 0.24 + H + 1, [], 0.45);
+
+    const rock = [x(EV.rockIn), x(EV.rockOut)];
+    const plat = x(EV.platform);
+    strip('near', 1, 6, -0.12, 1.2, -H - 3, XEND + H + 1, [[rock[0] - 0.6, rock[1] + 0.6], [plat - 0.8, 1e9]]);
+
+    // the rock cutting, and the tunnel in the middle of it
+    const rH = 1.4, rW = rH * IMG.rock.a;
+    let n = Math.ceil((rock[1] - rock[0]) / rW);
+    for (let i = 0; i < n; i++) {
+      addObj({ k:1, z:7, top:-0.2, h:rH, w:rW, x:rock[0] + i * rW, flip:i % 2 === 1, src:IMG.rock.src, blur:IMG.rock.blur,
+               cls:n === 1 ? 'fadeLR' : i === 0 ? 'fadeL' : i === n - 1 ? 'fadeR' : '' });
+    }
+    tunnel = addObj({ k:1, z:8, top:-0.25, h:1.5, w:x(EV.tunOut) - x(EV.tunIn), x:x(EV.tunIn), cls:'tunnel' });
+
+    // Ella: the platform, and the station board, coming to rest in a window
+    const winC = wins.map(([a, b]) => (a + b) / 2);
+    const full = wins.filter(([a, b]) => a >= 0 && b <= vw);
+    const pick = (full.length ? full : wins).map(([a, b]) => [(a + b) / 2, b - a])
+      .sort((A, B) => (A[0] < vw / 2) - (B[0] < vw / 2) || Math.abs(A[0] - vw / 2) - Math.abs(B[0] - vw / 2))[0];
+    const sw = Math.min(0.66, pick[1] / bh * 0.8), sh = sw / IMG.sign.a;
+    const signX = XEND + (pick[0] - vw / 2) / bh - sw / 2;
+    addObj({ k:1, z:5, top:0.955, h:0.5, w:XEND + H + 2 - plat, x:plat, cls:'platform' });
+    addObj({ k:1, z:6, top:1.0 - sh, h:sh, w:sw, x:signX, src:IMG.sign.src,
+             html:'<div class="board"><span class="si">ඇල්ල</span><span class="ta">எல்ல</span><span class="en">ELLA</span></div>' })
+      .el.style.fontSize = (sh * bh * 0.082).toFixed(1) + 'px';
+
+    // where the notes go: on the wall between the two middle windows, under the window on phones,
+    // or over the bottom of the window when the wall panel is too narrow
+    let mode, nx, ny, nw;
+    if (C === CAR.tall) {
+      mode = 'm-tall'; nx = winC[0]; ny = oy + C.panel * ch + 6; nw = Math.min(vw - 32, 380);
+    } else {
+      const gaps = [];
+      for (let i = 0; i < wins.length - 1; i++) gaps.push([wins[i][1], wins[i + 1][0]]);
+      const g = gaps.sort((A, B) => Math.abs((A[0] + A[1]) / 2 - vw / 2) - Math.abs((B[0] + B[1]) / 2 - vw / 2))[0];
+      const gw = g[1] - g[0];
+      if (gw >= 190) { mode = 'm-panel'; nx = (g[0] + g[1]) / 2; ny = by0 + 0.07 * bh; nw = Math.min(gw * 0.86, 300); }
+      else { mode = 'm-float'; nx = vw / 2; ny = by1 - 0.05 * bh; nw = Math.min(vw - 32, 360); }
+    }
+    hud.className = 'hud ' + mode;
+    hud.style.setProperty('--nx', nx + 'px');
+    hud.style.setProperty('--ny', ny + 'px');
+    hud.style.setProperty('--nw', nw + 'px');
+    const panelTop = oy + (C === CAR.tall ? 0.97 : C.panel) * ch;
+    hud.style.setProperty('--rb', Math.max(14, Math.min(28, (vh - panelTop - 30) / 2)) + 'px');
+
+    const r = ride.getBoundingClientRect();
+    L.rideTop = r.top + scrollY; L.rideLen = ride.offsetHeight - vh;
+    last.p = -1;   // force a full redraw
+  }
+
+  /* ---- the words on top ---- */
+  const shows = [...document.querySelectorAll('[data-show]')].map(el => {
+    const [a, b] = el.dataset.show.split(' ').map(Number); return { el, a, b, o:-1 };
+  });
+  const ticket = $('.ticket');
+  const stops = [...document.querySelectorAll('.route li')].map(el => ({ el, p:+el.dataset.p }));
+  const P0 = stops[0].p, P1 = stops[stops.length - 1].p, pos = p => clamp((p - P0) / (P1 - P0)) * 100;
+  stops.forEach(s => s.el.style.left = pos(s.p) + '%');
+  const fill = $('.route .fill'), loco = $('.route .loco');
+  function setOpacity(o, v) {
+    v = Math.round(v * 100) / 100;
+    if (v === o.o) return; o.o = v;
+    o.el.style.opacity = v; o.el.style.visibility = v > 0 ? 'visible' : 'hidden';
+  }
+  const tk = { el:ticket, o:-1 }, rt = { el:$('.route'), o:-1 };
+
+  function hudAt(p) {
+    const t = ss((p - 0.004) / 0.036);
+    setOpacity(tk, 1 - t);
+    ticket.style.transform = `translate(-50%, calc(-50% + ${(t * 40).toFixed(1)}px)) rotate(-1.4deg)`;
+    const f = 0.018;
+    shows.forEach(s => setOpacity(s, Math.min(ss((p - s.a) / f), 1 - ss((p - s.b + f) / f))));
+    const w = pos(p);
+    fill.style.width = w + '%'; loco.style.left = w + '%';
+    setOpacity(rt, hud.classList.contains('m-tall') ? 1 - ss((p - 0.94) / 0.018) : 1);
+    let on = 0; stops.forEach((s, i) => { if (p >= s.p - 0.012) on = i; });
+    stops.forEach((s, i) => { s.el.classList.toggle('past', i <= on); s.el.classList.toggle('on', i === on); });
+  }
+
+  /* ---- each frame ---- */
+  const last = { p:-1 };
+  let pT = 0, pC = 0, prevX = 0, speed = 0, jolt = 0, rail = 0, joltAt = 0, tPrev = performance.now();
+
+  function readScroll() { if (L) pT = clamp((scrollY - L.rideTop) / L.rideLen); }
+  addEventListener('scroll', readScroll, { passive:true });
+
+  function frame(now) {
+    const dt = Math.min(0.05, (now - tPrev) / 1000); tPrev = now;
+    // ease toward the scroll position, so the train has a little weight to it
+    pC = reduce ? pT : pC + (pT - pC) * (1 - Math.exp(-dt * 5.5));
+    if (Math.abs(pT - pC) < 2e-5) pC = pT;
+    const x = X(pC);
+    const v = dt > 0 ? Math.abs(x - prevX) / dt : 0; prevX = x;            // window heights per second
+    speed += (v - speed) * (1 - Math.exp(-dt * 7));
+    const moving = speed > 0.02;
+
+    // rail joints: a small double knock every rail length
+    if (!reduce) {
+      const r = Math.floor(x / 1.5);
+      if (r !== rail && moving) { jolt = Math.min(3, 1 + speed * 0.5); joltAt = now + 85; }
+      rail = r;
+      if (joltAt && now >= joltAt) { jolt += Math.min(2.4, 0.8 + speed * 0.4); joltAt = 0; }
+      jolt *= Math.exp(-dt * 16);
+    }
+
+    if (pC !== last.p || moving || jolt > 0.02) {
+      last.p = pC;
+      const { vw, bh } = L;
+      for (const o of objs) {
+        const sx = vw / 2 + (o.x - x * o.k) * bh, sw = o.w * bh;
+        const vis = sx < vw + 4 && sx + sw > -4;
+        if (vis !== o.vis) { o.el.style.visibility = vis ? 'visible' : 'hidden'; o.vis = vis; }
+        if (vis && Math.abs(sx - o.sx) > 0.05 || o.sx === null) { o.el.style.transform = `translate3d(${sx.toFixed(2)}px,0,0)`; o.sx = sx; }
+      }
+      // motion blur on the trackside, fading in with speed (pixels per second)
+      const b = reduce ? 0 : clamp((speed * bh - 650) / 1500, 0, 0.92);
+      for (const o of blurObjs) if (o.vis) { o.blurEl.style.opacity = b.toFixed(2); o.el.firstChild.style.opacity = (1 - b * 0.85).toFixed(2); }
+
+      // the tunnel: how much of the screen it fills decides how dark the carriage is
+      const tx = vw / 2 + (tunnel.x - x) * bh, cover = clamp((Math.min(vw, tx + tunnel.w * bh) - Math.max(0, tx)) / vw);
+      shade.style.opacity = (cover * 0.6).toFixed(3);
+      lamp.style.opacity = cover.toFixed(3);
+      hud.style.setProperty('--lit', (1 - cover * 0.5).toFixed(3));
+
+      // the carriage sways and knocks; the world outside moves the other way, a touch more
+      const sway = reduce ? 0 : Math.min(1, speed / 3);
+      const t = now / 1000;
+      const bob = sway * (Math.sin(t * 7.3) * 0.8 + Math.sin(t * 2.9) * 0.6) + jolt;
+      const tilt = sway * Math.sin(t * 1.7) * 0.07;
+      world.style.transform = `translate3d(0,${(-bob * 0.6).toFixed(2)}px,0)`;
+      car.style.transform = `translate3d(0,${(bob * 0.5).toFixed(2)}px,0) rotate(${tilt.toFixed(3)}deg) scale(1.006)`;
+
+      hudAt(pC);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  /* ---- start: wait for the main pictures, then board ---- */
+  let sized = '';
+  function onResize() {
+    const k = stage.clientWidth + 'x' + stage.clientHeight;
+    if (k === sized) return; sized = k;
+    layout(); readScroll();
+  }
+  addEventListener('resize', onResize);
+  onResize();
+  pC = pT; prevX = X(pC);
+
+  const need = [carImg.src, IMG.sky.src, IMG.far.src, IMG.mid.src, IMG.near.src].map(src => {
+    const im = new Image(); im.src = src; return im.decode().catch(() => {});
+  });
+  Promise.race([Promise.all(need), new Promise(r => setTimeout(r, 6000))]).then(() => document.body.classList.add('ready'));
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
