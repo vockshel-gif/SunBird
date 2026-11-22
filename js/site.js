@@ -255,6 +255,19 @@
   window.addEventListener("pageshow", onScroll);   // also when the page reopens part-way down
   onScroll();
 
+  // ---- tour pages: the photo on the first screen drifts down at a third of the page's speed (parallax)
+  var thBox = d.querySelector(".tour-hero"), thImg = thBox && thBox.querySelector(".th-bg img");
+  if (thImg && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    var thBusy = false;
+    var thDrift = function () {
+      thBusy = false;
+      var y = Math.min(window.scrollY, thBox.offsetHeight);
+      thImg.style.setProperty("--py", (y * .32).toFixed(1) + "px");
+    };
+    window.addEventListener("scroll", function () { if (!thBusy) { thBusy = true; requestAnimationFrame(thDrift); } }, { passive: true });
+    thDrift();
+  }
+
   // ---- home slider
   var slider = d.querySelector(".slider");
   if (slider) {
@@ -363,6 +376,131 @@
     leaving = false;
     d.querySelectorAll(".pt-out").forEach(function (o) { o.remove(); });
   });
+  // the photo you clicked opens out from its place on the page (rect r) until it fills the screen, with the name
+  // over it; the next page opens on that same picture and fades it away (ARRIVE_SCRIPT in build.py). Used by the
+  // home page's wheel and by the lists of tour categories.
+  var photoOut = function (href, r, src, word, lead) {
+    leaving = true;
+    var vw = window.innerWidth, vh = window.innerHeight;
+    try {
+      sessionStorage.setItem("sbTrip", JSON.stringify({ img: src, word: word, lead: lead || "", t: Date.now() }));
+    } catch (err) { /* private mode: the next page simply opens without the picture */ }
+    var o = d.createElement("div");
+    o.className = "pt pt-out";
+    o.setAttribute("aria-hidden", "true");
+    o.style.setProperty("--from", "inset(" + Math.max(0, r.top) + "px " + Math.max(0, vw - r.right) + "px " +
+      Math.max(0, vh - r.bottom) + "px " + Math.max(0, r.left) + "px)");
+    var pic = new Image();
+    pic.alt = "";
+    pic.src = src;
+    o.appendChild(pic);
+    var shade = d.createElement("div");
+    shade.className = "pt-shade";
+    o.appendChild(shade);
+    var say = d.createElement("p"), small = d.createElement("small"), em = d.createElement("em");
+    say.className = "pt-word";
+    small.textContent = lead || "";
+    em.textContent = word || "";
+    say.appendChild(small);
+    say.appendChild(em);
+    o.appendChild(say);
+    body.appendChild(o);
+    void o.offsetWidth;   // start from the photo's place on the page, then open out
+    o.classList.add("go");
+    setTimeout(function () { window.location.href = href; }, 820);
+  };
+
+  // ---- tour categories as an editorial index (build.py category_index: the top of /tours/ and "Other tour
+  // categories" on each category page). Pointing at a row lights it up and changes the big photo beside the
+  // list, with its line underneath; clicking one opens its photo out to fill the screen (photoOut). On phones
+  // the rows are swipe cards with a progress line and "01 / 07" under them.
+  d.querySelectorAll(".cat-index").forEach(function (ci) {
+    var rows = [].slice.call(ci.querySelectorAll(".ci-row")), pics = [].slice.call(ci.querySelectorAll(".ci-frame img"));
+    var frame = ci.querySelector(".ci-frame"), cap = ci.querySelector(".ci-cap"), cur = 0, capTimer = 0;
+    var show = function (i) {
+      if (i === cur || !rows[i]) return;
+      rows[cur].classList.remove("on");
+      if (pics[cur]) pics[cur].classList.remove("on");
+      cur = i;
+      rows[i].classList.add("on");
+      if (pics[i]) pics[i].classList.add("on");
+      if (!cap) return;
+      clearTimeout(capTimer);
+      cap.classList.add("swap");
+      capTimer = setTimeout(function () { cap.textContent = rows[cur].getAttribute("data-line") || ""; cap.classList.remove("swap"); }, 250);
+    };
+    rows.forEach(function (row, i) {
+      row.addEventListener("pointerenter", function (e) { if (e.pointerType !== "touch") show(i); });
+      row.addEventListener("focus", function () { show(i); });
+      row.addEventListener("click", function (e) {
+        if (leaving || e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button > 0 || calmMotion()) return;
+        // the big photo beside the list on wide screens; on phones the row's own small one
+        var wide = !!(frame && frame.offsetParent), img = wide ? pics[i] : row.querySelector(".ci-thumb");
+        var src = img && (img.currentSrc || img.src);
+        if (!src) return;   // the plain circle (every other page link) takes it instead
+        e.preventDefault();
+        show(i);
+        var name = row.querySelector(".ci-name");
+        photoOut(row.href, (wide ? frame : img).getBoundingClientRect(), src,
+          name ? name.textContent.trim() : "", row.getAttribute("data-line"));
+      });
+    });
+    var list = ci.querySelector(".ci-list"), bar = ci.querySelector(".ci-bar i"), count = ci.querySelector(".ci-count");
+    if (list && bar && count && rows.length > 1) {
+      var n = rows.length, busy = false, two = function (k) { return (k < 10 ? "0" : "") + k; };
+      var track = function () {
+        busy = false;
+        var step = list.children[1].offsetLeft - list.children[0].offsetLeft || list.clientWidth;
+        var k = list.scrollLeft >= list.scrollWidth - list.clientWidth - 2 ? n - 1 : Math.round(list.scrollLeft / step);
+        k = Math.max(0, Math.min(n - 1, k));
+        bar.style.width = ((k + 1) / n * 100).toFixed(2) + "%";
+        count.textContent = two(k + 1) + " / " + two(n);
+      };
+      list.addEventListener("scroll", function () { if (!busy) { busy = true; requestAnimationFrame(track); } }, { passive: true });
+    }
+  });
+
+  // ---- tour pages: the route map beside "The trip" (build.py tour_map) draws itself in once it's on screen:
+  // the island fades up, the gold line runs from the start, and each place appears as the line reaches it
+  if ("IntersectionObserver" in window && !calmMotion()) d.querySelectorAll(".tmap").forEach(function (map) {
+    map.classList.add("pre");
+    var seen = new IntersectionObserver(function (list) {
+      if (list.some(function (e) { return e.isIntersecting; })) { map.classList.add("in"); seen.disconnect(); }
+    }, { threshold: .3 });
+    seen.observe(map);
+  });
+  // pointing at the map lights the island up in yellow around the pointer: a soft round mask over the yellow
+  // copy of the island follows the pointer (gliding after it), opens out when it arrives and closes when it leaves
+  d.querySelectorAll(".tmap").forEach(function (map) {
+    var svg = map.querySelector("svg"), spot = map.querySelector(".tm-spot");
+    if (!svg || !spot || !svg.getScreenCTM) return;
+    var now = { x: 0, y: 0, r: 0 }, aim = { x: 0, y: 0, r: 0 }, busy = false, calm = calmMotion();
+    var draw = function () {
+      var k = calm ? 1 : .2;
+      now.x += (aim.x - now.x) * k;
+      now.y += (aim.y - now.y) * k;
+      now.r += (aim.r - now.r) * (calm ? 1 : .12);
+      spot.setAttribute("cx", now.x.toFixed(1));
+      spot.setAttribute("cy", now.y.toFixed(1));
+      spot.setAttribute("r", Math.max(0, now.r).toFixed(1));
+      busy = Math.abs(aim.x - now.x) + Math.abs(aim.y - now.y) + Math.abs(aim.r - now.r) > .5;
+      if (busy) requestAnimationFrame(draw);
+    };
+    var go = function () { if (!busy) { busy = true; requestAnimationFrame(draw); } };
+    var follow = function (e) {
+      var m = svg.getScreenCTM();
+      if (!m) return;
+      var p = new DOMPoint(e.clientX, e.clientY).matrixTransform(m.inverse());
+      if (now.r < 2) { now.x = p.x; now.y = p.y; }   // a new visit starts where the pointer is
+      aim.x = p.x;
+      aim.y = p.y;
+      aim.r = 150;
+      go();
+    };
+    svg.addEventListener("pointermove", follow);
+    svg.addEventListener("pointerdown", follow);
+    svg.addEventListener("pointerleave", function () { aim.r = 0; go(); });
+  });
 
   // ---- "I want a trip full of ___" wheel (home page tour categories)
   d.querySelectorAll(".trip-wheel").forEach(function (sec) {
@@ -434,38 +572,13 @@
     // clicking through to a tour: the wheel's photo opens out to fill the screen with the chosen word, then
     // the tour page opens on that same picture and fades it away (see "arriving from the home page" above)
     var leave = function (e, href) {
-      if (still || e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button > 0) return;
+      if (still || leaving || e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button > 0) return;
       var img = photos[cur()], src = img && (img.currentSrc || img.src);
       if (!src || !href) return;
       e.preventDefault();
-      var r = sec.querySelector(".tw-photos").getBoundingClientRect(), vw = window.innerWidth, vh = window.innerHeight;
-      var word = words[cur()].textContent, lead = sec.querySelector(".tw-lead");
-      try {
-        sessionStorage.setItem("sbTrip", JSON.stringify({ img: src, word: word, lead: lead ? lead.textContent : "", t: Date.now() }));
-      } catch (err) { /* private mode: the next page simply opens without the picture */ }
-      var o = d.createElement("div");
-      o.className = "pt pt-out";
-      o.setAttribute("aria-hidden", "true");
-      o.style.setProperty("--from", "inset(" + Math.max(0, r.top) + "px " + Math.max(0, vw - r.right) + "px " +
-        Math.max(0, vh - r.bottom) + "px " + Math.max(0, r.left) + "px)");
-      var pic = new Image();
-      pic.alt = "";
-      pic.src = src;
-      o.appendChild(pic);
-      var shade = d.createElement("div");
-      shade.className = "pt-shade";
-      o.appendChild(shade);
-      var say = d.createElement("p"), small = d.createElement("small"), em = d.createElement("em");
-      say.className = "pt-word";
-      small.textContent = lead ? lead.textContent : "";
-      em.textContent = word;
-      say.appendChild(small);
-      say.appendChild(em);
-      o.appendChild(say);
-      body.appendChild(o);
-      void o.offsetWidth;   // start from the photo's place on the page, then open out
-      o.classList.add("go");
-      setTimeout(function () { window.location.href = href; }, 820);
+      var lead = sec.querySelector(".tw-lead");
+      photoOut(href, sec.querySelector(".tw-photos").getBoundingClientRect(), src, words[cur()].textContent,
+        lead ? lead.textContent : "");
     };
     // coming back with the browser's Back button: take the full-screen picture down again
     window.addEventListener("pageshow", function (e) {

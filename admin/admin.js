@@ -13,7 +13,7 @@
   const MAX_SIDE = { site: 2400, about: 2400, people: 600, logos: 600 };
   const DEFAULT_SIDE = 1800;
   // photos the design itself uses (not listed in any text file), so they can't be deleted
-  const PROTECTED = ['static/img/logo.png', 'static/img/logo-white.png'];
+  const PROTECTED = ['static/img/logo.png', 'static/img/logo-white.png', 'static/img/logo.svg', 'static/img/logo-white.svg'];
   const enc = new TextEncoder();
   const dec = new TextDecoder();
   const siteBase = location.pathname.replace(/\/admin(\/.*)?$/, '');
@@ -418,7 +418,8 @@
         ['themes', 'Categories', 'themes', 'Tap to add or remove. The first one is the main category: it sets the breadcrumb.'],
         ['best_months', 'Best months', 'text', 'For example “Dec-Apr”. Shown as “Best …” on the tour.'],
         ['mixed_months', 'Mixed months', 'text', 'Months that can go either way, for example “Jul-Sep, Nov”. Other months count as off-season.'],
-        ['image', 'Main photo', 'photo', 'The big photo at the top and on tour cards.'],
+        ['image', 'Main photo', 'photo', 'The photo on tour cards, and at the top of the tour when there is no top photo.'],
+        ['hero_image', 'Top photo (wide)', 'photo', 'The full-screen photo at the top of the tour page. Use a wide photo, 2000px or more across. Leave empty to use the main photo.'],
         ['summary', 'Short summary', 'textarea', 'Shown on tour cards and in Google results. Two sentences is plenty.'],
         ['order', 'Position in lists', 'number', 'Lower numbers come first.'],
       ],
