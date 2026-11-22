@@ -1511,4 +1511,729 @@
       }).then(function () { button.disabled = false; });
     });
   });
+
+  // ---- the trip letter ({{letter}} on /contact-us/, build.py letter): the request written as a letter. On the page
+  // it shows as it stands, with "Start my letter"; it is written full screen, so the letter, the step being answered
+  // and at the end "Seal and send" are all on one screen. Every blue word is a blank, filled one after another in the
+  // order of the letter: who's coming, country (picked from a list), when, the exact days and nights (a slider), what
+  // they'd love, email and number, a P.S. and a name. Tapping a blue word goes straight to it. Answers from earlier
+  // in the visit (the tour finder, the month question) and a draft of this letter are written in already. "Plan my
+  // trip" links (/contact-us/#plan from another page of the site) open it full screen at once.
+  (function () {
+    var lt = d.querySelector(".lt"), box = lt && lt.closest(".lt-box"), dataEl = lt && lt.querySelector(".lt-data");
+    if (!lt || !box || !dataEl) return;
+    var data;
+    try { data = JSON.parse(dataEl.textContent); } catch (err) { return; }
+    var q$ = function (sel) { return lt.querySelector(sel); };
+    var plain = box.querySelector(".lt-plain"), tip = q$(".lt-tip"), bar = q$(".lt-top"), closeBtn = q$(".lt-close");
+    var dots = [].slice.call(lt.querySelectorAll(".lt-dots li"));
+    var mainEl = q$(".lt-main"), stage = q$(".lt-stage"), paper = q$(".lt-paper"), env = q$(".lt-env");
+    var foot = q$(".lt-foot"), startBtn = q$(".lt-start"), sheet = q$(".lt-sheet"), ask = q$(".lt-ask"), ready = q$(".lt-ready");
+    var pane = q$(".lt-pane"), errEl = q$(".lt-err"), qEl = q$(".lt-ask .lt-q"), stepEl = q$(".lt-step");
+    var nextBtn = q$(".lt-next"), prevBtn = q$(".lt-prev");
+    var sendBtn = q$(".lt-send"), wa = q$(".lt-wa"), status = q$(".lt-status");
+    var done = q$(".lt-done"), tourLine = q$(".lt-tour-line"), hp = q$("[name=botcheck]");
+    var blanks = {};
+    lt.querySelectorAll(".lt-b").forEach(function (b) { blanks[b.getAttribute("data-q")] = b; });
+    if (!plain || !bar || !closeBtn || !mainEl || !paper || !env || !foot || !startBtn || !sheet || !ask || !ready || !pane ||
+        !nextBtn || !prevBtn || !sendBtn || !done || dots.length !== 8 ||
+        ["who", "country", "when", "len", "love", "tour", "email", "phone", "ps", "name"].some(function (q) { return !blanks[q]; })) return;
+    // the site may live in a sub-folder (build.py apply_base_path): photos named in the data get the same start
+    var base = (done.querySelector("a[href$='/tours/']") || { getAttribute: function () { return "/tours/"; } })
+      .getAttribute("href").replace(/\/tours\/$/, "");
+    var M = data.months, words = data.words;
+    var WHO = ["On my own", "A couple", "A family with kids", "A group of friends"];
+    // the steps, in the order of the letter; the email and number blanks share one step
+    var ORDER = ["who", "country", "when", "len", "love", "contact", "ps", "name"];
+    var STEP = { email: "contact", phone: "contact" };
+    var stepOf = function (b) { return STEP[b] || b; };
+    var Q = { who: "Who’s coming?", country: "Where are you travelling from?", when: "When would you like to come?",
+      len: "How many days can you stay?", love: "What would make it perfect? Pick as many as you like",
+      contact: "Where can we write back to you?", ps: "Anything else you’d like us to know?", name: "Sign your letter",
+      tour: "Which tour caught your eye?" };
+    var PH = { who: "who’s coming?", country: "your country", when: "when?", len: "for how long?", love: "what would make it perfect?",
+      tour: "which tour?", email: "your email", phone: "your number (optional)", ps: "anything else you’d like us to know", name: "your name" };
+    var NUM = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve"];
+    var num = function (n) { return n <= 12 ? NUM[n] : String(n); };
+    var cap1 = function (w) { return w.charAt(0).toUpperCase() + w.slice(1); };
+    var andList = function (a) { return a.length < 2 ? a.join("") : a.slice(0, -1).join(", ") + " and " + a[a.length - 1]; };
+    var wait = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
+    var pad2 = function (n) { return ("0" + n).slice(-2); };
+    var iso = function (t) { return t.getFullYear() + "-" + pad2(t.getMonth() + 1) + "-" + pad2(t.getDate()); };
+    var today = new Date(), todayIso = iso(today);
+    var mobile = function () { return window.matchMedia("(max-width: 979px)").matches; };
+    var how = function () { return calmMotion() ? "auto" : "smooth"; };
+    var emailOk = function (v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); };
+    var MAXD = 30;
+
+    // the answers. month: -1 not answered, 0-11, 12 "not sure yet"; days: 0 not answered, else 1-30 (nights are one
+    // fewer); a and c: adults and children (asked for families and groups); any: "Surprise us"; psSeen: the P.S. step
+    // was passed (it may stay empty)
+    var fresh = function () {
+      return { who: -1, a: 2, c: 0, country: "", month: -1, date: "", days: 0, love: [], any: false, tour: "",
+        email: "", phone: "", ps: "", name: "", psSeen: false };
+    };
+    var s = fresh();
+    s.tour = data.tour || "";
+    var counts = function () { s.a = s.who === 0 ? 1 : s.who === 3 ? 4 : 2; s.c = s.who === 2 ? 2 : 0; };
+    // the tour finder's lengths (a single day, about a week, 10 to 12 days, two weeks or more) as days, and back
+    var LEN_DAYS = [1, 7, 11, 14];
+    var lenOf = function (n) { return n < 1 ? -1 : n === 1 ? 0 : n <= 8 ? 1 : n <= 13 ? 2 : 3; };
+    var KEY = "sbLetter", hadFinder = false;
+    try {
+      var tf = JSON.parse(sessionStorage.getItem("sbTfS") || "null");
+      if (tf) {
+        hadFinder = true;
+        if (tf.who >= 0 && tf.who < 4) { s.who = tf.who; counts(); }
+        if (tf.len >= 0 && tf.len < 4) s.days = LEN_DAYS[tf.len];
+        if (tf.love && tf.love.filter) s.love = tf.love.filter(function (w) { return words.indexOf(w) >= 0; });
+      }
+    } catch (err) { /* start empty */ }
+    var m0 = getMonth();
+    if (m0 !== null) s.month = m0 >= 0 && m0 < 12 ? m0 : m0 === -1 ? 12 : -1;
+    var draft = null;
+    try { draft = JSON.parse(sessionStorage.getItem(KEY) || "null"); } catch (err) { draft = null; }
+    if (draft && draft.s) {
+      var o = draft.s;
+      var whole = function (v, lo, hi) { return typeof v === "number" && v >= lo && v <= hi && v === Math.round(v); };
+      var str = function (v, n) { return typeof v === "string" ? v.slice(0, n) : null; };
+      if (whole(o.who, -1, 3)) s.who = o.who;
+      if (whole(o.a, 1, 40)) s.a = o.a;
+      if (whole(o.c, 0, 20)) s.c = o.c;
+      if (whole(o.month, -1, 12)) s.month = o.month;
+      if (typeof o.date === "string" && /^\d{4}-\d\d-\d\d$/.test(o.date) && o.date >= todayIso) s.date = o.date;
+      if (whole(o.days, 0, MAXD)) s.days = o.days;
+      if (o.love && o.love.filter) s.love = o.love.filter(function (w) { return words.indexOf(w) >= 0; });
+      s.any = o.any === true;
+      s.psSeen = o.psSeen === true;
+      if (typeof o.tour === "string" && (o.tour === "" || data.tours.indexOf(o.tour) >= 0)) s.tour = o.tour;
+      [["country", 80], ["email", 120], ["phone", 40], ["ps", 2000], ["name", 80]].forEach(function (f) {
+        var v = str(o[f[0]], f[1]);
+        if (v !== null) s[f[0]] = v;
+      });
+    }
+    // from links: the tour finder's best match (?tour=), its sentence (?trip=) when its answers aren't kept, and
+    // the trip words of old links to the retired mix page (?mix=)
+    if (window.URLSearchParams && location.search) {
+      var qs = new URLSearchParams(location.search), qt = qs.get("tour"), mix = qs.get("mix"), trip = qs.get("trip");
+      if (qt && data.tours.indexOf(qt) >= 0) s.tour = qt;
+      if (mix) mix.split(",").forEach(function (w) {
+        w = w.trim().toLowerCase();
+        if (words.indexOf(w) >= 0 && s.love.indexOf(w) < 0) s.love.push(w);
+      });
+      if (trip && !hadFinder && !s.ps) s.ps = trip.slice(0, 400);
+    }
+
+    // ---- countries: every country's English name comes from the browser (Intl.DisplayNames); a few are offered
+    // first (the visitor's own, going by their browser's language, then the countries most of our guests come from)
+    var CODES = ("AD AE AF AG AI AL AM AO AR AS AT AU AW AZ BA BB BD BE BF BG BH BI BJ BM BN BO BR BS BT BW BY BZ CA CD CF CG CH " +
+      "CI CK CL CM CN CO CR CU CV CY CZ DE DJ DK DM DO DZ EC EE EG ER ES ET FI FJ FM FO FR GA GB GD GE GH GI GL GM GN GQ GR GT " +
+      "GU GW GY HK HN HR HT HU ID IE IL IN IQ IR IS IT JM JO JP KE KG KH KI KM KN KP KR KW KY KZ LA LB LC LI LK LR LS LT LU LV " +
+      "LY MA MC MD ME MG MH MK ML MM MN MO MR MT MU MV MW MX MY MZ NA NC NE NG NI NL NO NP NR NZ OM PA PE PF PG PH PK PL PR PS " +
+      "PT PW PY QA RE RO RS RU RW SA SB SC SD SE SG SI SK SL SM SN SO SR SS ST SV SY SZ TD TG TH TJ TL TM TN TO TR TT TV TW TZ " +
+      "UA UG US UY UZ VA VC VE VG VI VN VU WS XK YE ZA ZM ZW").split(" ");
+    var POPULAR = [["IN", "India"], ["GB", "United Kingdom"], ["DE", "Germany"], ["RU", "Russia"], ["FR", "France"],
+      ["AU", "Australia"], ["NL", "Netherlands"], ["US", "United States"]];
+    var allCountries = null;
+    var countries = function () {
+      if (allCountries) return allCountries;
+      allCountries = [];
+      try {
+        var dn = new Intl.DisplayNames(["en"], { type: "region" });
+        CODES.forEach(function (c) { var n = dn.of(c); if (n && n !== c) allCountries.push([c, n]); });
+      } catch (err) { /* an old browser: the popular ones, or typed */ }
+      if (!allCountries.length) allCountries = POPULAR.slice();
+      allCountries.sort(function (x, y) { return x[1].localeCompare(y[1]); });
+      return allCountries;
+    };
+    var nameOf = function (code) {
+      var hit = countries().filter(function (c) { return c[0] === code; })[0] || POPULAR.filter(function (c) { return c[0] === code; })[0];
+      return hit ? hit[1] : "";
+    };
+    var guess = (function () {
+      var ls = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || ""];
+      for (var i = 0; i < ls.length; i++) { var m = /-([a-z]{2})$/i.exec(ls[i] || ""); if (m) return m[1].toUpperCase(); }
+      return "";
+    })();
+    var countryOptions = function (query) {
+      var q = query.trim().toLowerCase();
+      if (!q) {
+        var top = POPULAR.map(function (c) { return c[1]; }), g = guess && nameOf(guess);
+        if (s.country && top.indexOf(s.country) < 0) top.unshift(s.country);
+        if (g && top.indexOf(g) < 0) top.unshift(g);
+        else if (g) top = [g].concat(top.filter(function (n) { return n !== g; }));
+        return top.slice(0, 10).map(function (n) { return [n, n]; });
+      }
+      var all = countries(), starts = [], within = [];
+      all.forEach(function (c) {
+        var at = c[1].toLowerCase().indexOf(q);
+        if (at === 0) starts.push(c[1]); else if (at > 0) within.push(c[1]);
+      });
+      var hits = starts.concat(within).slice(0, 10).map(function (n) { return [n, n]; });
+      var typed = query.trim().replace(/\s+/g, " ").slice(0, 60);
+      if (!hits.length) hits.push(["Use “" + typed + "”", typed]);   // not in the list: their own words
+      return hits;
+    };
+
+    // ---- the words written into the blanks
+    var solo = function () { return s.who === 0; };
+    var year = function (m) { return today.getFullYear() + (m < today.getMonth() ? 1 : 0); };
+    var fmtDate = function (v) { var p = v.split("-"); return +p[2] + " " + M[+p[1] - 1] + " " + p[0]; };
+    var addDays = function (v, n) { var p = v.split("-"); return iso(new Date(+p[0], +p[1] - 1, +p[2] + n)); };
+    var whoText = function () {
+      if (s.who === 0) return "travelling on my own";
+      if (s.who === 1) return "a couple";
+      if (s.who === 2) return "a family of " + num(s.a + s.c) + (s.c ? " (" + num(s.a) + (s.a === 1 ? " adult, " : " adults, ") +
+        num(s.c) + (s.c === 1 ? " child)" : " children)") : "");
+      if (s.who === 3) return "a group of " + num(s.a) + " friends";
+      return "";
+    };
+    var whenText = function () {
+      return s.date ? "arriving on " + fmtDate(s.date) : s.month === 12 ? "sometime soon" : s.month >= 0 ? "in " + M[s.month] + " " + year(s.month) : "";
+    };
+    var nightsText = function (n) { return n === 1 ? "a single day" : n + " days and " + (n - 1) + (n === 2 ? " night" : " nights"); };
+    var lenText = function () { return s.days > 0 ? "for " + nightsText(s.days) : ""; };
+    // with an arrival date, the days also give the dates: "12 – 21 March 2027"
+    var dates = function (n) {
+      if (!s.date || !n) return "";
+      if (n === 1) return fmtDate(s.date);
+      var a = s.date.split("-"), b = addDays(s.date, n - 1).split("-"), sameY = a[0] === b[0], sameM = sameY && a[1] === b[1];
+      return +a[2] + (sameM ? "" : " " + M[+a[1] - 1] + (sameY ? "" : " " + a[0])) + " – " + +b[2] + " " + M[+b[1] - 1] + " " + b[0];
+    };
+    var loveText = function () {
+      var w = s.love.length === words.length ? ["a bit of everything"] : s.love.slice();
+      if (s.any) w.push(w.length ? "whatever else you’d suggest" : "whatever you’d suggest");
+      return andList(w);
+    };
+    var text = function (b) {
+      return b === "who" ? whoText() : b === "when" ? whenText() : b === "len" ? lenText() : b === "love" ? loveText() : (s[b] || "").trim();
+    };
+    var answered = function (q) {
+      return q === "who" ? s.who >= 0 : q === "country" ? !!s.country.trim() : q === "when" ? s.month >= 0 || !!s.date
+        : q === "len" ? s.days > 0 : q === "love" ? s.love.length > 0 || s.any : q === "contact" ? emailOk(s.email.trim())
+        : q === "ps" ? s.psSeen || !!s.ps.trim() : q === "name" ? !!s.name.trim() : true;
+    };
+    // the letter as plain words, for the email and for WhatsApp
+    var compose = function (forWa) {
+      var who = whoText(), from = s.country.trim(), when = whenText(), len = lenText();
+      var p1 = (solo() ? "I’m" : "We’re") + (who ? " " + who : "") + (from ? " from " + from : "") + (who || from ? ", hoping" : " hoping") +
+        " to visit Sri Lanka" + (when ? " " + when : "") + (len ? " " + len : "") + ".";
+      if (s.love.length || s.any) p1 += " " + (solo() ? "I’d" : "We’d") + " love " + loveText() + ".";
+      if (s.tour) p1 += " " + (solo() ? "I" : "We") + " like the look of your " + s.tour + ".";
+      var mail = s.email.trim(), tel = s.phone.trim(), out = ["Dear Sunbird team,", p1];
+      if (mail) out.push("You can write back to me at " + mail + (tel ? ", or WhatsApp me on " + tel : "") + ".");
+      else if (tel && !forWa) out.push("You can WhatsApp me on " + tel + ".");
+      if (s.ps.trim()) out.push("P.S. " + s.ps.trim());
+      out.push("Warm wishes,\n" + s.name.trim());
+      return out.join("\n\n").trim();
+    };
+    var save = function () {
+      try {
+        sessionStorage.setItem(KEY, JSON.stringify({ s: s }));
+        // the tour finder on /tours/ shows the same answers
+        sessionStorage.setItem("sbTfS", JSON.stringify({ who: s.who, len: lenOf(s.days), love: s.love }));
+      } catch (err) { /* not kept */ }
+    };
+
+    // open: the step showing in full screen ("ready" at the end), null on the page
+    var full = false, open = null, cur = null, editing = false, from = null, busy = false;
+    var nextUp = function () {
+      for (var i = 0; i < ORDER.length; i++) if (!answered(ORDER[i])) return ORDER[i];
+      return null;
+    };
+    var draw = function (changed) {
+      lt.querySelectorAll("[data-t=me]").forEach(function (el) { el.textContent = solo() ? "I’m" : "We’re"; });
+      lt.querySelectorAll("[data-t=we]").forEach(function (el) { el.textContent = solo() ? "I’d" : "We’d"; });
+      lt.querySelectorAll("[data-t=i]").forEach(function (el) { el.textContent = solo() ? "I" : "We"; });
+      var up = nextUp(), glow = !full && up ? (up === "contact" ? "email" : up) : null;
+      Object.keys(blanks).forEach(function (b) {
+        var el = blanks[b], v = text(b);
+        el.textContent = v || PH[b];
+        el.classList.toggle("empty", !v);
+        el.classList.toggle("on", full && stepOf(b) === open);
+        el.classList.toggle("up", b === glow);   // on the page, the next blank to fill glows softly
+        if (b === changed) { el.classList.remove("new"); void el.offsetWidth; el.classList.add("new"); }
+      });
+      tourLine.hidden = !s.tour;
+      dots.forEach(function (dot, i) {
+        dot.className = (answered(ORDER[i]) ? "done" : "") + (ORDER[i] === open ? " now" : "");
+      });
+      var any = ORDER.some(function (q) { return q !== "ps" && answered(q); });
+      startBtn.firstChild.textContent = !up ? "Read it and send" : any ? "Carry on with my letter" : "Start my letter";
+      if (wa && cfg.whatsapp) wa.href = "https://wa.me/" + cfg.whatsapp + "?text=" + encodeURIComponent(compose(true));
+      save();
+    };
+
+    // ---- what each step shows
+    var chip = function (label, i, on, photo, v) {
+      var p = photo && photo[0];
+      return '<button type="button" class="tf-c' + (p ? " has-av" : "") + '" data-i="' + i + '"' + (v !== undefined ? ' data-v="' + escHtml(v) + '"' : "") +
+        ' aria-pressed="' + on + '">' + (p ? '<span class="tf-av"><img src="' + escHtml(base + p) + '" alt=""' +
+          (photo[1] ? ' style="object-position:' + escHtml(photo[1]) + '"' : "") + "></span>" : "") +
+        '<span class="tf-cl">' + escHtml(label) + "</span></button>";
+    };
+    var chips = function (q, list) {
+      return '<div class="lt-chips at-' + q + '" role="group" aria-label="Answers">' + list.map(function (o, i) { return chip(o[0], i, o[1], o[2], o[3]); }).join("") + "</div>";
+    };
+    var stepper = function (k, label, v, fewer, more) {
+      return '<div class="lt-count"><span class="lt-count-l">' + label + '</span><button type="button" class="lt-pm" data-k="' + k +
+        '" data-d="-1" aria-label="' + fewer + '">−</button><output aria-live="polite">' + v + '</output><button type="button" class="lt-pm" data-k="' +
+        k + '" data-d="1" aria-label="' + more + '">+</button></div>';
+    };
+    var field = function (name, label, type, attrs, v) {
+      return '<label class="lt-field"><span>' + label + "</span>" + (type === "textarea"
+        ? '<textarea name="' + name + '" rows="3" ' + attrs + ">" + escHtml(v) + "</textarea>"
+        : '<input type="' + type + '" name="' + name + '" value="' + escHtml(v) + '" ' + attrs + ">") + "</label>";
+    };
+    var countryChips = function (query) {
+      return countryOptions(query).map(function (o, i) { return chip(o[0], i, o[1] === s.country, null, o[1]); }).join("");
+    };
+    var daysView = function (n) {
+      return '<span class="lt-days-n">' + n + '</span> ' + (n === 1 ? "day" : "days") +
+        (n > 1 ? ' <span class="lt-days-x">·</span> <span class="lt-days-n">' + (n - 1) + "</span> " + (n === 2 ? "night" : "nights") : "");
+    };
+    var fill = function (q) {
+      var k = ORDER.indexOf(q), html = "";
+      qEl.textContent = Q[q];
+      stepEl.textContent = k >= 0 ? (k + 1) + " of " + ORDER.length : "";
+      if (q === "who") {
+        html = chips(q, WHO.map(function (o, i) { return [o, s.who === i]; }));
+        if (s.who === 2) html += '<div class="lt-extra">' + stepper("a", "Adults", s.a, "One adult fewer", "One more adult") +
+          stepper("c", "Children", s.c, "One child fewer", "One more child") + "</div>";
+        if (s.who === 3) html += '<div class="lt-extra">' + stepper("a", "How many of you?", s.a, "One fewer", "One more") + "</div>";
+      } else if (q === "country") {
+        html = '<label class="lt-find"><span class="sr">Search for your country</span><input type="search" autocomplete="off" ' +
+          'enterkeyhint="search" placeholder="Search for your country"></label>' +
+          '<div class="lt-chips at-country" role="group" aria-label="Countries">' + countryChips("") + "</div>";
+      } else if (q === "when") {
+        html = chips(q, M.map(function (m, i) { return [m.slice(0, 3), !s.date && s.month === i]; }).concat([["Not sure yet", s.month === 12]])) +
+          '<div class="lt-extra"><label class="lt-dt"><span>Know your arrival date?</span><input type="date" min="' + todayIso +
+          '" value="' + escHtml(s.date) + '"></label></div>';
+      } else if (q === "len") {
+        var n = s.days || 10;
+        html = '<div class="lt-days"><button type="button" class="lt-pm" data-d="-1" aria-label="One day fewer">−</button>' +
+          '<p class="lt-days-v" aria-live="polite">' + daysView(n) + '</p><button type="button" class="lt-pm" data-d="1" aria-label="One more day">+</button></div>' +
+          '<p class="lt-days-s">' + escHtml(dates(n)) + "</p>" +
+          '<input type="range" class="lt-range" min="1" max="' + MAXD + '" step="1" value="' + n + '" aria-label="Number of days" style="--p:' +
+          ((n - 1) / (MAXD - 1) * 100).toFixed(1) + '%">' +
+          '<p class="lt-range-k" aria-hidden="true"><span>1 day</span><span>' + MAXD + " days</span></p>";
+      } else if (q === "love") {
+        html = chips(q, words.map(function (w) { return [cap1(w), s.love.indexOf(w) >= 0, data.photos && data.photos[w]]; })
+          .concat([["Surprise us", s.any]]));
+      } else if (q === "tour") {
+        html = chips(q, data.tours.map(function (t) { return [t, s.tour === t]; }).concat([["Don’t mention a tour", false]]));
+      } else if (q === "contact") {
+        html = field("email", "Email", "email", 'autocomplete="email" inputmode="email" enterkeyhint="next" autocapitalize="off" spellcheck="false" placeholder="you@example.com"', s.email) +
+          field("phone", 'WhatsApp or phone <em>(optional)</em>', "tel", 'autocomplete="tel" enterkeyhint="done" placeholder="With your country code"', s.phone);
+      } else if (q === "ps") {
+        html = field("ps", '<span class="sr">Anything else</span>', "textarea",
+          'maxlength="2000" placeholder="A budget, a birthday, hotels you like, a place you’ve always wanted to see…"', s.ps);
+      } else if (q === "name") {
+        html = field("name", "Your name", "text", 'autocomplete="name" autocapitalize="words" enterkeyhint="done" maxlength="80" placeholder="First and last name"', s.name);
+      }
+      pane.className = "lt-pane at-" + q;
+      pane.innerHTML = html;
+      err("");
+      label();
+    };
+    // the step's buttons: "Skip" while the P.S. is empty, "Done" on the last step; no "Back" on the first
+    var label = function () {
+      var k = ORDER.indexOf(open);
+      nextBtn.textContent = open === "ps" && !s.ps.trim() ? "Skip" : k === ORDER.length - 1 || k < 0 || editing ? "Done" : "Next";
+      prevBtn.hidden = k <= 0 || editing;
+    };
+    var err = function (t) { errEl.textContent = t; };
+    // keep the word being answered in sight in the letter
+    var reveal = function () {
+      var el = blanks[cur];
+      if (!full || !el) return;
+      requestAnimationFrame(function () {
+        var m = mainEl.getBoundingClientRect(), r = el.getBoundingClientRect();
+        if (r.top < m.top + 12) mainEl.scrollBy({ top: r.top - m.top - 24, behavior: how() });
+        else if (r.bottom > m.bottom - 12) mainEl.scrollBy({ top: r.bottom - m.bottom + 24, behavior: how() });
+      });
+    };
+    // what gets the focus when a step opens: a box to type in (on phones only after a tap, so the keyboard comes up
+    // when it is wanted), otherwise the chosen answer or the first one
+    var focusIn = function (q, blank, tapped) {
+      var el = null;
+      if (q === "contact") el = pane.querySelector(blank === "phone" ? "[name=phone]" : "[name=email]");
+      else if (q === "ps" || q === "name") el = pane.querySelector("[name=" + q + "]");
+      else if (q === "len") el = pane.querySelector(".lt-range");
+      else if (q === "country" && !mobile()) el = pane.querySelector(".lt-find input");
+      var typing = el && (el.tagName === "TEXTAREA" || el.type !== "range");
+      if (el && mobile() && (el.type === "range" || typing && !tapped)) el = null;
+      if (!el) el = pane.querySelector('.tf-c[aria-pressed="true"]') || pane.querySelector(".tf-c") || nextBtn;
+      el.focus({ preventScroll: true });
+    };
+    var show = function (q, tapped, blank) {
+      open = q;
+      cur = q === "ready" ? null : blank || (q === "contact" ? "email" : q);
+      ask.hidden = q === "ready";
+      ready.hidden = q !== "ready";
+      if (q === "ready") {
+        editing = false;
+        say("", "");
+        sendBtn.classList.remove("nudge");
+        void sendBtn.offsetWidth;
+        sendBtn.classList.add("nudge");
+        if (tapped) sendBtn.focus({ preventScroll: true });
+      } else {
+        fill(q);
+        focusIn(q, blank, tapped);
+      }
+      draw();
+      sheet.scrollTop = 0;
+      reveal();
+    };
+    // the next step in the order of the letter; after the last one, or after changing one answer of a finished
+    // letter, the letter is ready to send
+    var advance = function (tapped) {
+      var k = ORDER.indexOf(open);
+      show(!editing && k >= 0 && k < ORDER.length - 1 ? ORDER[k + 1] : "ready", tapped);
+    };
+
+    // ---- full screen. The letter is lifted out to the end of the page while open (so nothing around it can hold it
+    // in), with a stand-in of the same height left in its place, and goes back on closing. The phone's Back button
+    // closes it too.
+    var holder = null, pushed = false, vv = window.visualViewport;
+    // the live chat bubble (Tawk) sits in the bottom corner, over the step's buttons, so it steps aside meanwhile
+    var chatHidden = false;
+    var chat = function (show2) {
+      var t = window.Tawk_API;
+      try {
+        if (!show2 && t && t.hideWidget && !(t.isChatHidden && t.isChatHidden())) { t.hideWidget(); chatHidden = true; }
+        else if (show2 && chatHidden && t && t.showWidget) { t.showWidget(); chatHidden = false; }
+      } catch (err) { /* chat not ready */ }
+    };
+    // on phones the keyboard takes the bottom of the screen: the letter shrinks to the part still showing
+    var fit = function () {
+      if (!full) return;
+      var h = vv && mobile() ? vv.height : window.innerHeight;
+      if (vv && mobile()) { lt.style.height = Math.round(vv.height) + "px"; lt.style.top = Math.round(vv.offsetTop) + "px"; }
+      else lt.style.height = lt.style.top = "";
+      lt.style.setProperty("--h", Math.round(h) + "px");
+      reveal();
+    };
+    if (vv) { vv.addEventListener("resize", fit); vv.addEventListener("scroll", fit); }
+    window.addEventListener("resize", fit);
+    var openFull = function (q, tapped, blank) {
+      if (!full) {
+        full = true;
+        holder = d.createElement("div");
+        holder.style.height = lt.offsetHeight + "px";
+        lt.parentNode.insertBefore(holder, lt);
+        d.body.appendChild(lt);
+        lt.classList.add("full");
+        lt.setAttribute("role", "dialog");
+        lt.setAttribute("aria-modal", "true");
+        lt.setAttribute("aria-label", "Your letter to Sunbird Lanka Tours");
+        d.documentElement.classList.add("lt-lock");
+        chat(false);
+        mainEl.scrollTop = 0;
+        fit();
+        try { history.pushState({ sbLetter: 1 }, ""); pushed = true; } catch (err) { pushed = false; }
+      }
+      show(q || nextUp() || "ready", tapped, blank);
+    };
+    var closeFull = function (byBack) {
+      if (!full || busy) return;
+      full = false;
+      open = cur = null;
+      editing = false;
+      lt.classList.remove("full");
+      ["role", "aria-modal", "aria-label"].forEach(function (a) { lt.removeAttribute(a); });
+      lt.style.height = lt.style.top = "";
+      if (holder) { holder.parentNode.insertBefore(lt, holder); holder.parentNode.removeChild(holder); holder = null; }
+      d.documentElement.classList.remove("lt-lock");
+      chat(true);
+      if (pushed && !byBack) history.back();
+      pushed = false;
+      draw();
+      if (!foot.hidden) startBtn.focus({ preventScroll: true });
+    };
+    window.addEventListener("popstate", function () {
+      if (!full) return;
+      pushed = false;
+      if (!busy) return closeFull(true);
+      try { history.pushState({ sbLetter: 1 }, ""); pushed = true; } catch (err) { /* stays open anyway */ }   // not while sending
+    });
+    // the chat may load after the letter has opened: it is kept out of the way then too
+    try {
+      var tawk = window.Tawk_API = window.Tawk_API || {}, tawkLoaded = tawk.onLoad;
+      tawk.onLoad = function () { if (typeof tawkLoaded === "function") tawkLoaded(); if (full) chat(false); };
+    } catch (err) { /* no chat */ }
+    closeBtn.addEventListener("click", function () { closeFull(); });
+    startBtn.addEventListener("click", function () { openFull(null, true); });
+    d.addEventListener("keydown", function (e) { if (e.key === "Escape" && full) closeFull(); });
+    Object.keys(blanks).forEach(function (b) {
+      blanks[b].addEventListener("click", function () {
+        if (busy) return;
+        var q = stepOf(b);
+        if (!full) { editing = !nextUp() && q !== "tour"; return openFull(q, true, b); }
+        if (q === "tour") from = open;
+        else if (open === "ready") editing = true;   // one change to a finished letter, then back to sending
+        show(q, true, b);
+      });
+      blanks[b].addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); blanks[b].click(); }
+      });
+    });
+
+    // ---- answering
+    var setDays = function (n) {
+      n = Math.max(1, Math.min(MAXD, n));
+      s.days = n;
+      var r = pane.querySelector(".lt-range");
+      if (r) { r.value = n; r.style.setProperty("--p", ((n - 1) / (MAXD - 1) * 100).toFixed(1) + "%"); }
+      var v = pane.querySelector(".lt-days-v"), sub = pane.querySelector(".lt-days-s");
+      if (v) v.innerHTML = daysView(n);
+      if (sub) sub.textContent = dates(n);
+      draw("len");
+    };
+    pane.addEventListener("click", function (e) {
+      if (!open || open === "ready") return;
+      var q = open, pm = e.target.closest(".lt-pm");
+      if (pm) {
+        var step = +pm.getAttribute("data-d"), k = pm.getAttribute("data-k");
+        if (q === "len") return setDays((s.days || 10) + step);
+        if (k === "a") s.a = Math.max(s.who === 3 ? 2 : 1, Math.min(40, s.a + step));
+        else s.c = Math.max(0, Math.min(20, s.c + step));
+        pm.parentNode.querySelector("output").textContent = k === "a" ? s.a : s.c;
+        return draw("who");
+      }
+      var c = e.target.closest(".tf-c");
+      if (!c) return;
+      var i = +c.getAttribute("data-i"), auto = true;
+      if (q === "who") {
+        if (s.who !== i) { s.who = i; counts(); }
+        auto = i < 2;   // families and groups say how many first
+      } else if (q === "country") s.country = c.getAttribute("data-v") || "";
+      else if (q === "when") {
+        s.month = i;
+        s.date = "";
+        setMonth(i === 12 ? -1 : i);
+      } else if (q === "love") {
+        auto = false;
+        if (i === words.length) s.any = !s.any;
+        else s.love = s.love.indexOf(words[i]) >= 0 ? s.love.filter(function (w) { return w !== words[i]; }) : s.love.concat([words[i]]);
+      } else if (q === "tour") s.tour = i < data.tours.length ? data.tours[i] : "";
+      if (q === "country") pane.querySelectorAll(".tf-c").forEach(function (x) { x.setAttribute("aria-pressed", x === c ? "true" : "false"); });
+      else {
+        fill(q);
+        var again = pane.querySelector('[data-i="' + i + '"]');
+        if (again) again.focus({ preventScroll: true });
+      }
+      draw(q);
+      if (q === "tour") { show(from || nextUp() || "ready"); return; }
+      if (auto) setTimeout(function () { if (open === q) advance(false); }, 340);
+    });
+    pane.addEventListener("input", function (e) {
+      var t = e.target;
+      if (t.type === "range") return setDays(+t.value);
+      if (t.type === "search") {
+        var list = pane.querySelector(".lt-chips");
+        if (list) list.innerHTML = countryChips(t.value);
+        return;
+      }
+      if (t.name && s.hasOwnProperty(t.name) && typeof s[t.name] === "string") {
+        s[t.name] = t.value.slice(0, t.name === "ps" ? 2000 : 120);
+        err("");
+        label();
+        draw(t.name);
+      }
+    });
+    pane.addEventListener("change", function (e) {
+      if (e.target.type !== "date") return;
+      var v = e.target.value;
+      s.date = /^\d{4}-\d\d-\d\d$/.test(v) && v >= todayIso ? v : "";
+      if (s.date) { s.month = +s.date.split("-")[1] - 1; setMonth(s.month); }
+      pane.querySelectorAll(".tf-c").forEach(function (c) { c.setAttribute("aria-pressed", !s.date && +c.getAttribute("data-i") === s.month ? "true" : "false"); });
+      draw("when");
+    });
+    pane.addEventListener("keydown", function (e) {
+      if (e.key !== "Enter" || e.target.tagName === "TEXTAREA" || e.target.tagName === "BUTTON") return;
+      var t = e.target;
+      if (t.type === "search") { e.preventDefault(); var first = pane.querySelector(".tf-c"); if (first) first.click(); return; }
+      if (t.name === "email") { e.preventDefault(); pane.querySelector("[name=phone]").focus(); return; }
+      if (t.tagName === "INPUT" && t.type !== "date") { e.preventDefault(); nextBtn.click(); }
+    });
+    nextBtn.addEventListener("click", function () {
+      var q = open;
+      if (!q || q === "ready") return;
+      if (q === "len" && !s.days) setDays(+(pane.querySelector(".lt-range") || { value: 10 }).value);
+      // a country typed in the search but not picked: the first match is taken
+      var find = q === "country" && pane.querySelector(".lt-find input");
+      if (find && find.value.trim()) {
+        var c1 = pane.querySelector(".tf-c");
+        if (c1) { s.country = c1.getAttribute("data-v") || ""; draw("country"); }
+      }
+      if (q === "contact" && !emailOk(s.email.trim())) {
+        err(s.email.trim() ? "That email doesn’t look quite right." : "Add your email, so we can write back.");
+        pane.querySelector("[name=email]").focus();
+        return;
+      }
+      if (q === "name" && !s.name.trim()) {
+        err("Sign with your name, so we know who to write to.");
+        pane.querySelector("[name=name]").focus();
+        return;
+      }
+      if (q === "ps") s.psSeen = true;
+      if (q === "tour") return show(from || nextUp() || "ready", true);
+      advance(true);
+    });
+    prevBtn.addEventListener("click", function () {
+      var k = ORDER.indexOf(open);
+      if (k > 0) show(ORDER[k - 1], true);
+    });
+
+    // ---- sending
+    var say = function (cls, htmlText) { status.className = "lt-status " + cls; status.innerHTML = htmlText; };
+    var demo = false;
+    var finish = function () {
+      busy = false;
+      closeBtn.disabled = false;
+      var first = s.name.trim().split(/\s+/)[0];
+      try { sessionStorage.removeItem(KEY); } catch (err) { /* nothing kept */ }
+      done.querySelector(".lt-done-t").textContent = (first ? "Thank you, " + first + ". " : "Thank you. ") + "Your letter is on its way.";
+      done.querySelector(".lt-done-s").textContent = "We’ll write back to " + s.email.trim() + " within 24 hours.";
+      done.querySelector(".lt-demo").hidden = !demo;
+      mainEl.hidden = sheet.hidden = tip.hidden = foot.hidden = true;
+      done.hidden = false;
+      say("", "");
+      open = null;
+      dots.forEach(function (dot) { dot.className = "done"; });
+      done.focus({ preventScroll: true });
+    };
+    var seal = function (ok) {
+      busy = true;
+      closeBtn.disabled = true;
+      var failed = function () {
+        busy = false;
+        closeBtn.disabled = false;
+        sendBtn.disabled = false;
+        say("err", "Sorry, your letter didn’t go through. " + contactHtml());
+      };
+      if (calmMotion()) { ok.then(finish, failed); return; }
+      // the envelope waits in the middle of the part of the letter on screen; the letter folds to its size above it,
+      // slips in, the flap closes, and once the letter has really gone it is stamped and flies off
+      var st = stage.getBoundingClientRect(), pr = paper.getBoundingClientRect(), view = mainEl.getBoundingClientRect();
+      var ew = Math.min(380, st.width * .86), eh = ew / 1.55, ex = (st.width - ew) / 2;
+      var top = Math.max(st.top, view.top), bottom = Math.min(st.bottom, view.bottom);
+      var ey = Math.max(eh * .6, Math.min(st.height - eh - 8, top - st.top + Math.max(eh * .6, (bottom - top - eh) / 2 + eh * .3)));
+      var px = pr.left - st.left, py = pr.top - st.top, pw = pr.width, ph = pr.height;
+      var fw = ew * .86, fh = eh * .9, fx = ex + (ew - fw) / 2;
+      var to = function (y) { return "translate(" + (fx - px) + "px," + (y - py) + "px) scale(" + (fw / pw) + "," + (fh / ph) + ")"; };
+      env.style.cssText = "left:" + ex + "px;top:" + ey + "px;width:" + ew + "px;height:" + eh + "px";
+      var pic = data.photos && (data.photos[s.love[0]] || data.photos.history || data.photos[words[0]]);
+      var img = env.querySelector(".lt-stamp img");
+      if (pic && pic[0]) { img.src = base + pic[0]; if (pic[1]) img.style.objectPosition = pic[1]; }
+      env.querySelector(".lt-env-from").textContent = "From " + s.name.trim() + (s.country.trim() ? ", " + s.country.trim() : "");
+      env.querySelector(".lt-mark-d").textContent = today.getDate() + " " + M[today.getMonth()].slice(0, 3).toUpperCase();
+      env.querySelector(".lt-mark-y").textContent = today.getFullYear();
+      lt.classList.add("sealing");
+      void paper.offsetWidth;
+      lt.classList.add("fold");
+      paper.style.transform = to(ey - fh * .55);
+      var back = function () {
+        lt.classList.remove("seal");
+        wait(450).then(function () { lt.classList.remove("tuck"); paper.style.transform = to(ey - fh * .55); return wait(520); })
+          .then(function () { lt.classList.remove("fold"); paper.style.transform = ""; return wait(760); })
+          .then(function () { lt.classList.remove("sealing"); env.style.cssText = ""; failed(); });
+      };
+      wait(760).then(function () { lt.classList.add("tuck"); paper.style.transform = to(ey + eh * .07); return wait(560); })
+        .then(function () { lt.classList.add("seal"); return wait(560); })
+        .then(function () { return ok; })
+        .then(function () {
+          say("", "");
+          lt.classList.add("stamp");
+          return wait(1100).then(function () { lt.classList.add("fly"); return wait(900); }).then(finish);
+        }, back);
+    };
+    sendBtn.addEventListener("click", function () {
+      if (busy) return;
+      // a letter can't go without an email and a name: the step that still needs one opens
+      if (!emailOk(s.email.trim()) || !s.name.trim()) {
+        var q = !emailOk(s.email.trim()) ? "contact" : "name";
+        editing = true;
+        show(q, true);
+        err(q === "contact" ? (s.email.trim() ? "That email doesn’t look quite right." : "Add your email, so we can write back.")
+          : "Sign with your name, so we know who to write to.");
+        return;
+      }
+      say("", "");
+      var local = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname), noKey = !cfg.key || cfg.key.indexOf("PASTE") === 0;
+      if (noKey && !local && !(hp && hp.checked)) { say("err", "Sorry, sending letters isn’t switched on yet. " + contactHtml()); return; }
+      demo = noKey;
+      var party = s.who === 0 ? [1, 0] : s.who === 1 ? [2, 0] : s.who >= 2 ? [s.a, s.c] : null;
+      var payload = {
+        access_key: cfg.key, from_name: "Sunbird website", page: location.href,
+        subject: (s.tour ? "Tour enquiry: " + s.tour : "Trip plan request") + " – " + s.name.trim(),
+        name: s.name.trim(), email: s.email.trim(), phone: s.phone.trim(), country: s.country.trim(), travellers: whoText(),
+        adults: party ? String(party[0]) : "", children: party ? String(party[1]) : "",
+        arrival: s.date ? fmtDate(s.date) : s.month === 12 ? "Not sure yet" : s.month >= 0 ? M[s.month] + " " + year(s.month) : "",
+        days: s.days ? nightsText(s.days) : "", dates: dates(s.days),
+        interests: loveText(), tour: s.tour, message: compose(false)
+      };
+      Object.keys(payload).forEach(function (k) { if (payload[k] === "") delete payload[k]; });
+      var req = demo || (hp && hp.checked) ? wait(1400).then(function () { return { success: true }; })
+        : fetch("https://api.web3forms.com/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Accept": "application/json" },
+          body: JSON.stringify(payload)
+        }).then(function (r) { return r.json(); });
+      var ok = req.then(function (r) { if (!r || !r.success) throw new Error("failed"); return true; });
+      ok.catch(function () { /* handled in seal */ });
+      sendBtn.disabled = true;
+      say("", "Sealing your letter…");
+      seal(ok);
+    });
+    done.querySelector(".lt-again").addEventListener("click", function () {
+      // a new letter from the same person: their name and how to reach them stay
+      var keep = { country: s.country, email: s.email, phone: s.phone, name: s.name };
+      s = fresh();
+      Object.keys(keep).forEach(function (k) { s[k] = keep[k]; });
+      ["sealing", "fold", "tuck", "seal", "stamp", "fly"].forEach(function (c) { lt.classList.remove(c); });
+      paper.style.transform = env.style.cssText = "";
+      mainEl.hidden = sheet.hidden = tip.hidden = foot.hidden = false;
+      done.hidden = true;
+      sendBtn.disabled = false;
+      if (full) { mainEl.scrollTop = 0; show(nextUp() || "ready", true); }
+      else draw();
+    });
+
+    // ---- the plain form, for anyone who prefers it: it takes over what the letter already says
+    var backP = plain.querySelector(".lt-back"), form = plain.querySelector(".plan-form");
+    q$(".lt-plain-on").addEventListener("click", function () {
+      if (form) {
+        var set = function (n, v) { if (form.elements[n] && v !== "" && v !== null && v !== undefined) form.elements[n].value = v; };
+        ["name", "email", "phone", "country"].forEach(function (k) { set(k, s[k].trim()); });
+        set("arrival_date", s.date);
+        if (s.days) set("days", s.days);
+        if (s.who >= 0) { set("adults", s.who === 0 ? 1 : s.who === 1 ? 2 : s.a); set("children", s.who === 2 ? s.c : 0); }
+        var sel = form.elements.tour;
+        if (sel && s.tour) [].forEach.call(sel.options, function (o) { if (o.text === s.tour) sel.value = o.value; });
+        if (s.who >= 0 || s.month >= 0 || s.days || s.love.length || s.any || s.ps.trim()) set("message", compose(false));
+      }
+      lt.hidden = true;
+      plain.hidden = false;
+      var f = form && form.querySelector("input:not(.hp)");
+      if (f) f.focus();
+    });
+    if (backP) backP.querySelector("button").addEventListener("click", function () {
+      plain.hidden = true;
+      lt.hidden = false;
+      lt.scrollIntoView({ block: "start" });
+    });
+
+    lt.hidden = false;
+    plain.hidden = true;
+    if (backP) backP.hidden = false;
+    q$(".lt-date").textContent = today.getDate() + " " + M[today.getMonth()] + " " + today.getFullYear();
+    draw();
+    // from a "Plan my trip" link on another page of the site, the letter opens full screen straight away
+    var inSite = false;
+    try { inSite = !!d.referrer && new URL(d.referrer).origin === location.origin; } catch (err) { inSite = false; }
+    if (location.hash === "#plan" && inSite) openFull(null, false);
+  })();
 })();
