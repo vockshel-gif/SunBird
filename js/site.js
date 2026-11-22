@@ -120,7 +120,11 @@
     };
     var load = function (j) {
       var img = slides[j] && slides[j].querySelector("img[data-src]");
-      if (img) { img.src = img.getAttribute("data-src"); img.removeAttribute("data-src"); }
+      if (img) {
+        // the smaller WebP widths (build.py) go in first, so the browser only fetches one photo
+        if (img.getAttribute("data-srcset")) { img.srcset = img.getAttribute("data-srcset"); img.removeAttribute("data-srcset"); }
+        img.src = img.getAttribute("data-src"); img.removeAttribute("data-src");
+      }
     };
     var caption = function (c, first) {
       days.forEach(function (x, j) { x.classList.toggle("on", j === c); });
@@ -542,7 +546,10 @@
     var rel = function (k) { var r = ((k - cur()) % n + n) % n; return r > n / 2 ? r - n : r; };
     var load = function (k) {
       var img = photos[((k % n) + n) % n], src = img && img.getAttribute("data-src");
-      if (src && !img.getAttribute("src")) img.src = (src.charAt(0) === "/" ? base : "") + src;
+      if (src && !img.getAttribute("src")) {
+        if (img.getAttribute("data-srcset")) img.srcset = img.getAttribute("data-srcset");
+        img.src = (src.charAt(0) === "/" ? base : "") + src;
+      }
     };
     var show = function () {
       var c = cur();
@@ -1580,11 +1587,40 @@
     }
   }
 
-  // ---- enquiry forms (sent by email through Web3Forms)
+  // ---- enquiry forms and the trip letter go two ways at once: into the inquiry box that the admin
+  // panel reads (cfg.api, functions/api/inquiries.js, only on Cloudflare) and by email through
+  // Web3Forms (cfg.key). Either one arriving is enough.
   var cfg = window.SB || {};
   var contactHtml = function () {
     return 'Please email us at <a href="mailto:' + cfg.email + '">' + cfg.email + '</a> or <a href="https://wa.me/' +
       cfg.whatsapp + '" target="_blank" rel="noopener">message us on WhatsApp</a>.';
+  };
+  var hasMailKey = function () { return !!cfg.key && cfg.key.indexOf("PASTE") !== 0; };
+  var canSend = function () { return hasMailKey() || !!cfg.api; };
+  var postJson = function (url, data) {
+    return fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
+      body: JSON.stringify(data)
+    }).then(function (r) { return r.json(); }).then(function (r) {
+      if (!r || !r.success) throw new Error("failed");
+      return true;
+    });
+  };
+  var sendInquiry = function (data) {
+    var ways = [];
+    if (cfg.api) ways.push(postJson(cfg.api, data));
+    if (hasMailKey()) {
+      var mail = {};
+      Object.keys(data).forEach(function (k) { mail[k] = data[k]; });
+      mail.access_key = cfg.key;
+      ways.push(postJson("https://api.web3forms.com/submit", mail));
+    }
+    if (!ways.length) return Promise.reject(new Error("off"));
+    return new Promise(function (ok, no) {
+      var left = ways.length;
+      ways.forEach(function (p) { p.then(function () { ok(true); }, function () { if (--left === 0) no(new Error("failed")); }); });
+    });
   };
   d.querySelectorAll("form.plan-form").forEach(function (form) {
     var status = form.querySelector(".form-status"), button = form.querySelector("[type=submit]");
@@ -1601,22 +1637,17 @@
       });
       if (firstBad) { say("err", "Please fill in the highlighted fields."); firstBad.focus(); return; }
       if (form.elements.botcheck && form.elements.botcheck.checked) { say("ok", "Thank you! Your message has been sent."); return; }
-      if (!cfg.key || cfg.key.indexOf("PASTE") === 0) { say("err", "Sorry, this form isn’t connected yet. " + contactHtml()); return; }
+      if (!canSend()) { say("err", "Sorry, this form isn’t connected yet. " + contactHtml()); return; }
 
       var data = {};
       new FormData(form).forEach(function (v, k) { if (k !== "botcheck" && v !== "") data[k] = v; });
-      data.access_key = cfg.key;
       data.subject = (form.getAttribute("data-subject") || "Website enquiry") + (data.name ? " – " + data.name : "");
       data.from_name = "Sunbird website";
       data.page = location.href;
+      data.form = "Form";
       button.disabled = true;
       say("", "Sending…");
-      fetch("https://api.web3forms.com/submit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Accept": "application/json" },
-        body: JSON.stringify(data)
-      }).then(function (r) { return r.json(); }).then(function (r) {
-        if (!r || !r.success) throw new Error("failed");
+      sendInquiry(data).then(function () {
         say("ok", "Thank you! We’ve received your request and will reply within 24 hours.");
         form.reset();
       }).catch(function () {
@@ -2275,12 +2306,12 @@
         return;
       }
       say("", "");
-      var local = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname), noKey = !cfg.key || cfg.key.indexOf("PASTE") === 0;
+      var local = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname), noKey = !canSend();
       if (noKey && !local && !(hp && hp.checked)) { say("err", "Sorry, sending letters isn’t switched on yet. " + contactHtml()); return; }
       demo = noKey;
       var party = s.who === 0 ? [1, 0] : s.who === 1 ? [2, 0] : s.who >= 2 ? [s.a, s.c] : null;
       var payload = {
-        access_key: cfg.key, from_name: "Sunbird website", page: location.href,
+        from_name: "Sunbird website", page: location.href, form: "Letter",
         subject: (s.tour ? "Tour enquiry: " + s.tour : "Trip plan request") + " – " + s.name.trim(),
         name: s.name.trim(), email: s.email.trim(), phone: s.phone.trim(), country: s.country.trim(), travellers: whoText(),
         adults: party ? String(party[0]) : "", children: party ? String(party[1]) : "",
@@ -2289,13 +2320,7 @@
         interests: loveText(), tour: s.tour, message: compose(false)
       };
       Object.keys(payload).forEach(function (k) { if (payload[k] === "") delete payload[k]; });
-      var req = demo || (hp && hp.checked) ? wait(1400).then(function () { return { success: true }; })
-        : fetch("https://api.web3forms.com/submit", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", "Accept": "application/json" },
-          body: JSON.stringify(payload)
-        }).then(function (r) { return r.json(); });
-      var ok = req.then(function (r) { if (!r || !r.success) throw new Error("failed"); return true; });
+      var ok = demo || (hp && hp.checked) ? wait(1400).then(function () { return true; }) : sendInquiry(payload);
       ok.catch(function () { /* handled in seal */ });
       sendBtn.disabled = true;
       say("", "Sealing your letter…");

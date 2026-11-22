@@ -91,6 +91,7 @@
     ready: null,          // promise: all text files loaded
     editor: null,         // the open editor: {isDirty, save, discard}
     recent: new Set(),    // photos uploaded in this visit (shown first)
+    cfg: {},              // admin/config.json (written by build.py)
   };
 
   function setFiles(files) {
@@ -269,6 +270,18 @@
     clearInterval(publishTimer);
     setStatus('busy', 'Publishing…');
     const started = Date.now();
+    if (S.cfg.host === 'cloudflare') {
+      // Cloudflare Pages builds the site itself; every build writes the commit it was made from
+      // into admin/config.json, so the save is live once that file names this commit
+      publishTimer = setInterval(async () => {
+        if (Date.now() - started > 10 * 60 * 1000) { clearInterval(publishTimer); setStatus('', 'Saved · not live yet, check Cloudflare'); return; }
+        try {
+          const c = await (await fetch(siteBase + '/admin/config.json?t=' + Date.now(), { cache: 'no-store' })).json();
+          if (c.built_from === sha) { clearInterval(publishTimer); setStatus('ok', 'Live on the site'); }
+        } catch (e) { /* the site is between builds: ask again */ }
+      }, 8000);
+      return;
+    }
     publishTimer = setInterval(async () => {
       if (Date.now() - started > 6 * 60 * 1000) { clearInterval(publishTimer); setStatus('', 'Saved'); return; }
       try {
@@ -513,6 +526,7 @@
 
   const NAV = [
     ['#/', 'Home', 'home'],
+    ['#/inquiries', 'Inquiries', 'mail'],
     ['#/photos', 'Photos', 'photo'],
     null,
     ['#/c/tours', 'Tours', 'map'],
@@ -541,6 +555,7 @@
     car: 'M5 16h14M6 16l1.5-5.5A2 2 0 0 1 9.4 9h5.2a2 2 0 0 1 1.9 1.5L18 16v3h-2v-1.5H8V19H6zM8 13.5h.01M16 13.5h.01',
     gear: 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm7.4-3a7.4 7.4 0 0 0-.1-1.2l2-1.6-2-3.4-2.4 1a7.5 7.5 0 0 0-2-1.2L14.5 3h-5l-.4 2.6a7.5 7.5 0 0 0-2 1.2l-2.4-1-2 3.4 2 1.6a7.4 7.4 0 0 0 0 2.4l-2 1.6 2 3.4 2.4-1a7.5 7.5 0 0 0 2 1.2l.4 2.6h5l.4-2.6a7.5 7.5 0 0 0 2-1.2l2.4 1 2-3.4-2-1.6c.1-.4.1-.8.1-1.2z',
     list: 'M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01',
+    mail: 'M4 6h16v12H4zM4 7l8 6 8-6',
     ext: 'M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5',
     up: 'M12 19V5M5 12l7-7 7 7', down: 'M12 5v14M5 12l7 7 7-7', x: 'M6 6l12 12M18 6L6 18',
     plus: 'M12 5v14M5 12h14', upload: 'M12 16V4M7 9l5-5 5 5M4 20h16', search: 'M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zm9 2l-4-4',
@@ -1372,6 +1387,7 @@
     const hour = new Date().getHours();
     const hello = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
     const tiles = [
+      ['#/inquiries', 'Inquiries', inq.counts.new ? plural(inq.counts.new, 'new letter') : 'From the website', 'Read and answer trip requests', 'mail'],
       ['#/photos', 'Photos', plural(images().length, 'photo'), 'Upload, replace and find photos', 'photo'],
       ['#/c/tours', 'Tours', plural(n('content/tours/'), 'tour'), 'Days, photos, months and text', 'map'],
       ['#/c/destinations', 'Destinations', plural(n('content/destinations/'), 'place'), 'Attractions and hidden gems', 'pin'],
@@ -1381,7 +1397,7 @@
     ];
     const how = S.be.mode === 'local'
       ? [h('b', 'Working on this computer.'), ' Saving writes into the files in this folder and rebuilds the site at once, so you can check it on ', h('a', { href: '/', target: '_blank' }, 'localhost'), '. To put changes online, upload them to GitHub as usual.']
-      : [h('b', 'Working on the live website.'), ' Saving sends the change to GitHub, and the website updates about a minute later. The status at the top shows when it is live.'];
+      : [h('b', 'Working on the live website.'), ' Saving sends the change to GitHub, and the website updates a minute or two later. The status at the top shows when it is live.'];
     main.replaceChildren(page('Sunbird Lanka Tours', hello + '.', 'What would you like to change today?',
       h('div.tiles', tiles.map(t => h('a.tile-card', { href: t[0] }, icon(t[4]), h('h2', t[1]), h('p.tc-count', t[2]), h('p.tc-sub', t[3])))),
       h('div.note', how)));
@@ -1748,6 +1764,205 @@
     setEditor(ed);
   }
 
+  // ------------------------------------------------------------------ inquiries
+  // Trip letters and enquiry forms from the website. They are kept in the inquiry box on Cloudflare
+  // (functions/api/inquiries.js), which lets in whoever has a GitHub key that may change the site.
+  const INQ_STATUS = [['new', 'New'], ['replied', 'Replied'], ['booked', 'Booked'], ['closed', 'Closed']];
+  const inq = { items: null, counts: {}, more: false, filter: 'new', q: '', error: null };
+
+  async function inqApi(method, query, body) {
+    const r = await fetch(siteBase + '/api/inquiries' + (query || ''), {
+      method, cache: 'no-store',
+      headers: Object.assign({ Authorization: 'Bearer ' + (S.be.token || ''), Accept: 'application/json' },
+        body ? { 'Content-Type': 'application/json' } : {}),
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    const data = await r.json().catch(() => null);
+    if (!r.ok || !data) {
+      const e = new Error((data && data.error) || 'The inquiry box did not answer (' + r.status + ').');
+      e.status = r.status;
+      e.missing = !data || r.status === 503; // no box on this website, or no database linked to it
+      throw e;
+    }
+    return data;
+  }
+
+  async function loadInquiries() {
+    const d = await inqApi('GET');
+    inq.items = d.items; inq.counts = d.counts || {}; inq.more = !!d.more; inq.error = null;
+    setInquiryBadge();
+    return d;
+  }
+
+  function setInquiryBadge() {
+    const a = document.querySelector('.nav-link[data-route="#/inquiries"]');
+    if (!a) return;
+    const n = inq.counts.new || 0;
+    let b = a.querySelector('.nav-badge');
+    if (!n) { if (b) b.remove(); return; }
+    if (!b) { b = h('b.nav-badge'); a.append(b); }
+    b.textContent = n > 99 ? '99+' : n;
+    b.title = plural(n, 'new inquiry', 'new inquiries');
+  }
+
+  const whenText = iso => {
+    const t = new Date(iso);
+    if (isNaN(t)) return '';
+    const mins = Math.round((Date.now() - t) / 60000);
+    if (mins < 1) return 'just now';
+    if (mins < 60) return mins + ' min ago';
+    if (mins < 60 * 24 && t.getDate() === new Date().getDate()) return Math.round(mins / 60) + ' h ago';
+    const y = new Date(Date.now() - 864e5);
+    if (t.toDateString() === y.toDateString()) return 'yesterday';
+    return t.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: t.getFullYear() === new Date().getFullYear() ? undefined : 'numeric' });
+  };
+  const fullDate = iso => { const t = new Date(iso); return isNaN(t) ? '' : t.toLocaleString(undefined, { dateStyle: 'full', timeStyle: 'short' }); };
+  const waDigits = p => { const d = String(p || '').replace(/[^\d+]/g, '').replace(/^00/, '+'); return d.replace(/\D/g, '').length >= 8 ? d.replace(/\D/g, '') : ''; };
+  const inqTrip = it => {
+    const d = it.data || {};
+    return [d.tour || (d.form === 'Letter' ? 'Trip plan' : 'Enquiry'), daysText(d.days), d.arrival || d.arrival_date].filter(Boolean).join(' · ');
+  };
+  const daysText = v => (/^\d+$/.test(v || '') ? plural(+v, 'day') : v);
+  const statusPill = s => h('span.inq-pill.' + s, (INQ_STATUS.find(x => x[0] === s) || [s, s])[1]);
+
+  function inquiryBlocked(e) {
+    if (S.be.mode === 'local') {
+      return h('div.note', h('b', 'Inquiries are kept online.'),
+        ' Letters and forms from the website go into the inquiry box on Cloudflare. Open the admin panel on the website (its address ends in /admin/) to read them.');
+    }
+    if (!S.cfg.inquiries || (e && e.status === 404)) {
+      return h('div.note', h('b', 'There is no inquiry box on this website yet.'),
+        ' It starts working once the site is hosted on Cloudflare Pages. Until then, letters and forms only arrive by email, if the Web3Forms key is filled in under Settings.');
+    }
+    if (e && e.status === 503) {
+      return h('div.note', h('b', 'The inquiry box isn’t connected yet.'),
+        ' In Cloudflare open the Pages project → Settings → Bindings → Add → D1 database, name it ', h('code', 'DB'),
+        ' and pick the database. Then deploy the site again (Deployments → Retry deployment).');
+    }
+    if (e && e.status === 401) {
+      return h('div.note', h('b', 'Your GitHub key may not read the inquiries.'),
+        ' The inquiry box only opens for keys that may change ' + S.be.repo + '. Sign out and sign in with that key.');
+    }
+    return h('div.note', h('b', 'The inquiries could not be loaded. '), (e && e.message) || '');
+  }
+
+  async function viewInquiries(id) {
+    const blank = (sub, body) => main.replaceChildren(page('Website', 'Inquiries', sub, body));
+    if (S.be.mode === 'local' || !S.cfg.inquiries) return blank('Trip letters and enquiry forms sent from the website.', inquiryBlocked(null));
+    if (!inq.items) {
+      loading('Opening the inquiry box…');
+      try { await loadInquiries(); } catch (e) { inq.error = e; return blank('Trip letters and enquiry forms sent from the website.', inquiryBlocked(e)); }
+    }
+    if (id) return viewInquiry(Number(id));
+
+    const chips = h('div.inq-chips');
+    const search = h('input.search', { type: 'search', placeholder: 'Search names, emails, tours…', value: inq.q });
+    const list = h('div.doc-list.inq-list');
+    const draw = () => {
+      const all = inq.items.length;
+      const counts = Object.assign({ all }, inq.counts);
+      chips.replaceChildren(...INQ_STATUS.concat([['all', 'All']]).map(([k, label]) => h('button.inq-chip' + (inq.filter === k ? '.on' : ''),
+        { type: 'button', onclick: () => { inq.filter = k; draw(); } }, label, h('b', String(counts[k] || 0)))));
+      const q = inq.q.trim().toLowerCase();
+      const rows = inq.items.filter(it => (inq.filter === 'all' || it.status === inq.filter)
+        && (!q || [it.name, it.email, it.phone, it.country, it.tour, (it.data || {}).message, it.note].join(' ').toLowerCase().includes(q)));
+      if (!rows.length) {
+        list.replaceChildren(h('p.inq-empty', q ? 'Nothing matches that search.'
+          : inq.filter === 'new' ? 'No new inquiries. New letters and forms from the website appear here.' : 'Nothing here yet.'));
+        return;
+      }
+      list.replaceChildren(...rows.map(it => h('a.doc-row.inq-row' + (it.status === 'new' ? '.unread' : ''), { href: '#/inquiries/' + it.id },
+        h('div.inq-av', (it.name || '?').trim().charAt(0).toUpperCase()),
+        h('div.dr-text', h('b', it.name, it.country ? h('span.inq-country', ' · ' + it.country) : null), h('small', inqTrip(it))),
+        h('div.inq-side', h('small.inq-when', { title: fullDate(it.created) }, whenText(it.created)), statusPill(it.status)))));
+    };
+    search.addEventListener('input', debounce(() => { inq.q = search.value; draw(); }, 120));
+    const reload = async () => {
+      setStatus('busy', 'Checking for new letters…');
+      try { await loadInquiries(); draw(); setStatus('ok', 'Up to date'); } catch (e) { toast(e.message, { bad: true }); setStatus('bad', 'Could not check'); }
+    };
+    draw();
+    main.replaceChildren(page('Website', 'Inquiries', 'Trip letters and enquiry forms sent from the website, newest first. Open one to reply, then mark it replied.',
+      h('div.list-bar', chips, h('div.inq-tools', search, h('button.btn.sm', { type: 'button', onclick: reload }, 'Refresh'))),
+      list,
+      inq.more ? h('p.muted.small', 'Showing the newest 300.') : null));
+  }
+
+  function viewInquiry(id) {
+    const it = inq.items.find(x => x.id === id);
+    if (!it) return notFound();
+    const d = it.data || {};
+    const back = h('a', { href: '#/inquiries' }, 'Inquiries');
+    const first = (it.name || '').trim().split(/\s+/)[0] || '';
+    const subject = 'Re: ' + (it.subject || (d.tour ? 'Your ' + d.tour + ' enquiry' : 'Your trip to Sri Lanka')).replace(/\s+–\s+[^–]*$/, '');
+    const mail = 'mailto:' + encodeURIComponent(it.email) + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent('Dear ' + first + ',\n\n');
+    const wa = waDigits(it.phone);
+
+    const setStatusTo = async s => {
+      if (s === it.status) return;
+      const was = it.status;
+      try {
+        await inqApi('PATCH', '', { id: it.id, status: s });
+        inq.counts[was] = Math.max(0, (inq.counts[was] || 1) - 1);
+        inq.counts[s] = (inq.counts[s] || 0) + 1;
+        it.status = s;
+        setInquiryBadge();
+        drawStatus();
+        toast('Marked ' + (INQ_STATUS.find(x => x[0] === s) || [s, s])[1].toLowerCase());
+      } catch (e) { toast(e.message, { bad: true }); }
+    };
+    const seg = h('div.seg');
+    const drawStatus = () => seg.replaceChildren(...INQ_STATUS.map(([k, label]) => h('button' + (it.status === k ? '.on.' + k : ''),
+      { type: 'button', 'aria-pressed': it.status === k ? 'true' : 'false', onclick: () => setStatusTo(k) }, label)));
+    drawStatus();
+
+    const facts = [
+      ['Email', h('a', { href: 'mailto:' + it.email }, it.email)],
+      ['Phone / WhatsApp', it.phone ? (wa ? h('a', { href: 'https://wa.me/' + wa, target: '_blank', rel: 'noopener' }, it.phone) : it.phone) : null],
+      ['Country', d.country],
+      ['Travellers', d.travellers || [d.adults && plural(+d.adults || 0, 'adult'), +d.children ? plural(+d.children, 'child', 'children') : ''].filter(Boolean).join(', ')],
+      ['Arriving', d.arrival || d.arrival_date],
+      ['Length', daysText(d.days)],
+      ['Dates', d.dates],
+      ['They’d love', d.interests],
+      ['Tour', d.tour],
+      ['Sent from', d.page ? h('a', { href: d.page, target: '_blank', rel: 'noopener' }, d.page.replace(/^https?:\/\/[^/]+/, '') || '/') : null],
+    ].filter(f => f[1]);
+
+    const noteBox = h('textarea.grow', { rows: 3, value: it.note || '', placeholder: 'Only the team sees this. For example: sent the 10-day plan, waiting for dates.' });
+    const noteBtn = h('button.btn.sm', { type: 'button', disabled: true }, 'Save note');
+    noteBox.addEventListener('input', () => { noteBtn.disabled = noteBox.value === (it.note || ''); autoGrow(noteBox); });
+    noteBtn.addEventListener('click', async () => {
+      noteBtn.disabled = true;
+      try { await inqApi('PATCH', '', { id: it.id, note: noteBox.value }); it.note = noteBox.value; toast('Note saved'); } catch (e) { noteBtn.disabled = false; toast(e.message, { bad: true }); }
+    });
+    const del = async () => {
+      if (!await confirmBox('Delete this inquiry?', 'The letter from ' + (it.name || 'this traveller') + ' is removed for good. This can’t be undone.', 'Delete', true)) return;
+      try {
+        await inqApi('DELETE', '?id=' + it.id);
+        inq.items = inq.items.filter(x => x !== it);
+        inq.counts[it.status] = Math.max(0, (inq.counts[it.status] || 1) - 1);
+        setInquiryBadge();
+        toast('Inquiry deleted');
+        location.hash = '#/inquiries';
+      } catch (e) { toast(e.message, { bad: true }); }
+    };
+
+    main.replaceChildren(page(back, it.name || 'Inquiry', [d.form === 'Letter' ? 'Trip letter' : 'Enquiry form', fullDate(it.created)].filter(Boolean).join(' · '),
+      h('div.inq-actions',
+        h('a.btn.gold', { href: mail }, icon('mail'), 'Reply by email'),
+        wa ? h('a.btn', { href: 'https://wa.me/' + wa, target: '_blank', rel: 'noopener' }, 'WhatsApp') : null,
+        h('div.spacer'), seg),
+      h('div.inq-detail',
+        h('section.card.inq-letter', h('div.card-head', h('h2', d.form === 'Letter' ? 'Their letter' : 'Their message')),
+          h('div.inq-msg', d.message || '(no message)')),
+        h('section.card', h('div.card-head', h('h2', 'Details')),
+          h('dl.inq-facts', facts.map(([k, v]) => [h('dt', k), h('dd', v)])))),
+      h('section.card', h('div.card-head', h('h2', 'Notes for the team')), noteBox, h('p.inq-note-bar', noteBtn)),
+      h('p', h('button.btn.danger-text.sm', { type: 'button', onclick: del }, 'Delete this inquiry'))));
+    growAll(main);
+  }
+
   function notFound() {
     main.replaceChildren(page(null, 'Not found', 'That page of the admin panel does not exist.', h('a.btn', { href: '#/' }, 'Back to the start')));
   }
@@ -1767,6 +1982,7 @@
     const [a, b, c] = parts;
     if (!a) return viewHome();
     if (a === 'photos') return viewPhotos(b);
+    if (a === 'inquiries') return viewInquiries(b).catch(showError);
     if (a === 'c' && c) return viewDoc(b, c).catch(showError);
     if (a === 'c') return viewCollection(b).catch(showError);
     if (a === 'list') return viewList(b).catch(showError);
@@ -1831,7 +2047,9 @@
             h('li', 'Sign in to GitHub and open ', h('a', { href: 'https://github.com/settings/personal-access-tokens/new', target: '_blank', rel: 'noopener' }, 'New fine-grained token'), '.'),
             h('li', 'Name it “Sunbird admin” and choose an expiry date.'),
             h('li', 'Repository access: ', h('b', 'Only select repositories'), ' → ', h('b', gh.repo.split('/')[1] || gh.repo), '.'),
-            h('li', 'Permissions → Repository permissions: ', h('b', 'Contents: Read and write'), '. Also ', h('b', 'Actions: Read-only'), ' if you want to see when the site is live.'),
+            S.cfg.host === 'cloudflare'
+              ? h('li', 'Permissions → Repository permissions: ', h('b', 'Contents: Read and write'), '.')
+              : h('li', 'Permissions → Repository permissions: ', h('b', 'Contents: Read and write'), '. Also ', h('b', 'Actions: Read-only'), ' if you want to see when the site is live.'),
             h('li', 'Generate the token, copy it and paste it above.')),
           h('p.muted', 'The key stays in this browser only. Anyone who has it can change the website, so don’t share it. Sign out on shared computers.')))));
     inp.focus();
@@ -1851,11 +2069,14 @@
     shell();
     setStatus('', S.be.mode === 'local' ? 'Ready' : 'Signed in');
     route();
+    // the number of new inquiries, next to Inquiries in the menu
+    if (S.be.mode === 'github' && S.cfg.inquiries && !inq.items) loadInquiries().catch(e => { inq.error = e; });
   }
 
   async function boot() {
     let cfg = {};
     try { cfg = await (await fetch('config.json', { cache: 'no-store' })).json(); } catch (e) { /* no config */ }
+    S.cfg = cfg;
     if (cfg.mode === 'local') { S.be = Local; return start(); }
     if (!cfg.repo) {
       app.replaceChildren(h('div.login', h('div.login-box', h('h1', 'Admin is not set up'),

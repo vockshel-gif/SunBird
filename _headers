@@ -1,0 +1,10 @@
+# Extra headers for Cloudflare Pages (other hosts just ignore this file).
+# The WebP photo copies (build.py) are named after their contents, so a browser can keep them
+# for a year: a changed photo gets a new name.
+/imgv/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# the admin panel: never kept by browsers, never shown in search engines
+/admin/*
+  Cache-Control: no-store
+  X-Robots-Tag: noindex
