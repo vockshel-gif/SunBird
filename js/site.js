@@ -27,110 +27,183 @@
   }
 
   // ---- home hero: a short looping film over the photo (build.py home_hero). The photo shows first and the
-  // film fades in once it is really playing. It is not loaded at all for people who have turned motion off or
-  // asked to save data. Tall screens (phones) get the tall cut. The place name in the corner follows the film.
-  // It only plays while you can see it: off screen, or covered by the next card of the home page stack
-  // (hvState.covered, set by the stack below), it rests so scrolling stays smooth.
-  var hv = d.querySelector(".hh-video"), hvState = { seen: true, covered: false };
-  var hvSync = function () {
-    if (!hv || !hv.getAttribute("src")) return;
-    if (hvState.seen && !hvState.covered) {
-      var pr = hv.play();
-      if (pr && pr.catch) pr.catch(function () { /* autoplay refused: the photo stays */ });
-    } else if (!hv.paused) { hv.pause(); }
-  };
-  // Which file: the film comes in several versions (data-files, best first: newer codecs at 60 fps). Play the
-  // first one this device says it can decode smoothly AND power-efficiently (in hardware); if none, the plain
-  // 30 fps H.264 file (data-wide / data-phone), which every device can play.
-  var hvPick = function (done) {
-    var tall = window.matchMedia("(max-aspect-ratio: 4/5)").matches;
-    var plain = hv.getAttribute(tall ? "data-phone" : "data-wide"), rows = [];
-    try { rows = JSON.parse(hv.getAttribute("data-files") || "[]"); } catch (err) { rows = []; }
-    rows = rows.filter(function (r) { return r[0] === (tall ? "tall" : "wide"); });
-    var mc = navigator.mediaCapabilities, i = 0;
-    var next = function () {
-      if (i >= rows.length) { done(plain); return; }
-      var r = rows[i++], type = 'video/mp4; codecs="' + r[4] + '"';
-      if (!hv.canPlayType(type)) { next(); return; }
-      if (!mc || !mc.decodingInfo) { done(r[6]); return; }
-      mc.decodingInfo({ type: "file", video: { contentType: type, width: r[1], height: r[2], bitrate: r[5] * 1000, framerate: r[3] } })
-        .then(function (res) { if (res.supported && res.smooth && res.powerEfficient) done(r[6]); else next(); }, next);
-    };
-    next();
-  };
-  // slow mobile data (2G/3G, or under about 3 Mbit/s, which browsers on Android report) can't keep a 60 fps film
-  // flowing: the film would keep stopping to load, so those visitors simply keep the photo
+  // film fades in over it once it is really playing. It is not loaded at all for people who have turned motion
+  // off, asked to save data or are on slow mobile data. Tall screens (phones) get the tall cut. The place name
+  // in the corner follows the film. It only plays while you can see it: off screen, or covered by the next
+  // card of the home page stack (hvState.covered, set by the stack below), it rests so scrolling stays smooth.
+  //
+  // The film comes in two parts so it can start quickly: part 1 (the first 10.6 s, about a quarter of the
+  // film) downloads the moment the page opens and starts playing as soon as it has arrived; part 2 downloads
+  // while part 1 plays. Each part is played from memory, so it never stops to wait for the network. There are
+  // two video layers: one plays while the other waits, paused on its first frame, and takes over instantly
+  // when the first one ends (part 1 -> part 2 -> part 1 ...). If part 2 has not arrived by the end of part 1,
+  // part 1 dissolves back to its own start (like a cut between shots) and part 2 takes over on a later pass.
+  var hv = d.querySelector(".hh-video"), hvState = { seen: true, covered: false }, hvSync = function () {};
   var hvNet = navigator.connection || {};
   var hvSlow = !!hvNet.saveData || /(^|-)(2g|3g)$/.test(hvNet.effectiveType || "") || (hvNet.downlink > 0 && hvNet.downlink < 3);
-  if (hv && !window.matchMedia("(prefers-reduced-motion: reduce)").matches && !hvSlow) {
-    var hvPlain = window.matchMedia("(max-aspect-ratio: 4/5)").matches ? hv.getAttribute("data-phone") : hv.getAttribute("data-wide");
-    // The whole film is downloaded first and then played from memory. Played straight from the server it
-    // starts before enough has arrived, and on a slower or busy connection it keeps stopping for a moment to
-    // wait for the heavy shots (surf, forest). From memory it never waits, and the loop restarts instantly.
-    // The download starts once the page's own photos have loaded, so it does not slow them down.
-    var hvFile = "", hvBlob = "";
-    var hvLoad = function (src) {
-      hvFile = src;
-      var use = function (url, blob) {
-        if (hvFile !== src) { if (blob) URL.revokeObjectURL(url); return; }
-        if (hvBlob) URL.revokeObjectURL(hvBlob);
-        hvBlob = blob ? url : "";
-        hv.src = url;
-        hvSync();
+  if (hv && !window.matchMedia("(prefers-reduced-motion: reduce)").matches && !hvSlow) (function () {
+    var tall = window.matchMedia("(max-aspect-ratio: 4/5)").matches, rows = [];
+    try { rows = JSON.parse(hv.getAttribute("data-files") || "[]"); } catch (err) { rows = []; }
+    // [screen, width, height, fps, codec, kbps, part 1, part 2]; the last row for each screen is the plain one
+    rows = rows.filter(function (r) { return r[0] === (tall ? "tall" : "wide"); });
+    if (!rows.length) return;
+    var media = hv.parentNode, vids = [hv, hv.cloneNode(false)];
+    media.appendChild(vids[1]);
+    // (filmPart / filmReady: which part a layer holds and whether its first frame is ready. Not "part":
+    // every element already has a built-in .part)
+    vids.forEach(function (v) { v.preload = "auto"; v.filmPart = -1; v.filmReady = false; });
+    var row = null, urls = [], cur = 0, curPart = 0, started = false, dissolving = false, dur0 = 0, gen = 0;
+
+    // Which version: the first row this device says it can decode smoothly AND power-efficiently (in hardware)
+    var pick = function (done) {
+      var mc = navigator.mediaCapabilities, i = 0;
+      var next = function () {
+        if (i >= rows.length - 1) { done(rows[rows.length - 1]); return; }
+        var r = rows[i++], type = 'video/mp4; codecs="' + r[4] + '"';
+        if (!hv.canPlayType(type)) { next(); return; }
+        if (!mc || !mc.decodingInfo) { done(r); return; }
+        mc.decodingInfo({ type: "file", video: { contentType: type, width: r[1], height: r[2], bitrate: r[5] * 1000, framerate: r[3] } })
+          .then(function (res) { if (res.supported && res.smooth && res.powerEfficient) done(r); else next(); }, next);
       };
-      if (!window.fetch || !window.URL || !URL.createObjectURL) { use(src, false); return; }
+      next();
+    };
+    // download part k into memory; done(address) ("" when part 2 is missing or could not be fetched)
+    var get = function (k, done) {
+      var src = row[6 + k];
+      if (!src) { done(""); return; }
+      if (!window.fetch || !window.URL || !URL.createObjectURL) { done(src); return; }
       fetch(src).then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.blob(); })
-        .then(function (b) { use(URL.createObjectURL(b), true); }, function () { use(src, false); });
+        .then(function (b) { done(URL.createObjectURL(b)); }, function () { done(k === 0 ? src : ""); });
     };
-    // step down to the plain 30 fps version: when the chosen one fails, or when this device turns out not to
-    // keep up with it after all (it stalls, or drops more than 1 frame in 12)
-    var hvStepDown = function () {
-      if (hvFile === hvPlain) return;
-      hv.classList.remove("on");
-      hv.parentNode.classList.remove("hh-live");
-      hvLoad(hvPlain);
+    var load = function (v, k) { v.filmPart = k; v.filmReady = false; v.src = urls[k]; };
+    var play = function (v) { var pr = v.play(); if (pr && pr.catch) pr.catch(function () { /* refused: the photo stays */ }); };
+    hvSync = function () {
+      var v = vids[cur];
+      if (!started || !v.getAttribute("src")) return;
+      if (hvState.seen && !hvState.covered && !d.hidden) play(v); else if (!v.paused) v.pause();
     };
-    hv.addEventListener("error", hvStepDown);
-    var hvStalls = 0, hvSeekAt = 0;
-    hv.addEventListener("seeking", function () { hvSeekAt = Date.now(); });
-    hv.addEventListener("waiting", function () {
-      // (the loop jumping back to the start may wait a moment; that does not count)
-      if (hv.classList.contains("on") && Date.now() - hvSeekAt > 800 && ++hvStalls >= 3) hvStepDown();
+    // make sure the waiting layer holds what comes next: after part 1 that is part 2 if it has arrived,
+    // otherwise part 1 again (for the dissolve); after part 2 it is part 1
+    var prepare = function () {
+      if (dissolving) return;
+      var spare = vids[1 - cur], need = curPart === 0 && urls[1] ? 1 : 0;
+      if (spare.filmPart !== need) load(spare, need);
+    };
+    // part 1 -> part 2 -> part 1: the waiting layer shows its first frame and plays as this one ends
+    var handOver = function () {
+      var old = vids[cur], spare = vids[1 - cur];
+      spare.classList.add("show");
+      old.classList.remove("show");
+      cur = 1 - cur;
+      curPart = spare.filmPart;
+      hvSync();
+      old.currentTime = 0;     // ready for the next time round (it already holds the part that comes next)
+      prepare();
+    };
+    // part 2 is late: part 1 dissolves back into its own beginning
+    var dissolve = function () {
+      var old = vids[cur], spare = vids[1 - cur];
+      if (spare.filmPart !== 0 || !spare.filmReady) return;
+      dissolving = true;
+      spare.currentTime = 0;
+      spare.classList.add("dissolve", "show");
+      cur = 1 - cur;
+      curPart = 0;
+      hvSync();
+      setTimeout(function () {
+        old.classList.remove("show");
+        old.pause();
+        spare.classList.remove("dissolve");
+        dissolving = false;
+        prepare();
+      }, 850);
+    };
+    var begin = function (r) {
+      var my = ++gen;
+      row = r;
+      get(0, function (u0) {
+        if (my !== gen) return;
+        urls[0] = u0;
+        load(vids[0], 0);
+        prepare();     // the waiting layer gets part 1 too, ready for the dissolve if part 2 is late
+        // part 2 downloads straight after part 1, while part 1 plays
+        get(1, function (u1) { if (my !== gen) return; urls[1] = u1; prepare(); });
+      });
+    };
+    // a device that says it can play the 60 fps film but then does not keep up with it (it stalls, or drops
+    // more than 1 frame in 12) is moved to the plain 30 fps version; so is one where a file fails
+    var stepDown = function () {
+      if (!row || row === rows[rows.length - 1]) return;
+      vids.forEach(function (v) { v.pause(); v.classList.remove("show", "ease", "dissolve"); v.filmPart = -1; v.filmReady = false; v.removeAttribute("src"); v.load(); });
+      media.classList.remove("hh-live");
+      urls.forEach(function (u) { if (u && u.indexOf("blob:") === 0) URL.revokeObjectURL(u); });
+      urls = []; cur = 0; curPart = 0; started = false; dissolving = false;
+      begin(rows[rows.length - 1]);
+    };
+    var stalls = 0, seekAt = 0;
+    vids.forEach(function (v) {
+      v.addEventListener("loadeddata", function () {
+        v.filmReady = true;
+        if (v.filmPart === 0 && v.duration) dur0 = v.duration;
+        if (!started && v === vids[cur]) { started = true; hvSync(); }
+      });
+      v.addEventListener("playing", function () {
+        if (v !== vids[cur] || media.classList.contains("hh-live") || v.classList.contains("show")) return;
+        // the very first start: fade in over the photo, then stop drawing the photo underneath
+        v.classList.add("ease", "show");
+        setTimeout(function () { v.classList.remove("ease"); if (v.classList.contains("show")) media.classList.add("hh-live"); }, 1400);
+      });
+      v.addEventListener("timeupdate", function () {
+        if (v !== vids[cur] || dissolving || curPart !== 0 || !v.duration) return;
+        if (v.duration - v.currentTime < 0.9 && vids[1 - cur].filmPart !== 1) dissolve();
+      });
+      v.addEventListener("ended", function () {
+        if (v !== vids[cur] || dissolving) return;
+        var spare = vids[1 - cur], next = curPart === 0 && urls[1] ? 1 : 0;
+        if (spare.filmPart !== next) load(spare, next);
+        if (spare.filmReady) { handOver(); return; }
+        spare.addEventListener("loadeddata", function once() {
+          spare.removeEventListener("loadeddata", once);
+          if (v === vids[cur]) handOver();
+        });
+      });
+      v.addEventListener("error", function () { if (v.getAttribute("src")) stepDown(); });
+      v.addEventListener("seeking", function () { seekAt = Date.now(); });
+      v.addEventListener("waiting", function () {
+        if (v === vids[cur] && media.classList.contains("hh-live") && Date.now() - seekAt > 800 && ++stalls >= 3) stepDown();
+      });
     });
-    var hvWatch = setInterval(function () {
-      if (hvFile === hvPlain) { clearInterval(hvWatch); return; }
-      var q = !hv.paused && hv.getVideoPlaybackQuality && hv.getVideoPlaybackQuality();
-      if (q && q.totalVideoFrames > 240 && q.droppedVideoFrames * 12 > q.totalVideoFrames) { clearInterval(hvWatch); hvStepDown(); }
+    var watch = setInterval(function () {
+      if (row === rows[rows.length - 1]) { clearInterval(watch); return; }
+      var shown = 0, dropped = 0;
+      vids.forEach(function (v) { var q = v.getVideoPlaybackQuality && v.getVideoPlaybackQuality(); if (q) { shown += q.totalVideoFrames; dropped += q.droppedVideoFrames; } });
+      if (shown > 240 && dropped * 12 > shown) { clearInterval(watch); stepDown(); }
     }, 2000);
-    // (or after 4 seconds at the latest, in case something else on the page keeps it from counting as loaded)
-    var hvStarted = false;
-    var hvStart = function () { if (hvStarted) return; hvStarted = true; hvPick(hvLoad); };
-    if (d.readyState === "complete") hvStart(); else { window.addEventListener("load", hvStart); setTimeout(hvStart, 4000); }
-    hv.addEventListener("playing", function () {
-      if (hv.classList.contains("on")) return;
-      hv.classList.add("on");
-      // once the film has faded in, stop drawing the photo underneath it
-      setTimeout(function () { if (hv.classList.contains("on")) hv.parentNode.classList.add("hh-live"); }, 1400);
-    });
+
+    pick(begin);
     // browsers pause muted films in background tabs: start again when the page is back in view
-    d.addEventListener("visibilitychange", function () { if (!d.hidden) hvSync(); });
+    d.addEventListener("visibilitychange", function () { hvSync(); });
     if ("IntersectionObserver" in window) {
       new IntersectionObserver(function (es) { hvState.seen = es[0].isIntersecting; hvSync(); })
         .observe(hv.closest(".hero-home"));
     }
+    // the place name in the corner: the film's own time is part 1's length plus the time into part 2
     var hvPlace = d.querySelector(".hh-place[data-places]");
     if (hvPlace) {
-      var hvPlaces = JSON.parse(hvPlace.getAttribute("data-places")), hvLabel = hvPlace.querySelector("span"), hvShown = hvLabel.textContent;
-      hv.addEventListener("timeupdate", function () {
-        var t = hv.currentTime, name = hvPlaces[0][1];
-        hvPlaces.forEach(function (r) { if (t >= r[0]) name = r[1]; });
-        if (name === hvShown) return;
-        hvShown = name;
-        hvLabel.classList.add("swap");
-        setTimeout(function () { hvLabel.textContent = name; hvLabel.classList.remove("swap"); }, 350);
+      var places = JSON.parse(hvPlace.getAttribute("data-places")), label = hvPlace.querySelector("span"), shownName = label.textContent;
+      vids.forEach(function (v) {
+        v.addEventListener("timeupdate", function () {
+          if (v !== vids[cur]) return;
+          var t = (curPart === 1 ? dur0 : 0) + v.currentTime, name = places[0][1];
+          places.forEach(function (r) { if (t >= r[0]) name = r[1]; });
+          if (name === shownName) return;
+          shownName = name;
+          label.classList.add("swap");
+          setTimeout(function () { label.textContent = name; label.classList.remove("swap"); }, 350);
+        });
       });
     }
-  }
+  })();
 
   // ---- arriving from the home page's tour wheel: the page opens on the same full-screen picture the wheel
   // ended on (put up by the small script at the top of <body>, see build.py); fade it away to reveal this page
