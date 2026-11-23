@@ -64,16 +64,53 @@
   var hvSlow = !!hvNet.saveData || /(^|-)(2g|3g)$/.test(hvNet.effectiveType || "") || (hvNet.downlink > 0 && hvNet.downlink < 3);
   if (hv && !window.matchMedia("(prefers-reduced-motion: reduce)").matches && !hvSlow) {
     var hvPlain = window.matchMedia("(max-aspect-ratio: 4/5)").matches ? hv.getAttribute("data-phone") : hv.getAttribute("data-wide");
-    hvPick(function (src) { hv.src = src; hvSync(); });
-    // if the chosen version fails to load or decode after all, fall back to the plain one
-    hv.addEventListener("error", function () {
-      if (hv.getAttribute("src") !== hvPlain) { hv.src = hvPlain; hvSync(); }
+    // The whole film is downloaded first and then played from memory. Played straight from the server it
+    // starts before enough has arrived, and on a slower or busy connection it keeps stopping for a moment to
+    // wait for the heavy shots (surf, forest). From memory it never waits, and the loop restarts instantly.
+    // The download starts once the page's own photos have loaded, so it does not slow them down.
+    var hvFile = "", hvBlob = "";
+    var hvLoad = function (src) {
+      hvFile = src;
+      var use = function (url, blob) {
+        if (hvFile !== src) { if (blob) URL.revokeObjectURL(url); return; }
+        if (hvBlob) URL.revokeObjectURL(hvBlob);
+        hvBlob = blob ? url : "";
+        hv.src = url;
+        hvSync();
+      };
+      if (!window.fetch || !window.URL || !URL.createObjectURL) { use(src, false); return; }
+      fetch(src).then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.blob(); })
+        .then(function (b) { use(URL.createObjectURL(b), true); }, function () { use(src, false); });
+    };
+    // step down to the plain 30 fps version: when the chosen one fails, or when this device turns out not to
+    // keep up with it after all (it stalls, or drops more than 1 frame in 12)
+    var hvStepDown = function () {
+      if (hvFile === hvPlain) return;
+      hv.classList.remove("on");
+      hv.parentNode.classList.remove("hh-live");
+      hvLoad(hvPlain);
+    };
+    hv.addEventListener("error", hvStepDown);
+    var hvStalls = 0, hvSeekAt = 0;
+    hv.addEventListener("seeking", function () { hvSeekAt = Date.now(); });
+    hv.addEventListener("waiting", function () {
+      // (the loop jumping back to the start may wait a moment; that does not count)
+      if (hv.classList.contains("on") && Date.now() - hvSeekAt > 800 && ++hvStalls >= 3) hvStepDown();
     });
+    var hvWatch = setInterval(function () {
+      if (hvFile === hvPlain) { clearInterval(hvWatch); return; }
+      var q = !hv.paused && hv.getVideoPlaybackQuality && hv.getVideoPlaybackQuality();
+      if (q && q.totalVideoFrames > 240 && q.droppedVideoFrames * 12 > q.totalVideoFrames) { clearInterval(hvWatch); hvStepDown(); }
+    }, 2000);
+    // (or after 4 seconds at the latest, in case something else on the page keeps it from counting as loaded)
+    var hvStarted = false;
+    var hvStart = function () { if (hvStarted) return; hvStarted = true; hvPick(hvLoad); };
+    if (d.readyState === "complete") hvStart(); else { window.addEventListener("load", hvStart); setTimeout(hvStart, 4000); }
     hv.addEventListener("playing", function () {
       if (hv.classList.contains("on")) return;
       hv.classList.add("on");
       // once the film has faded in, stop drawing the photo underneath it
-      setTimeout(function () { hv.parentNode.classList.add("hh-live"); }, 1400);
+      setTimeout(function () { if (hv.classList.contains("on")) hv.parentNode.classList.add("hh-live"); }, 1400);
     });
     // browsers pause muted films in background tabs: start again when the page is back in view
     d.addEventListener("visibilitychange", function () { if (!d.hidden) hvSync(); });
