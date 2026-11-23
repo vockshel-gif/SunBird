@@ -32,13 +32,19 @@
 
   /* outside: everything that passes the windows. Each piece sits on a plane that moves at its own speed. */
   .world { position:absolute; inset:0; will-change:transform; }
-  .o { position:absolute; left:0; top:0; will-change:transform; backface-visibility:hidden; visibility:hidden; }
+  /* Everything that passes at one speed shares a plane, and the plane slides as one piece. The copies of a picture
+     sit side by side in a row (.run) on it, so no hairline opens between them. */
+  .plane { position:absolute; left:0; top:0; will-change:transform; }
+  .run { position:absolute; display:flex; }
+  .run > .o { position:relative; flex:none; height:100%; }
+  .o { position:absolute; visibility:hidden; }
   .o img { position:absolute; inset:0; display:block; width:100%; height:100%; pointer-events:none; user-select:none; -webkit-user-drag:none; }
-  .o.flip img { transform:scaleX(-1); }
-  .o img.blur { opacity:0; }
-  .o.fadeL  { -webkit-mask-image:linear-gradient(90deg, transparent, #000 18%); mask-image:linear-gradient(90deg, transparent, #000 18%); }
-  .o.fadeR  { -webkit-mask-image:linear-gradient(270deg, transparent, #000 18%); mask-image:linear-gradient(270deg, transparent, #000 18%); }
-  .o.fadeLR { -webkit-mask-image:linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent); mask-image:linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent); }
+  /* the motion blur: the plane sets how far each copy has faded from sharp to blurred */
+  .o.hasblur img { opacity:var(--sharp, 1); }
+  .o.hasblur img.blur { opacity:var(--blur, 0); }
+  .fadeL  { -webkit-mask-image:linear-gradient(90deg, transparent, #000 18%); mask-image:linear-gradient(90deg, transparent, #000 18%); }
+  .fadeR  { -webkit-mask-image:linear-gradient(270deg, transparent, #000 18%); mask-image:linear-gradient(270deg, transparent, #000 18%); }
+  .fadeLR { -webkit-mask-image:linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent); mask-image:linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent); }
 
   /* the tunnel: a dark stone wall right outside the glass, with soft ribs of slightly lighter rock */
   .tunnel { background:
@@ -282,13 +288,14 @@
     wide: { src:'img/carriage-wide.webp', w:3584, h:1184, wins:[[171,711],[1061,1622],[1960,2516],[2858,3402]], y:[279,1032], panel:0.885 },
     tall: { src:'img/carriage-tall.webp', w:1536, h:2752, wins:[[424,1121]], y:[862,1961], panel:0.75 },
   };
-  // The pictures outside, and their width-to-height.
+  // The pictures outside, and their width-to-height. The passing ones are seamless loops: the right edge of
+  // each runs on into its own left edge, so copies can sit end to end without a join or a mirror.
   const IMG = {
-    sky:  { src:'img/sky.webp',  a:2400 / 1018 },
-    far:  { src:'img/far.webp',  a:2400 / 1018 },
-    mid:  { src:'img/mid.webp',  a:3168 / 1344 },
-    near: { src:'img/near.webp', blur:'img/near-blur.webp', a:2400 / 1018 },
-    rock: { src:'img/rock.webp', blur:'img/rock-blur.webp', a:2000 / 848 },
+    sky:  { src:'img/sky-loop.webp',  a:1764 / 1018 },
+    far:  { src:'img/far-loop.webp',  a:1733 / 1018 },
+    mid:  { src:'img/mid-loop.webp',  a:2538 / 1344 },
+    near: { src:'img/near-loop.webp', blur:'img/near-loop-blur.webp', a:1971 / 1018 },
+    rock: { src:'img/rock-loop.webp', blur:'img/rock-loop-blur.webp', a:1675 / 848 },
     sign: { src:'img/sign.webp', a:1100 / 910 },
   };
 
@@ -311,39 +318,62 @@
   // where things happen along the line (as scroll progress)
   const EV = { rockIn:0.603, tunIn:0.632, tunOut:0.688, rockOut:0.716, platform:0.905 };
 
-  let L = null, objs = [], tunnel = null, blurObjs = [];
+  let L = null, objs = [], tunnel = null, planes = new Map(), blurPlane = null;
 
-  function addObj(o) {
+  // one plane per speed (k); the first thing on it decides how it stacks against the others
+  function planeFor(k, z) {
+    let p = planes.get(k);
+    if (!p) {
+      const el = document.createElement('div');
+      el.className = 'plane'; el.style.zIndex = z;
+      world.appendChild(el);
+      p = { el, k, tx:null, cur:0, b:null };
+      planes.set(k, p);
+    }
+    return p;
+  }
+
+  // a row for copies of one picture, starting at x
+  function addRun(k, z, top, h, x) {
     const el = document.createElement('div');
-    el.className = 'o' + (o.flip ? ' flip' : '') + (o.cls ? ' ' + o.cls : '');
-    el.style.cssText = `width:${(o.w * L.bh).toFixed(1)}px;height:${(o.h * L.bh).toFixed(1)}px;top:${(L.by0 + o.top * L.bh).toFixed(1)}px;z-index:${o.z}`;
+    el.className = 'run';
+    el.style.cssText = `left:${(x * L.bh).toFixed(2)}px;top:${(L.by0 + top * L.bh).toFixed(1)}px;height:${(h * L.bh).toFixed(1)}px;z-index:${z}`;
+    planeFor(k, z).el.appendChild(el);
+    return el;
+  }
+
+  // a thing outside: on its plane at x, or the next copy in a row
+  function addObj(o, run = null) {
+    const el = document.createElement('div');
+    el.className = 'o' + (o.blur ? ' hasblur' : '') + (o.cls ? ' ' + o.cls : '');
+    el.style.cssText = run ? `width:${o.w * L.bh}px`
+      : `left:${(o.x * L.bh).toFixed(2)}px;width:${(o.w * L.bh).toFixed(1)}px;height:${(o.h * L.bh).toFixed(1)}px;top:${(L.by0 + o.top * L.bh).toFixed(1)}px;z-index:${o.z}`;
     if (o.src) { const im = new Image(); im.alt = ''; im.decoding = 'async'; im.src = o.src; el.appendChild(im); }
-    if (o.blur) { const im = new Image(); im.alt = ''; im.className = 'blur'; im.decoding = 'async'; im.src = o.blur; el.appendChild(im); o.blurEl = im; blurObjs.push(o); }
+    if (o.blur) { const im = new Image(); im.alt = ''; im.className = 'blur'; im.decoding = 'async'; im.src = o.blur; el.appendChild(im); }
     if (o.html) el.insertAdjacentHTML('beforeend', o.html);
-    world.appendChild(el);
-    o.el = el; o.vis = false; o.sx = null;
+    o.plane = planeFor(o.k, o.z);
+    if (o.blur) blurPlane = o.plane;
+    (run || o.plane.el).appendChild(el);
+    o.el = el; o.vis = false;
     objs.push(o);
     return o;
   }
 
-  // Lay pictures end to end on one plane, every other one mirrored so the joins always match.
-  // `at` pins one point of the picture (0..1 across it, unmirrored) to the middle of the screen at Ella.
+  // Lay copies of a picture end to end, in rows broken only where `skip` leaves a gap.
+  // `at` pins one point of the picture (0..1 across it) to the middle of the screen at Ella.
   function strip(kind, k, z, top, h, from, to, skip = [], at = null) {
-    const I = IMG[kind], w = h * I.a, list = [];
+    const I = IMG[kind], w = h * I.a, xs = [];
     if (at !== null) {
       const anchor = XEND * k - at * w;
-      let n = Math.ceil((anchor - from) / w); if (n % 2) n++;
-      from = anchor - n * w;
+      from = anchor - Math.ceil((anchor - from) / w) * w;
     }
-    for (let x = from, i = 0; x < to; x += w, i++) {
-      const hit = skip.some(([a, b]) => x + w > a && x < b);
-      list.push(hit ? null : { k, z, top, h, w, x, flip:i % 2 === 1, src:I.src, blur:I.blur });
-    }
-    list.forEach((o, i) => {
-      if (!o) return;
-      const l = i > 0 && !list[i - 1], r = i < list.length - 1 && !list[i + 1];
-      o.cls = l && r ? 'fadeLR' : l ? 'fadeL' : r ? 'fadeR' : '';
-      addObj(o);
+    for (let x = from; x < to; x += w) xs.push(skip.some(([a, b]) => x + w > a && x < b) ? null : x);
+    let run = null;
+    xs.forEach((x, i) => {
+      if (x === null) { run = null; return; }
+      const l = i > 0 && xs[i - 1] === null, r = i < xs.length - 1 && xs[i + 1] === null;
+      if (!run) run = addRun(k, z, top, h, x);
+      addObj({ k, z, top, h, w, x, src:I.src, blur:I.blur, cls:l && r ? 'fadeLR' : l ? 'fadeL' : r ? 'fadeR' : '' }, run);
     });
   }
 
@@ -359,14 +389,14 @@
     const wins = C.wins.map(([a, b]) => [ox + a * s, ox + b * s]);
     L = { vw, vh, by0, by1, bh, wins, half:vw / 2 / bh };
 
-    world.replaceChildren(); objs = []; blurObjs = [];
+    world.replaceChildren(); objs = []; planes = new Map(); blurPlane = null;
     const H = L.half, x = X;
 
     // sky and distant mountains barely move; tea hills drift; the trackside rushes past
     strip('sky',  0.012, 1, -by0 / bh - 0.06, vh / bh + 0.12, -H - 4, XEND * 0.012 + H + 1);
     strip('far',  0.06,  2, -0.07, 1.08, -H - 3, XEND * 0.06 + H + 1);
-    // (the tea hills stop with the farmhouse and the waterfall in view, away from a mirrored join)
-    strip('mid',  0.24,  3,  0.27, 0.96, -H - 3, XEND * 0.24 + H + 1, [], 0.45);
+    // (the tea hills stop with the farmhouse and the waterfall in view)
+    strip('mid',  0.24,  3,  0.27, 0.96, -H - 3, XEND * 0.24 + H + 1, [], 0.562);
 
     const rock = [x(EV.rockIn), x(EV.rockOut)];
     const plat = x(EV.platform);
@@ -374,10 +404,10 @@
 
     // the rock cutting, and the tunnel in the middle of it
     const rH = 1.4, rW = rH * IMG.rock.a;
-    let n = Math.ceil((rock[1] - rock[0]) / rW);
+    const n = Math.ceil((rock[1] - rock[0]) / rW), rockRun = addRun(1, 7, -0.2, rH, rock[0]);
     for (let i = 0; i < n; i++) {
-      addObj({ k:1, z:7, top:-0.2, h:rH, w:rW, x:rock[0] + i * rW, flip:i % 2 === 1, src:IMG.rock.src, blur:IMG.rock.blur,
-               cls:n === 1 ? 'fadeLR' : i === 0 ? 'fadeL' : i === n - 1 ? 'fadeR' : '' });
+      addObj({ k:1, z:7, top:-0.2, h:rH, w:rW, x:rock[0] + i * rW, src:IMG.rock.src, blur:IMG.rock.blur,
+               cls:n === 1 ? 'fadeLR' : i === 0 ? 'fadeL' : i === n - 1 ? 'fadeR' : '' }, rockRun);
     }
     tunnel = addObj({ k:1, z:8, top:-0.25, h:1.5, w:x(EV.tunOut) - x(EV.tunIn), x:x(EV.tunIn), cls:'tunnel' });
 
@@ -476,15 +506,22 @@
     if (pC !== last.p || moving || jolt > 0.02) {
       last.p = pC;
       const { vw, bh } = L;
+      for (const p of planes.values()) {
+        p.cur = vw / 2 - x * p.k * bh;
+        if (p.tx === null || Math.abs(p.cur - p.tx) > 0.05) { p.el.style.transform = `translate3d(${p.cur.toFixed(2)}px,0,0)`; p.tx = p.cur; }
+      }
+      // only what is in view is drawn
       for (const o of objs) {
-        const sx = vw / 2 + (o.x - x * o.k) * bh, sw = o.w * bh;
-        const vis = sx < vw + 4 && sx + sw > -4;
+        const sx = o.plane.cur + o.x * bh, vis = sx < vw + 4 && sx + o.w * bh > -4;
         if (vis !== o.vis) { o.el.style.visibility = vis ? 'visible' : 'hidden'; o.vis = vis; }
-        if (vis && Math.abs(sx - o.sx) > 0.05 || o.sx === null) { o.el.style.transform = `translate3d(${sx.toFixed(2)}px,0,0)`; o.sx = sx; }
       }
       // motion blur on the trackside, fading in with speed (pixels per second)
-      const b = reduce ? 0 : clamp((speed * bh - 650) / 1500, 0, 0.92);
-      for (const o of blurObjs) if (o.vis) { o.blurEl.style.opacity = b.toFixed(2); o.el.firstChild.style.opacity = (1 - b * 0.85).toFixed(2); }
+      const b = (reduce ? 0 : clamp((speed * bh - 650) / 1500, 0, 0.92)).toFixed(2);
+      if (blurPlane && b !== blurPlane.b) {
+        blurPlane.b = b;
+        blurPlane.el.style.setProperty('--blur', b);
+        blurPlane.el.style.setProperty('--sharp', (1 - b * 0.85).toFixed(2));
+      }
 
       // the tunnel: how much of the screen it fills decides how dark the carriage is
       const tx = vw / 2 + (tunnel.x - x) * bh, cover = clamp((Math.min(vw, tx + tunnel.w * bh) - Math.max(0, tx)) / vw);
