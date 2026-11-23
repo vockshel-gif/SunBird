@@ -26,6 +26,75 @@
     });
   }
 
+  // ---- home hero: a short looping film over the photo (build.py home_hero). The photo shows first and the
+  // film fades in once it is really playing. It is not loaded at all for people who have turned motion off or
+  // asked to save data. Tall screens (phones) get the tall cut. The place name in the corner follows the film.
+  // It only plays while you can see it: off screen, or covered by the next card of the home page stack
+  // (hvState.covered, set by the stack below), it rests so scrolling stays smooth.
+  var hv = d.querySelector(".hh-video"), hvState = { seen: true, covered: false };
+  var hvSync = function () {
+    if (!hv || !hv.getAttribute("src")) return;
+    if (hvState.seen && !hvState.covered) {
+      var pr = hv.play();
+      if (pr && pr.catch) pr.catch(function () { /* autoplay refused: the photo stays */ });
+    } else if (!hv.paused) { hv.pause(); }
+  };
+  // Which file: the film comes in several versions (data-files, best first: newer codecs at 60 fps). Play the
+  // first one this device says it can decode smoothly AND power-efficiently (in hardware); if none, the plain
+  // 30 fps H.264 file (data-wide / data-phone), which every device can play.
+  var hvPick = function (done) {
+    var tall = window.matchMedia("(max-aspect-ratio: 4/5)").matches;
+    var plain = hv.getAttribute(tall ? "data-phone" : "data-wide"), rows = [];
+    try { rows = JSON.parse(hv.getAttribute("data-files") || "[]"); } catch (err) { rows = []; }
+    rows = rows.filter(function (r) { return r[0] === (tall ? "tall" : "wide"); });
+    var mc = navigator.mediaCapabilities, i = 0;
+    var next = function () {
+      if (i >= rows.length) { done(plain); return; }
+      var r = rows[i++], type = 'video/mp4; codecs="' + r[4] + '"';
+      if (!hv.canPlayType(type)) { next(); return; }
+      if (!mc || !mc.decodingInfo) { done(r[6]); return; }
+      mc.decodingInfo({ type: "file", video: { contentType: type, width: r[1], height: r[2], bitrate: r[5] * 1000, framerate: r[3] } })
+        .then(function (res) { if (res.supported && res.smooth && res.powerEfficient) done(r[6]); else next(); }, next);
+    };
+    next();
+  };
+  // slow mobile data (2G/3G, or under about 3 Mbit/s, which browsers on Android report) can't keep a 60 fps film
+  // flowing: the film would keep stopping to load, so those visitors simply keep the photo
+  var hvNet = navigator.connection || {};
+  var hvSlow = !!hvNet.saveData || /(^|-)(2g|3g)$/.test(hvNet.effectiveType || "") || (hvNet.downlink > 0 && hvNet.downlink < 3);
+  if (hv && !window.matchMedia("(prefers-reduced-motion: reduce)").matches && !hvSlow) {
+    var hvPlain = window.matchMedia("(max-aspect-ratio: 4/5)").matches ? hv.getAttribute("data-phone") : hv.getAttribute("data-wide");
+    hvPick(function (src) { hv.src = src; hvSync(); });
+    // if the chosen version fails to load or decode after all, fall back to the plain one
+    hv.addEventListener("error", function () {
+      if (hv.getAttribute("src") !== hvPlain) { hv.src = hvPlain; hvSync(); }
+    });
+    hv.addEventListener("playing", function () {
+      if (hv.classList.contains("on")) return;
+      hv.classList.add("on");
+      // once the film has faded in, stop drawing the photo underneath it
+      setTimeout(function () { hv.parentNode.classList.add("hh-live"); }, 1400);
+    });
+    // browsers pause muted films in background tabs: start again when the page is back in view
+    d.addEventListener("visibilitychange", function () { if (!d.hidden) hvSync(); });
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver(function (es) { hvState.seen = es[0].isIntersecting; hvSync(); })
+        .observe(hv.closest(".hero-home"));
+    }
+    var hvPlace = d.querySelector(".hh-place[data-places]");
+    if (hvPlace) {
+      var hvPlaces = JSON.parse(hvPlace.getAttribute("data-places")), hvLabel = hvPlace.querySelector("span"), hvShown = hvLabel.textContent;
+      hv.addEventListener("timeupdate", function () {
+        var t = hv.currentTime, name = hvPlaces[0][1];
+        hvPlaces.forEach(function (r) { if (t >= r[0]) name = r[1]; });
+        if (name === hvShown) return;
+        hvShown = name;
+        hvLabel.classList.add("swap");
+        setTimeout(function () { hvLabel.textContent = name; hvLabel.classList.remove("swap"); }, 350);
+      });
+    }
+  }
+
   // ---- arriving from the home page's tour wheel: the page opens on the same full-screen picture the wheel
   // ended on (put up by the small script at the top of <body>, see build.py); fade it away to reveal this page
   var arrival = d.querySelector(".pt-in");
@@ -1479,7 +1548,7 @@
       });
       d.documentElement.classList.add("pinned");
 
-      var heroInner = hero.querySelector(".hh-inner"), heroPic = hero.querySelector("picture");
+      var heroInner = hero.querySelector(".hh-inner"), heroPic = hero.querySelector(".hh-media") || hero.querySelector("picture");
       // "Who we are": wrap each word of the big statement so it can light up as you scroll
       var introWords = [], introBtn = intro.querySelector(".intro-text > p:last-child");
       var statement = intro.querySelector(".intro-text > p:not(.kicker):not(:last-child)");
@@ -1512,6 +1581,10 @@
 
       var vh = window.innerHeight, lastY = -1;
       var mix = function (a, b, t) { return a + (b - a) * t; };
+      // a dark layer that fades in to dim a section as the next one slides over it (much lighter for the
+      // browser than a brightness filter, which would redraw the hero's film on every frame)
+      var dimLayer = function (sec) { var el = d.createElement("div"); el.className = "sb-dim"; el.setAttribute("aria-hidden", "true"); sec.appendChild(el); return el; };
+      var heroDim = dimLayer(hero), introDim = dimLayer(intro);
       var render = function () {
         // p[k]: how far through section k's own effect we are (0 to 1);
         // c[k]: how far the next section has slid up over it (0 to 1)
@@ -1528,7 +1601,10 @@
         heroInner.style.transform = "translate3d(0," + (-110 * t).toFixed(1) + "px,0)";
         heroInner.style.opacity = (1 - t).toFixed(3);
         heroPic.style.transform = "scale(" + mix(1, 1.14, p[0]).toFixed(4) + ")";
-        hero.style.filter = c[0] > 0 ? "brightness(" + mix(1, 0.6, c[0]).toFixed(3) + ")" : "";
+        heroDim.style.opacity = (0.4 * c[0]).toFixed(3);
+        // the film rests once "Who we are" covers the hero completely
+        var covered = c[0] > 0.99;
+        if (covered !== hvState.covered) { hvState.covered = covered; hvSync(); }
 
         // 2. "Who we are": while it slides up over the hero, its photo settles (it moves slower than its
         // frame and zooms out a little) and the motto rises in line by line; scrolling on, the statement
@@ -1555,7 +1631,7 @@
           iaBadge.style.opacity = e.toFixed(3);
           iaBadge.style.transform = "rotate(" + mix(-70, -8, e).toFixed(1) + "deg) scale(" + mix(0.6, 1, e).toFixed(3) + ")";
         }
-        intro.style.filter = c[1] > 0 ? "brightness(" + mix(1, 0.7, c[1]).toFixed(3) + ")" : "";
+        introDim.style.opacity = (0.3 * c[1]).toFixed(3);
 
         // 3. tour wheel: the photo opens from a framed window to full size, the ring of words swings in,
         // then the rest fades in and the wheel is ready to turn
