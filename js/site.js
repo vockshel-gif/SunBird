@@ -3,8 +3,14 @@
   "use strict";
   var d = document, body = d.body;
 
-  // ---- mobile menu
-  var toggle = d.querySelector(".nav-toggle"), nav = d.getElementById("nav");
+  // ---- the menu (build.py nav). Phones: the menu button opens the menu over the page, and the + beside a menu
+  // word folds its lines open. Big screens: pointing at a menu word opens its sheet under the header. There is one
+  // paper background for all the sheets; moving from word to word, the sheet's lines slide across from that side
+  // and the background grows or shrinks to fit. The thin line under the menu words glides to the word you point
+  // at and goes back to the section you are in. Pointing at a line in the sheet shows its photo. The photos only
+  // load once the pointer comes into the header, so pages where nobody opens the menu don't download them.
+  var toggle = d.querySelector(".nav-toggle"), nav = d.getElementById("nav"), siteHdr = d.querySelector(".site-header");
+  var sheetClose = function () {};
   if (toggle) {
     toggle.addEventListener("click", function () {
       var open = body.classList.toggle("nav-open");
@@ -19,12 +25,144 @@
   });
   if (nav) {
     nav.addEventListener("click", function (e) {
-      if (e.target.closest("a")) {
+      if (e.target.closest("a") && !e.defaultPrevented) {
         body.classList.remove("nav-open");
         if (toggle) toggle.setAttribute("aria-expanded", "false");
+        sheetClose();
       }
     });
   }
+  // the language button shows the chosen language's code (GTranslate keeps the choice in its "googtrans" cookie)
+  var langCode = d.querySelector(".lang-code");
+  if (langCode) {
+    var setLang = function (code) { if (code) langCode.textContent = code.split("-")[0].toUpperCase(); };
+    var gt = /(?:^|;\s*)googtrans=\/[^/]*\/([^;]+)/.exec(d.cookie);
+    setLang(gt && decodeURIComponent(gt[1]));
+    langCode.parentNode.addEventListener("change", function (e) { setLang((e.target.value || "").split("|")[1]); });
+  }
+  if (siteHdr && nav) (function () {
+    var wide = window.matchMedia("(min-width: 901px)"), canHover = window.matchMedia("(hover: hover)");
+    var words = [].slice.call(nav.querySelectorAll(":scope > ul > li"));
+    var here = nav.querySelector(":scope > ul > li.here");
+    var bg = siteHdr.querySelector(".mega-bg"), ink = siteHdr.querySelector(".nav-ink"), scrim = d.querySelector(".mega-scrim");
+    var cur = null, tIn = 0, tOut = 0, quiet = false, warmed = false;
+    var load = function (imgs) {
+      [].forEach.call(imgs, function (img) {
+        if (!img.hasAttribute("data-src")) return;
+        if (img.hasAttribute("data-srcset")) img.setAttribute("srcset", img.getAttribute("data-srcset"));
+        img.src = img.getAttribute("data-src");
+        img.removeAttribute("data-src");
+        img.removeAttribute("data-srcset");
+      });
+    };
+    // the line under a word: 100px wide in the CSS, stretched to the word's width. When it wasn't showing, it
+    // grows out from the middle of the word instead of sliding in from wherever it was last.
+    var inkTo = function (li) {
+      if (!ink) return;
+      if (!li || !wide.matches) { ink.classList.remove("on"); return; }
+      var a = li.querySelector(".top"), cs = window.getComputedStyle(a), r = a.getBoundingClientRect(), h = siteHdr.getBoundingClientRect();
+      var pl = parseFloat(cs.paddingLeft) || 0, w = r.width - pl - (parseFloat(cs.paddingRight) || 0), x = r.left - h.left + pl;
+      if (!ink.classList.contains("on")) {
+        ink.style.transition = "none";
+        ink.style.transform = "translate3d(" + (x + w / 2).toFixed(1) + "px,0,0) scaleX(0)";
+        void ink.offsetWidth;
+        ink.style.transition = "";
+      }
+      ink.style.transform = "translate3d(" + x.toFixed(1) + "px,0,0) scaleX(" + (w / 100).toFixed(3) + ")";
+      ink.classList.add("on");
+    };
+    var leave = function (li) {
+      li.classList.remove("on");
+      li.classList.add("was");
+      clearTimeout(li._was);
+      li._was = setTimeout(function () { li.classList.remove("was"); }, 450);
+    };
+    var show = function (li) {
+      clearTimeout(tIn);
+      clearTimeout(tOut);
+      if (li === cur) return;
+      var pg = li.querySelector(".mega-pg");
+      if (!pg) { close(); inkTo(li); return; }
+      var prev = cur;
+      siteHdr.style.setProperty("--mdx", prev ? (words.indexOf(li) > words.indexOf(prev) ? "36px" : "-36px") : "0px");
+      siteHdr.style.setProperty("--mdy", prev ? "0px" : "-14px");
+      if (prev) leave(prev);
+      if (!li.classList.contains("was") && pg._pick) pg._pick(pg._home);   // a fresh sheet starts on this page's line, or its first
+      li.classList.remove("was");
+      void window.getComputedStyle(pg).transform;   // let it start from its side before it slides in
+      load(pg.querySelectorAll(".mp-ph img"));
+      cur = li;
+      li.classList.add("on");
+      siteHdr.classList.add("mx", "is-open");
+      if (bg) bg.style.height = pg.offsetHeight + "px";
+      if (scrim) scrim.classList.add("on");
+      inkTo(li);
+    };
+    var close = function () {
+      clearTimeout(tIn);
+      if (cur) {
+        siteHdr.style.setProperty("--mdx", "0px");
+        leave(cur);
+        cur = null;
+        siteHdr.classList.remove("is-open");
+        if (bg) bg.style.height = "0px";
+        if (scrim) scrim.classList.remove("on");
+      }
+      inkTo(here);
+    };
+    sheetClose = close;
+    words.forEach(function (li) {
+      var a = li.querySelector(".top");
+      // a short wait before switching, so that crossing another word on the way down into a sheet doesn't switch to it
+      li.addEventListener("mouseenter", function () {
+        if (!wide.matches || !canHover.matches) return;
+        clearTimeout(tIn);
+        tIn = setTimeout(function () { show(li); }, cur ? 70 : 90);
+      });
+      li.addEventListener("mouseleave", function () { clearTimeout(tIn); });
+      a.addEventListener("focus", function () { if (wide.matches && !quiet) show(li); });
+      // touch screens: the first tap opens the sheet, a second tap follows the link
+      a.addEventListener("click", function (e) {
+        if (wide.matches && !canHover.matches && li.querySelector(".mega-pg") && cur !== li) { e.preventDefault(); show(li); }
+      });
+    });
+    nav.querySelectorAll(".mega-pg").forEach(function (pg) {
+      var rows = [].slice.call(pg.querySelectorAll(".mp-row")), imgs = pg.querySelectorAll(".mp-ph > *");
+      pg._home = Math.max(0, rows.findIndex(function (r) { return r.pathname === location.pathname && !r.hash; }));
+      pg._pick = function (k) {
+        rows.forEach(function (r, n) { r.classList.toggle("on", n === k); });
+        [].forEach.call(imgs, function (im, n) { im.classList.toggle("on", n === k); });
+      };
+      rows.forEach(function (r, k) {
+        r.addEventListener("mouseenter", function () { pg._pick(k); });
+        r.addEventListener("focus", function () { pg._pick(k); });
+      });
+    });
+    siteHdr.addEventListener("mouseenter", function () {
+      clearTimeout(tOut);
+      if (!warmed && wide.matches) { warmed = true; load(nav.querySelectorAll(".mp-ph img:first-child")); }
+    });
+    siteHdr.addEventListener("mouseleave", function () {
+      clearTimeout(tIn);
+      if (cur && wide.matches && canHover.matches) tOut = setTimeout(close, 200);
+    });
+    siteHdr.addEventListener("focusout", function (e) { if (cur && !siteHdr.contains(e.relatedTarget)) close(); });
+    d.addEventListener("keydown", function (e) {
+      if (e.key !== "Escape" || !cur) return;
+      var a = cur.querySelector(".top");
+      close();
+      quiet = true; a.focus(); quiet = false;
+    });
+    d.addEventListener("click", function (e) { if (cur && !siteHdr.contains(e.target)) close(); });
+    var fit = function () {
+      if (cur && bg) bg.style.height = cur.querySelector(".mega-pg").offsetHeight + "px";
+      if (ink) { ink.classList.remove("on"); inkTo(cur || here); }
+    };
+    window.addEventListener("resize", fit);
+    if (wide.addEventListener) wide.addEventListener("change", function () { close(); fit(); });
+    // the line rests under this page's section once the fonts have given the words their real widths
+    if (d.fonts && d.fonts.ready) d.fonts.ready.then(fit); else fit();
+  })();
 
   // ---- home hero: a short looping film over the photo (build.py home_hero). The photo shows first and the
   // film fades in over it once it is really playing. It is not loaded at all for people who have turned motion
@@ -452,16 +590,31 @@
   window.addEventListener("pageshow", onScroll);   // also when the page reopens part-way down
   onScroll();
 
-  // ---- tour pages: the photo on the first screen drifts down at a third of the page's speed (parallax)
+  // ---- the full-screen first screen (tour pages and every page that opens on a photo, build.py tour_hero and
+  // screen_hero), in layers as you scroll: the photo drifts down at under half the page's speed and zooms in a
+  // touch, the words in the middle float up a little slower than the page and fade, the facts along the bottom
+  // fade sooner, and the photo dims. Only transforms and opacity change, so it stays smooth.
   var thBox = d.querySelector(".tour-hero"), thImg = thBox && thBox.querySelector(".th-bg img");
   if (thImg && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-    var thBusy = false;
+    var thIn = thBox.querySelector(".th-in"), thFoot = thBox.querySelector(".th-foot"), thDim = thBox.querySelector(".th-dim");
+    var thBusy = false, thH = thBox.offsetHeight, thLast = -1;
     var thDrift = function () {
       thBusy = false;
-      var y = Math.min(window.scrollY, thBox.offsetHeight);
-      thImg.style.setProperty("--py", (y * .32).toFixed(1) + "px");
+      var y = Math.max(0, Math.min(window.scrollY, thH)), k = y / thH;
+      if (y === thLast) return;
+      thLast = y;
+      thImg.style.setProperty("--py", (y * .42).toFixed(1) + "px");
+      thImg.style.setProperty("--pz", (1 + k * .08).toFixed(4));
+      if (thIn) {
+        thIn.style.transform = y ? "translate3d(0," + (y * .24).toFixed(1) + "px,0)" : "";
+        thIn.style.opacity = y ? Math.max(0, 1 - k * 1.6).toFixed(3) : "";
+      }
+      if (thFoot) thFoot.style.opacity = y ? Math.max(0, 1 - k * 2.4).toFixed(3) : "";
+      if (thDim) thDim.style.opacity = (k * .6).toFixed(3);
     };
-    window.addEventListener("scroll", function () { if (!thBusy) { thBusy = true; requestAnimationFrame(thDrift); } }, { passive: true });
+    var thAsk = function () { if (!thBusy) { thBusy = true; requestAnimationFrame(thDrift); } };
+    window.addEventListener("scroll", thAsk, { passive: true });
+    window.addEventListener("resize", function () { thH = thBox.offsetHeight; thLast = -1; thAsk(); });
     thDrift();
   }
 
