@@ -77,7 +77,19 @@
       fetch(src).then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.blob(); })
         .then(function (b) { done(URL.createObjectURL(b)); }, function () { done(k === 0 ? src : ""); });
     };
-    var load = function (v, k) { v.filmPart = k; v.filmReady = false; v.src = urls[k]; };
+    // The opening screen (js/hello.js): starting a film layer (the video decoder starting up) holds up every
+    // moving thing on screen for a moment, even the moves the graphics card does, and that showed as a stutter
+    // in the logo. The film can't be seen under the screen anyway, so while the screen is up a layer waits
+    // until it has gone and the hero's words have risen into place (0.6 s more); the film then fades in over
+    // the photo as usual. The film still downloads meanwhile.
+    var afterHello = function (fn) {
+      if (!d.querySelector(".hl")) { fn(); return; }
+      d.addEventListener("sbhello:gone", function () { setTimeout(fn, 600); }, { once: true });
+    };
+    var load = function (v, k) {
+      v.filmPart = k; v.filmReady = false;
+      afterHello(function () { if (v.filmPart === k && v.getAttribute("src") !== urls[k]) v.src = urls[k]; });
+    };
     var play = function (v) { var pr = v.play(); if (pr && pr.catch) pr.catch(function () { /* refused: the photo stays */ }); };
     hvSync = function () {
       var v = vids[cur];
@@ -960,6 +972,12 @@
     var dName = dial.querySelector(".dial-name"), dSum = dial.querySelector(".dial-sum"), detail = dial.querySelector(".dial-detail");
     var dists = [].slice.call(dial.querySelectorAll(".dm-d")), rainClip = dial.querySelector("#dm-rain-clip");
     var ring = dial.querySelector(".dial"), tip = dial.querySelector(".dial-tip");
+    // the raindrops move inside the map's drawing, so the page itself redraws them every frame, wherever the
+    // visitor is on the page: they rest while the map is off screen (.dial-rest, site.css)
+    if ("IntersectionObserver" in window) {
+      dial.classList.add("dial-rest");
+      new IntersectionObserver(function (es) { dial.classList.toggle("dial-rest", !es[0].isIntersecting); }).observe(dial);
+    }
     var moreA = detail.querySelector(".dial-more"), arrow = moreA && moreA.querySelector("svg") ? moreA.querySelector("svg").outerHTML : "";
     var guideBase = moreA ? moreA.getAttribute("href").split("#")[0] : "";
     var LBL = { G: "Sunny", M: "Mixed", R: "Rainy" }, LONG = { G: "Sunny", M: "Mixed weather", R: "Rainy" }, now = 0, angle = 0;
