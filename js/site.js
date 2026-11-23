@@ -28,7 +28,7 @@
 
   // ---- home hero: a short looping film over the photo (build.py home_hero). The photo shows first and the
   // film fades in over it once it is really playing. It is not loaded at all for people who have turned motion
-  // off, asked to save data or are on slow mobile data. Tall screens (phones) get the tall cut. The place name
+  // off, asked to save data or are on 2G/3G mobile data. Tall screens (phones) get the tall cut. The place name
   // in the corner follows the film. It only plays while you can see it: off screen, or covered by the next
   // card of the home page stack (hvState.covered, set by the stack below), it rests so scrolling stays smooth.
   //
@@ -40,7 +40,9 @@
   // part 1 dissolves back to its own start (like a cut between shots) and part 2 takes over on a later pass.
   var hv = d.querySelector(".hh-video"), hvState = { seen: true, covered: false }, hvSync = function () {};
   var hvNet = navigator.connection || {};
-  var hvSlow = !!hvNet.saveData || /(^|-)(2g|3g)$/.test(hvNet.effectiveType || "") || (hvNet.downlink > 0 && hvNet.downlink < 3);
+  // (only the browser's own 2G/3G verdict counts, not its speed guess: Chrome's "downlink" figure is often far
+  // too low on a good connection, and a slow one is fine anyway, as part 2 just arrives later)
+  var hvSlow = !!hvNet.saveData || /(^|-)(2g|3g)$/.test(hvNet.effectiveType || "");
   if (hv && !window.matchMedia("(prefers-reduced-motion: reduce)").matches && !hvSlow) (function () {
     var tall = window.matchMedia("(max-aspect-ratio: 4/5)").matches, rows = [];
     try { rows = JSON.parse(hv.getAttribute("data-files") || "[]"); } catch (err) { rows = []; }
