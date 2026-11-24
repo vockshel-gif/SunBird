@@ -4,8 +4,8 @@
   --blue-dark: #155c94;
   --ink: #113d48;
   --ink-deep: #0c2c34;
-  --text: #4a5558;
-  --muted: #6e7070;
+  --text: #4a6170;
+  --muted: #5b7383;
   --mist: #e9f6f9;
   --smoke: #f3f4f6;
   --line: #e1e4e5;
@@ -20,6 +20,10 @@ html { scroll-behavior: smooth; scroll-padding-top: 96px; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 body { margin: 0; font: 16px/1.7 var(--body); color: var(--text); background: var(--white); -webkit-font-smoothing: antialiased; }
 img { max-width: 100%; height: auto; display: block; }
+/* photos fade in as they arrive (site.js marks the ones still loading when the page starts) */
+img.img-wait { opacity: 0 !important; }
+img.img-in { animation: img-in .8s cubic-bezier(.25, .6, .3, 1); }
+@keyframes img-in { from { opacity: 0; } }
 a { color: var(--blue); text-decoration: none; }
 a:hover { color: var(--blue-dark); }
 h1, h2, h3, h4, h5 { font-family: var(--title); color: var(--ink); line-height: 1.2; margin: 0 0 .6em; font-weight: 700; }
@@ -28,11 +32,15 @@ h1, h2 { font-family: var(--serif); font-weight: 400; line-height: 1.06; letter-
 h1 { font-size: clamp(2.6rem, 5.4vw, 4.4rem); }
 h2 { font-size: clamp(2.1rem, 3.8vw, 3.2rem); }
 h3 { font-size: 1.25rem; }
+h1, h2, h3, h4, blockquote, figcaption, .th-tag, .dh-tag, .pm-tag,
+.kicker, .ci-kicker, .hh-kicker, .tw-kicker, .ma-kicker, .sx-k, .ft-k { text-wrap: balance; }
+p, li, dd { text-wrap: pretty; }
 p { margin: 0 0 1.1em; }
 ul, ol { padding-left: 1.2em; margin: 0 0 1.2em; }
 li { margin-bottom: .35em; }
 strong { color: var(--ink); font-weight: 600; }
 svg { width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+svg.brand { overflow: visible; }   /* logos that reach the edge of their box (Facebook's circle) keep their soft edge */
 /* page column: wide on big screens; running text keeps a comfortable line length (--measure) */
 .wrap { max-width: 1760px; margin: 0 auto; padding: 0 clamp(20px, 6vw - 40px, 72px); }
 :root { --measure: 52rem; }
@@ -63,7 +71,7 @@ svg { width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-widt
 .btn.gold { --sun: 40px; --edge: 6px; position: relative; isolation: isolate; overflow: hidden; gap: 16px; justify-content: space-between;
   min-height: calc(var(--sun) + var(--edge) * 2); padding: var(--edge) var(--edge) var(--edge) 1.55em; border: 0;
   background: var(--brand-yellow, #fbdc03); color: var(--brand-navy, #0c3460); font-weight: 700; box-shadow: none;
-  transition: color .4s ease, transform .2s ease; }
+  transition: color .4s ease, transform .2s ease, background-color 0s; }
 .btn.gold > svg { display: none; }   /* the sun carries the arrow */
 /* the sun: a logo-blue disc, cut from a layer behind the words so that it can spread over the whole button */
 .btn.gold::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--brand-sky, #29abe2);
@@ -73,12 +81,30 @@ svg { width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-widt
 .btn.gold::after { content: ""; flex: none; width: var(--sun); height: var(--sun); border-radius: 50%;
   background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14M13 6l6 6-6 6'/%3E%3C/svg%3E") center / 46% no-repeat;
   transition: transform .45s cubic-bezier(.2, .7, .2, 1); }
-.btn.gold:hover, .btn.gold:focus-visible { background: var(--brand-yellow, #fbdc03); color: #fff; }
+/* once the sun has covered the button, the button's own colour turns to the sun's too: otherwise a hair of yellow
+   showed round the rounded edge, where the edge's soft pixels mix the sun with the yellow under it. Pointing away,
+   the yellow comes back at once, before the sun shrinks off it. */
+.btn.gold:hover, .btn.gold:focus-visible { background: var(--sun-fill, var(--brand-blue, #1f74ba)); color: #fff;
+  transition: color .4s ease, transform .2s ease, background-color 0s .42s; }
 /* as it spreads, the light-blue sun deepens to the logo blue so that white words read clearly on it */
-.btn.gold:hover::before, .btn.gold:focus-visible::before { background: var(--brand-blue, #1f74ba); clip-path: circle(160% at calc(100% - var(--edge) - var(--sun) / 2) 50%); }
+.btn.gold:hover::before, .btn.gold:focus-visible::before { background: var(--sun-fill, var(--brand-blue, #1f74ba)); clip-path: circle(160% at calc(100% - var(--edge) - var(--sun) / 2) 50%); }
 .btn.gold:hover::after, .btn.gold:focus-visible::after { transform: rotate(-45deg); }
 .btn.gold:active { transform: scale(.98); }
 .btn.gold.small { --sun: 32px; --edge: 4px; gap: 12px; padding-left: 1.2em; }
+/* the blue sun pill ("btn gold blue"): the way into the tour finder, the reverse of "Plan my trip": a logo-blue pill
+   with white words and a yellow sun holding a navy arrow; on hover the yellow spreads and the words turn navy */
+.btn.gold.blue { background: var(--brand-blue, #1f74ba); color: #fff; }
+.btn.gold.blue::before { background: var(--brand-yellow, #fbdc03); }
+.btn.gold.blue::after { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230c3460' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14M13 6l6 6-6 6'/%3E%3C/svg%3E"); }
+.btn.gold.blue:hover, .btn.gold.blue:focus-visible { background: var(--brand-yellow, #fbdc03); color: var(--brand-navy, #0c3460); }
+.btn.gold.blue:hover::before, .btn.gold.blue:focus-visible::before { background: var(--brand-yellow, #fbdc03); }
+/* on a logo-blue ground (the blue band, the footer's blue half) the spreading sun turns white instead, with logo-blue
+   words and arrow, or the whole button would melt into the blue behind it; outline buttons there fill white too */
+.band.blue, .ft-talk { --sun-fill: #fff; }
+:is(.band.blue, .ft-talk) .btn.gold:is(:hover, :focus-visible) { color: var(--brand-blue, #1f74ba); }
+:is(.band.blue, .ft-talk) .btn.gold:is(:hover, :focus-visible)::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231f74ba' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14M13 6l6 6-6 6'/%3E%3C/svg%3E"); }
+:is(.band.blue, .ft-talk) .btn:not(.gold):hover { background: #fff; border-color: #fff; color: var(--brand-blue, #1f74ba); }
 @media (prefers-reduced-motion: reduce) { .btn.gold, .btn.gold::before, .btn.gold::after { transition: none; } }
 
 /* ---------- header: the logo, the menu words in the middle, WhatsApp and the language on the right, then "Plan my
@@ -104,10 +130,13 @@ svg { width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-widt
 .nav-ink { position: absolute; left: 0; top: calc(50% + 15px); width: 100px; height: 2px; border-radius: 2px; background: var(--brand-blue);
   transform-origin: 0 50%; opacity: 0; pointer-events: none; transition: transform .5s var(--glide), opacity .3s ease, background-color .35s ease; }
 .nav-ink.on { opacity: 1; }
-.hd-tools { display: flex; align-items: center; gap: 2px; flex: none; }
+/* even steps on the right: WhatsApp to the globe is the same 30px as "EN" to "Plan my trip" (the words' 20px gap
+   plus the language button's 10px inside); laptops without "EN" and phones set their own below */
+.hd-tools { display: flex; align-items: center; gap: 8px; flex: none; }
 .hd-ic { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-width: 42px; height: 42px; padding: 0 10px;
   border-radius: 21px; color: #1f3a4a; font: 700 .74rem/1 var(--title); letter-spacing: .08em; transition: background-color .25s ease, color .35s ease; }
 .hd-ic svg { width: 20px; height: 20px; stroke-width: 1.6; }
+.hd-wa svg { width: 18px; height: 18px; }   /* the solid WhatsApp logo fills its whole box: a little smaller looks the same size as the thin globe */
 .hd-ic:hover, .lang:focus-within { background-color: rgba(31, 116, 186, .08); color: var(--brand-blue); }
 .lang:has(select:focus-visible) { outline: 2px solid var(--brand-sky); outline-offset: 2px; }
 /* the language list is GTranslate's own select, lying unseen over the globe, so a click opens it */
@@ -117,7 +146,7 @@ svg { width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-widt
 .sub-toggle, .nav-toggle, .nav-foot, .mega-bg { display: none; }
 .btn.header-cta { flex: none; --sun: 34px; --edge: 5px; gap: 12px; padding-left: 1.3em; }
 .mega-scrim { position: fixed; inset: 0; z-index: 49; background: rgba(9, 28, 36, .3); opacity: 0; visibility: hidden; pointer-events: none;
-  transition: opacity .45s ease, visibility 0s .45s; }
+  transition: opacity .65s ease, visibility 0s .65s; }
 .mega-scrim.on { opacity: 1; visibility: visible; transition: opacity .45s ease; }
 
 @media (min-width: 901px) {
@@ -130,8 +159,15 @@ svg { width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-widt
      nothing was open (--mdy); the one you leave slides out the other way ("was") */
   .mega-pg { position: absolute; left: 0; right: 0; top: 100%; z-index: 1; visibility: hidden; opacity: 0; pointer-events: none;
     transform: translate3d(var(--mdx, 0px), var(--mdy, 0px), 0); }
-  .has-sub.on > .mega-pg { visibility: visible; opacity: 1; pointer-events: auto; transform: none; transition: opacity .4s ease .05s, transform .6s var(--glide); }
+  .has-sub.on > .mega-pg { visibility: visible; opacity: 1; pointer-events: auto; transform: none; transition: opacity .4s ease .05s, transform .6s var(--glide), clip-path .6s var(--glide); }
   .has-sub.was > .mega-pg { transform: translate3d(calc(var(--mdx, 0px) * -1), 0, 0); transition: opacity .2s ease, transform .4s ease, visibility 0s .4s; }
+  /* closing (scrolling, the pointer leaving, Esc): the paper rolls up like a blind on one even curve, and the sheet
+     goes up with it, cut off at the paper's lower edge, so nothing snaps away. The cut (clip-path) rests well
+     outside the sheet while it is open. */
+  .mega-pg { clip-path: inset(-40px -40px -40px -40px); }
+  .site-header.closing .mega-bg { transition: height .7s cubic-bezier(.6, 0, .3, 1), box-shadow .6s ease; }
+  .site-header.closing .has-sub.was > .mega-pg { clip-path: inset(-40px -40px 100% -40px); transform: translate3d(0, -28px, 0); opacity: 0;
+    transition: clip-path .7s cubic-bezier(.6, 0, .3, 1), transform .7s cubic-bezier(.6, 0, .3, 1), opacity .45s ease .2s, visibility 0s .7s; }
   .mp-in { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); grid-template-rows: auto 1fr; column-gap: clamp(40px, 6vw, 112px);
     padding-top: clamp(26px, 3vw, 40px); padding-bottom: clamp(26px, 3vw, 36px); }
   .mp-in:has(.mp-ph.tall) { grid-template-columns: minmax(0, 1fr) clamp(240px, 22vw, 340px); }
@@ -158,6 +194,7 @@ svg { width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-widt
     transition: opacity .6s ease, transform 1.4s var(--glide); }
   .mp-ph img.on { opacity: 1; transform: none; }
   .mp-foot { grid-column: 1; align-self: end; display: flex; align-items: center; gap: 24px; padding-top: 22px; }
+  .btn.mp-cta { --sun: 34px; --edge: 5px; gap: 14px; padding-left: 1.4em; font-size: .92rem; }
   .mp-all { display: inline-flex; align-items: center; gap: 10px; padding: 4px 0; border-bottom: 1px solid rgba(31, 58, 74, .3);
     font: 600 .9rem/1.2 var(--title); color: #1f3a4a; transition: color .25s, border-color .25s; }
   .mp-all svg { width: 15px; height: 15px; transition: transform .35s ease; }
@@ -172,6 +209,7 @@ svg { width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-widt
   .site-header > .wrap { gap: 12px; }
   .nav .top { padding-left: 11px; padding-right: 11px; }
   .lang .lang-code { display: none; }
+  .hd-tools { gap: 0; }   /* WhatsApp to the globe 23px, the same as the globe to "Plan my trip" */
   .mp-row { grid-template-columns: 2.4em minmax(0, 1fr) 36px; row-gap: 3px; }
   .mp-n { grid-row: 1 / 3; }
   .mp-d { grid-column: 2; grid-row: 2; text-align: left; }
@@ -182,7 +220,7 @@ svg { width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-widt
    a word folds its lines open */
 @media (max-width: 900px) {
   .btn.header-cta, .nav-ink { display: none; }
-  .hd-tools { margin-left: auto; }
+  .hd-tools { margin-left: auto; gap: 2px; }
   .nav-toggle { display: inline-flex; width: 44px; height: 44px; margin-right: -8px; border: 0; border-radius: 50%; background: none; color: #1f3a4a;
     align-items: center; justify-content: center; cursor: pointer; transition: color .35s ease; }
   .bars, .bars::before, .bars::after { display: block; width: 22px; height: 1.5px; border-radius: 1px; background-color: currentColor; position: relative;
@@ -218,7 +256,9 @@ svg { width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-widt
   .mp-t { font: 400 1.35rem/1.2 var(--serif); }
   .mp-d { font-size: .82rem; line-height: 1.4; color: #5b7383; }
   .mp-go, .mp-ph, .mp-wa { display: none; }
-  .mp-all { display: inline-flex; align-items: center; gap: 8px; margin: 4px 0 0 2.4em; padding: 4px 0; font: 600 .88rem/1.2 var(--title); color: var(--brand-blue); }
+  .mp-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 22px; margin-left: 2.4em; }
+  .btn.mp-cta { --sun: 32px; --edge: 4px; gap: 12px; margin-top: 8px; padding-left: 1.2em; font-size: .88rem; }
+  .mp-all { display: inline-flex; align-items: center; gap: 8px; margin: 4px 0 0; padding: 4px 0; font: 600 .88rem/1.2 var(--title); color: var(--brand-blue); }
   .mp-all svg { width: 14px; height: 14px; }
   .nav-foot { --n: 5; display: flex; flex-direction: column; align-items: flex-start; gap: 16px; padding-top: 28px; }
   .nf-line { display: inline-flex; align-items: center; gap: 10px; color: #1f3a4a; font-size: .95rem; }
@@ -288,7 +328,7 @@ svg { width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-widt
 .card-body { padding: 20px 22px 24px; display: flex; flex-direction: column; flex: 1; }
 .card-body h3 { margin-bottom: .4em; }
 .card-body p { font-size: .95rem; color: var(--muted); }
-.card-type { font-size: .78rem !important; text-transform: uppercase; letter-spacing: .06em; color: var(--blue) !important; font-weight: 600; margin-bottom: .4em; }
+.card-type { font-size: .72rem !important; text-transform: uppercase; letter-spacing: .16em; color: var(--blue) !important; font-weight: 600; margin-bottom: .4em; }
 .more { margin-top: auto; display: inline-flex; align-items: center; gap: 6px; font: 600 .92rem var(--title); color: var(--blue); }
 .cats { grid-template-columns: repeat(5, 1fr); gap: 20px; }
 @media (max-width: 1000px) { .cats { grid-template-columns: repeat(3, 1fr); } }
@@ -387,7 +427,7 @@ svg { width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-widt
 @media (max-width: 960px) { .tour-layout { grid-template-columns: 1fr; } }
 .prose > p:first-child { font-size: 1.08rem; color: var(--ink); }
 .prose :is(p, ul, ol) { max-width: var(--measure); }
-.prose h2 { margin-top: 1.4em; font-size: 2.3rem; }
+.prose h2 { margin-top: 1.4em; font-size: clamp(1.8rem, 1.2rem + 1.25vw, 2.3rem); }
 .prose .gallery.n1 img { max-height: 460px; }
 
 /* the first screen (build.py tour_hero): the photo fills the screen under the header; the tagline, the name and
@@ -430,7 +470,7 @@ svg { width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-widt
 .th-facts { display: flex; flex-wrap: wrap; gap: 18px 0; margin: 0; }
 .th-fact { padding: 0 clamp(18px, 2.4vw, 40px); border-left: 1px solid rgba(255, 255, 255, .2); }
 .th-fact:first-child { padding-left: 0; border-left: 0; }
-.th-fact dt { margin: 0 0 9px; font: 600 .66rem/1.3 var(--body); letter-spacing: .2em; text-transform: uppercase; color: rgba(255, 255, 255, .66); }
+.th-fact dt { margin: 0 0 9px; font: 600 .7rem/1.3 var(--body); letter-spacing: .2em; text-transform: uppercase; color: rgba(255, 255, 255, .66); }
 .th-fact dd { margin: 0; font: 400 clamp(1.35rem, 1.9vw, 1.8rem)/1.1 var(--serif); color: #fff; }
 .th-fact dd a { color: #fff; text-decoration: underline; text-decoration-color: rgba(255, 255, 255, .35); text-decoration-thickness: 1px; text-underline-offset: 5px; transition: text-decoration-color .25s; }
 .th-fact dd a:hover { text-decoration-color: var(--brand-yellow); }
@@ -439,7 +479,7 @@ svg { width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-widt
 .th-ms .G { background: #f2c75c; }
 .th-ms .M { background: #ddd5c2; }
 .th-ms .R { background: #9dbedd; }
-.th-down { display: inline-flex; flex: none; align-items: center; gap: 14px; color: #fff; font: 600 .68rem/1 var(--body); letter-spacing: .2em; text-transform: uppercase; }
+.th-down { display: inline-flex; flex: none; align-items: center; gap: 14px; color: #fff; font: 600 .7rem/1 var(--body); letter-spacing: .2em; text-transform: uppercase; }
 .th-down i { display: grid; place-items: center; width: 50px; height: 50px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .45); transition: background .25s, color .25s; }
 .th-down svg { width: 18px; height: 18px; transform: rotate(90deg); animation: th-bob 2.4s ease-in-out infinite; }
 @keyframes th-bob { 50% { translate: 0 4px; } }
@@ -461,6 +501,7 @@ svg { width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-widt
 .page-top .th-title.mid { max-width: 15ch; font-size: clamp(2.7rem, min(6.8vw, 11vh), 6.2rem); }
 .page-top .th-title.long { max-width: 21ch; font-size: clamp(2.2rem, min(5vw, 8.5vh), 4.6rem); line-height: 1.02; }
 .th-down { margin-left: auto; }
+body:has(.cb) .th-down { margin-right: 64px; }   /* clear of the chat button in the corner */
 .th-end { display: block; }
 @media (max-width: 760px) {
   .th-top { padding-top: 14px; }
@@ -564,6 +605,11 @@ svg { width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-widt
 .day-where svg { width: 15px; height: 15px; color: var(--brand-sky); }
 .day-where i { display: inline-flex; color: #9db4c1; }
 .day-where i svg { width: 14px; height: 14px; color: inherit; }
+/* a place in a day's heading that has its own page: a link to it (build.py place_links) */
+.day-place { color: inherit; text-decoration: underline; text-decoration-color: rgba(31, 116, 186, .35); text-decoration-thickness: 1px;
+  text-underline-offset: 4px; transition: color .25s, text-decoration-color .25s; }
+.day-place:hover { color: var(--brand-blue, #1f74ba); text-decoration-color: currentColor; }
+.day-place:focus-visible { outline: 2px solid var(--brand-sky); outline-offset: 2px; border-radius: 2px; }
 .day-title { margin: 10px 0 0; color: var(--dbd-ink); font: 400 clamp(1.8rem, 2.5vw, 2.6rem)/1.08 var(--serif); letter-spacing: -.005em;
   transition: color .25s; }
 .day > summary:hover .day-title { color: var(--brand-blue); }
@@ -616,6 +662,10 @@ svg { width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-widt
   .dbd-top { align-items: end; }
   .dbd-grid { display: grid; align-items: start; }
   .dbd-side { display: block; position: sticky; top: 112px; }
+  /* the window stays put until the last day is over: a sticky box lets go when the end of its grid reaches it,
+     so the days get room at the end until the last day's bottom has passed the reading line (45% down the
+     screen, site.js readerAt) by the time the grid ends at the window's bottom (its top 112px + its height) */
+  .dbd-grid:not(.solo) .dbd-days { padding-bottom: max(0px, calc(112px + clamp(420px, calc(100vh - 170px), 780px) - 45vh)); }
   /* the first photo is in the window; an open day shows its second one, wide */
   .dbd-grid:not(.solo) .day-pics { grid-template-columns: 1fr; }
   .dbd-grid:not(.solo) .day-pic:first-child { display: none; }
@@ -638,22 +688,65 @@ svg { width: 1.1em; height: 1.1em; fill: none; stroke: currentColor; stroke-widt
 .faq details > div { padding: 0 20px 14px; }
 .post-cta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 2em; }
 
-/* ---------- footer */
-.site-footer { background: var(--ink-deep); color: #b9cdd2; font-size: .94rem; }
-.fcols { display: grid; grid-template-columns: 1.3fr 1fr 1.2fr 1.3fr; gap: 40px; padding-top: 70px; padding-bottom: 50px; }
-@media (max-width: 960px) { .fcols { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 600px) { .fcols { grid-template-columns: 1fr; } }
-.site-footer h3 { color: var(--white); font-size: 1.1rem; margin-bottom: 1em; }
-.site-footer ul { list-style: none; padding: 0; }
-.site-footer a { color: #d8e6ea; }
-.site-footer a:hover { color: var(--white); }
-.fabout img { margin-bottom: 18px; }
-.social { display: flex; gap: 10px; }
-.social a { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; background: rgba(255,255,255,.08); }
-.social a:hover { background: var(--blue); }
-.fcontact li { display: flex; gap: 10px; align-items: flex-start; }
-.fcontact svg { margin-top: .3em; color: var(--blue); }
-.fbottom { border-top: 1px solid rgba(255,255,255,.1); padding: 18px 0; font-size: .85rem; text-align: center; }
+/* ---------- footer (build.py footer): "Talk to a person" on the left in logo blue, the links on the right on pale
+   blue. Big screens: two halves side by side, edge to edge. Phones: they stack. */
+.site-footer { font-size: .95rem; }
+.ft { display: grid; grid-template-columns: minmax(0, 1fr); }
+.ft-in { padding: clamp(56px, 7vw, 100px) clamp(20px, 4vw, 72px); }
+.ft ul { list-style: none; margin: 0; padding: 0; }
+.ft-talk { background: var(--brand-blue); color: #fff; }
+.ft-logo { display: block; width: 170px; height: auto; margin: 0 0 clamp(36px, 4vw, 56px); }
+.ft-k { margin: 0 0 14px; font: 600 .74rem/1.4 var(--body); letter-spacing: .22em; text-transform: uppercase; color: #eaf4fb; }
+.ft-say { max-width: 30rem; margin: 0; font: 400 clamp(1.7rem, 2.5vw, 2.5rem)/1.12 var(--serif); color: #fff; }
+.ft-say em { font-style: italic; }
+.ft-wa { margin: 30px 0 0; }
+.ft .ft-big { margin: 34px 0 0; border-top: 1px solid rgba(255, 255, 255, .22); }
+.ft-big li { border-bottom: 1px solid rgba(255, 255, 255, .22); }
+.ft-big a { display: flex; align-items: center; gap: 14px; padding: 14px 0; color: #fff; font: 400 clamp(1.35rem, 1.9vw, 1.8rem)/1.2 var(--serif);
+  overflow-wrap: anywhere; transition: transform .4s var(--glide); }
+.ft-big a:hover { color: #fff; transform: translateX(6px); }
+.ft-big svg { width: 20px; height: 20px; color: #eaf4fb; }
+.ft-more, .ft-where { margin: 18px 0 0; font-size: .88rem; line-height: 1.6; color: #eaf4fb; }
+.ft-more a { color: #fff; border-bottom: 1px solid rgba(255, 255, 255, .4); }
+.ft-more a:hover { color: #fff; border-color: #fff; }
+.ft-where { display: flex; gap: 10px; align-items: flex-start; }
+.ft-where svg { margin-top: .25em; }
+.ft-links { background: #eef5f9; color: #1f3a4a; display: flex; }
+.ft-links .ft-in { display: flex; flex-direction: column; width: 100%; }
+.ft-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 40px clamp(24px, 3vw, 56px); }
+.ft-h { margin: 0 0 16px; padding-bottom: 12px; border-bottom: 1px solid #d5e3ea; font: 600 .74rem/1.4 var(--body); letter-spacing: .22em;
+  text-transform: uppercase; color: #5b7383; }
+.ft-cols li { margin: 0; }
+.ft-cols a { display: inline-block; padding: 5px 0; color: #1f3a4a; line-height: 1.45; transition: color .25s, transform .35s var(--glide); }
+.ft-cols a:hover { color: var(--brand-blue); transform: translateX(4px); }
+.ft-end { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 24px; margin-top: auto; padding-top: 56px; }
+.ft-social { display: flex; gap: 10px; margin: 0; }
+.ft-social a { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; border: 1px solid rgba(31, 58, 74, .25); color: #1f3a4a;
+  transition: background-color .3s, border-color .3s, color .3s; }
+.ft-social a:hover { background: var(--brand-blue); border-color: var(--brand-blue); color: #fff; }
+.ft-social svg { width: 20px; height: 20px; }
+.ft-social a[aria-label="Tripadvisor"] svg { width: 24px; height: 24px; }   /* the owl is wide and short: a little bigger to look the same size */
+.ft-copy { margin: 0; font-size: .82rem; color: #5b7383; }
+@media (min-width: 980px) {
+  .ft { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); }
+  .ft-talk .ft-in { max-width: 700px; margin-left: auto; }
+  .ft-links .ft-in { max-width: 1060px; }
+  /* at the bottom of the page the footer fills exactly the screen under the header, so the header stays in view and
+     nothing of the footer (its logo, the column headings) sits under it: its spacing and big words follow the
+     screen's height, so it still fits on short laptop screens */
+  .ft { min-height: calc(100vh - var(--hh)); }
+  .ft-in { padding-top: clamp(28px, 6vh, 100px); padding-bottom: clamp(28px, 6vh, 100px); }
+  .ft-logo { margin-bottom: clamp(18px, 4vh, 56px); }
+  .ft-say { font-size: clamp(1.5rem, min(2.5vw, 4.6vh), 2.5rem); }
+  .ft-wa { margin-top: clamp(16px, 3vh, 30px); }
+  .ft .ft-big { margin-top: clamp(18px, 3.4vh, 34px); }
+  .ft-big a { padding: clamp(8px, 1.6vh, 14px) 0; font-size: clamp(1.25rem, min(1.9vw, 3.4vh), 1.8rem); }
+  .ft-more, .ft-where { margin-top: clamp(10px, 1.8vh, 18px); }
+  .ft-end { padding-top: clamp(28px, 5vh, 56px); }
+  .ft-cols { grid-template-columns: repeat(3, minmax(0, 1fr)); }   /* Plan, Tours, Sunbird side by side, never two rows */
+  body:has(.cb) .ft-end { padding-right: 52px; }   /* the copyright line stops short of the chat button in the corner */
+}
+@media (min-width: 980px) and (max-width: 1199px) { .ft-cols { column-gap: 22px; } }
 
 /* ---------- misc */
 hr { border: 0; border-top: 1px solid var(--line); margin: 2em 0; }
@@ -731,7 +824,7 @@ blockquote { margin: 1.4em 0; padding: 14px 22px; border-left: 4px solid var(--b
 
 .hh-kicker {
   display: flex; align-items: center; gap: 12px; margin: 0 0 18px;
-  font: 600 .74rem/1.4 var(--body); letter-spacing: .24em; text-transform: uppercase; color: rgba(255, 255, 255, .9);
+  font: 600 .74rem/1.4 var(--body); letter-spacing: .22em; text-transform: uppercase; color: rgba(255, 255, 255, .9);
   text-shadow: 0 1px 12px rgba(0, 0, 0, .4);
 }
 .hh-kicker::before { content: ""; width: 32px; height: 1px; background: var(--brand-yellow); flex: none; }
@@ -757,7 +850,7 @@ blockquote { margin: 1.4em 0; padding: 14px 22px; border-left: 4px solid var(--b
 .hh-facts li { margin: 0; padding: 0 24px; border-left: 1px solid rgba(255, 255, 255, .22); font-size: .8rem; line-height: 1.35; color: rgba(255, 255, 255, .72); }
 .hh-facts li:first-child { padding-left: 0; border-left: 0; }
 .hh-facts strong { display: block; margin-bottom: 4px; font: 400 1.75rem/1 var(--serif); color: #fff; }
-.hh-place { display: inline-flex; align-items: center; gap: 8px; margin: 0; font: 600 .68rem/1.4 var(--body); letter-spacing: .2em; text-transform: uppercase; color: rgba(255, 255, 255, .72); }
+.hh-place { display: inline-flex; align-items: center; gap: 8px; margin: 0; font: 600 .7rem/1.4 var(--body); letter-spacing: .2em; text-transform: uppercase; color: rgba(255, 255, 255, .72); }
 .hh-place svg { width: 14px; height: 14px; color: var(--brand-yellow); }
 .hh-place span { transition: opacity .35s ease; }
 .hh-place span.swap { opacity: 0; }
@@ -813,7 +906,7 @@ blockquote { margin: 1.4em 0; padding: 14px 22px; border-left: 4px solid var(--b
 .tw-inner { width: 100%; position: relative; }
 .tw-kicker {
   display: flex; align-items: center; gap: 12px; margin: 0 0 18px;
-  font: 600 .74rem/1.4 var(--body); letter-spacing: .24em; text-transform: uppercase; color: rgba(255, 255, 255, .88);
+  font: 600 .74rem/1.4 var(--body); letter-spacing: .22em; text-transform: uppercase; color: rgba(255, 255, 255, .88);
 }
 .tw-kicker::before { content: ""; width: 32px; height: 1px; background: var(--brand-yellow); flex: none; }
 .tw-lead { margin: 0; color: #fff; font: 400 clamp(2.4rem, 9.5vw, 3.8rem)/1.05 var(--serif); letter-spacing: -.01em; }
@@ -843,9 +936,11 @@ blockquote { margin: 1.4em 0; padding: 14px 22px; border-left: 4px solid var(--b
 .tw-word[data-d="-1"], .tw-word[data-d="1"] { opacity: .5; visibility: visible; }
 .tw-word.on { opacity: 1; visibility: visible; color: #fff; }
 .tw-word.on:hover { color: #fff; }
+/* once site.js runs it moves the words itself, every frame (following a finger, a throw, a trackpad) */
+.trip-wheel.tw-js .tw-word { transition: color .4s; will-change: transform, opacity; }
 
 .tw-turn { display: flex; align-items: center; gap: 12px; margin: 4px 0 0; }
-.tw-turn small { font: 700 .68rem var(--title); letter-spacing: .18em; text-transform: uppercase; color: rgba(255, 255, 255, .7); }
+.tw-turn small { font: 700 .7rem var(--title); letter-spacing: .18em; text-transform: uppercase; color: rgba(255, 255, 255, .7); }
 .tw-turn button { width: 44px; height: 44px; display: grid; place-items: center; padding: 0; border-radius: 50%; cursor: pointer;
   border: 2px solid rgba(255, 255, 255, .45); background: rgba(255, 255, 255, .06); color: #fff; transition: background .2s, color .2s, border-color .2s; }
 .tw-turn button:hover, .tw-turn button:focus-visible { background: var(--brand-yellow); border-color: var(--brand-yellow); color: var(--brand-navy); }
@@ -859,9 +954,31 @@ blockquote { margin: 1.4em 0; padding: 14px 22px; border-left: 4px solid var(--b
 /* the line under the wheel and the word in the yellow button fade and slide when the wheel turns */
 .tw-line span, .tw-go em { display: inline-block; transition: opacity .22s ease, transform .4s cubic-bezier(.2, .7, .2, 1), filter .22s ease; }
 .tw-swap { opacity: 0; transform: translate3d(0, 10px, 0); filter: blur(4px); }
-.btn.gold.tw-go { white-space: nowrap; transition: width .45s cubic-bezier(.2, .7, .2, 1), color .4s ease, transform .2s ease; }
+.btn.gold.tw-go { white-space: nowrap; transition: width .45s cubic-bezier(.2, .7, .2, 1), color .4s ease, transform .2s ease, background-color 0s; }
+.btn.gold.tw-go:is(:hover, :focus-visible) { transition: width .45s cubic-bezier(.2, .7, .2, 1), color .4s ease, transform .2s ease, background-color 0s .42s; }
 .tw-btns .btn.ghost { -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); background: rgba(255, 255, 255, .08); }
 @media (max-width: 480px) { .tw-btns .btn { flex: 1 1 100%; } }
+
+/* phones and small tablets: no ring. The words stand straight in a short list on a thin line: the chosen one big,
+   one faded neighbour above and below. Swipe up and down on the list (once the section is fully on screen and
+   the page has stopped), tap a word or use the arrows. (--hx = where the line sits; the gap between words is
+   1em of the word size, and site.js moves the list by that much per word) */
+@media (max-width: 979px) {
+  .tw-wheel { --hx: 8px; height: 2.9em; margin: 14px 0 0; font-size: clamp(3rem, 14vw, 4.8rem); }
+  .tw-wheel::before { content: ""; position: absolute; left: var(--hx); top: .15em; bottom: .15em; width: 1px; background: rgba(255, 255, 255, .35); }
+  .tw-ring { display: none; }
+  .tw-rot { left: var(--hx); }
+  .tw-word { --ms: .46; transform: translate3d(0, calc(var(--k, 0) * 1em), 0) scale(var(--ms)); }
+  .tw-word.on { --ms: 1; }
+  .tw-word:not(.on)::before { opacity: 0; }
+  .tw-word[data-d="-1"], .tw-word[data-d="1"] { opacity: .55; }
+  .tw-turn { margin: 10px 0 0; }
+  /* "Want it all? Mix your own" is a quiet text link here, so only one big button is left */
+  .tw-btns { align-items: center; }
+  .tw-btns .btn.ghost.tw-mix { min-height: 0; padding: 8px 4px; border: 0; background: none; -webkit-backdrop-filter: none; backdrop-filter: none;
+    text-decoration: underline; text-decoration-color: rgba(255, 255, 255, .55); text-underline-offset: 5px; }
+  .tw-btns .btn.ghost.tw-mix:hover { background: none; color: #fff; text-decoration-color: #fff; }
+}
 
 /* big screens: the photo fills the right side, like the hero; text and wheel on the left */
 @media (min-width: 980px) {
@@ -914,14 +1031,14 @@ blockquote { margin: 1.4em 0; padding: 14px 22px; border-left: 4px solid var(--b
 .ia-photo::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 40%; pointer-events: none;
   background: linear-gradient(180deg, rgba(10, 24, 34, 0), rgba(10, 24, 34, .5)); }
 .ia-photo figcaption { position: absolute; left: 18px; bottom: 18px; z-index: 1; display: flex; align-items: center; gap: 10px;
-  font: 600 .64rem/1.4 var(--body); letter-spacing: .22em; text-transform: uppercase; color: #fff; }
+  font: 600 .7rem/1.4 var(--body); letter-spacing: .2em; text-transform: uppercase; color: #fff; }
 .ia-photo figcaption::before { content: ""; width: 24px; height: 1px; background: var(--brand-yellow); }
 /* the "licensed" seal: a white disc with a fine blue ring, on the photo's corner */
-.ia-badge { position: absolute; right: 14px; top: 14px; z-index: 1; width: 92px; height: 92px; margin: 0; border-radius: 50%;
+.ia-badge { position: absolute; right: 14px; top: 14px; z-index: 1; width: 104px; height: 104px; margin: 0; border-radius: 50%;
   display: grid; place-content: center; text-align: center; background: rgba(255, 255, 255, .95); color: var(--blue);
   box-shadow: 0 12px 28px rgba(10, 24, 34, .25); transform: rotate(-8deg); }
 .ia-badge::before { content: ""; position: absolute; inset: 5px; border: 1px solid rgba(41, 171, 226, .5); border-radius: 50%; }
-.ia-badge small { display: block; font: 600 .48rem/1.35 var(--body); letter-spacing: .16em; text-transform: uppercase; }
+.ia-badge small { display: block; font: 600 .54rem/1.35 var(--body); letter-spacing: .14em; text-transform: uppercase; }
 .ia-badge strong { display: block; margin: 2px 0 1px; color: #1f3a4a; font: 400 1.45rem/1 var(--serif); }
 @media (min-width: 980px) {
   /* fills the screen under the header: the photo is the left half, the words sit in the right half */
@@ -930,7 +1047,7 @@ blockquote { margin: 1.4em 0; padding: 14px 22px; border-left: 4px solid var(--b
   .ia-photo { position: absolute; left: 0; top: 0; bottom: 0; width: 46%; margin: 0; aspect-ratio: auto; border-radius: 0; }
   .ia-photo figcaption { left: clamp(24px, 3vw, 48px); bottom: 30px; }
   .ia-badge { width: 120px; height: 120px; right: clamp(24px, 3vw, 48px); top: auto; bottom: 26px; }
-  .ia-badge small { font-size: .56rem; }
+  .ia-badge small { font-size: .6rem; }
   .ia-badge strong { font-size: 1.9rem; }
   /* as big as the screen allows, by its width and by its height */
   .ia-words { font-size: clamp(4rem, min(8.2vw, 14vh), 10rem); }
@@ -963,13 +1080,6 @@ html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-smooth { scroll-behavior: auto !important; }
 .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
 .lenis.lenis-stopped { overflow: hidden; }
-/* phones and small tablets (no stacked sections there): the browser's own gentle snapping lines the tour
-   wheel up with the screen when you stop scrolling near it, so it is easy to get it fully in view */
-@media (max-width: 979px) {
-  html:has(body.layout-home) { scroll-snap-type: y proximity; }
-  .layout-home .trip-wheel { scroll-snap-align: start; scroll-margin-top: 72px; }
-}
-
 /* ---------- "pin and play" (big screens; site.js builds the stack): the hero, "Who we are" and the tour
    wheel each stay pinned while the empty stretch after them scrolls past and plays their effect, then the
    next one slides up over them like a card. Make a stretch longer to slow that section's effect down. */
@@ -991,8 +1101,11 @@ html.lenis, html.lenis body { height: auto; }
 /* ---------- page-to-page transition from the home page's tour wheel (site.js + the small script at the top
    of every page): the wheel's photo opens out to fill the screen with the chosen word, the next page opens
    on that same picture, and it fades away to reveal the page */
-.pt { position: fixed; inset: 0; z-index: 300; overflow: hidden; pointer-events: none; background: var(--brand-sky); }
-.pt img { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; }
+/* (dark under the photo, like the photo tops of the pages, in case the photo is a moment late) */
+.pt { position: fixed; inset: 0; z-index: 300; overflow: hidden; pointer-events: none; background: #0b1824; }
+/* the photo is framed exactly like the big photo at the top of the next page (.th-bg img: the full width and 116%
+   of the screen's height, from the top), so when the screen fades the two copies lie on top of each other */
+.pt img { position: absolute; left: 0; top: 0; width: 100%; height: 116%; max-width: none; object-fit: cover; }
 .pt-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(6, 14, 22, .3) 0%, rgba(6, 14, 22, .55) 100%); }
 .pt-word { position: absolute; left: 0; right: 0; top: 50%; margin: 0; padding: 0 20px; transform: translateY(-50%); text-align: center; color: #fff; }
 .pt-word small { display: block; margin-bottom: .7rem; font: 600 .78rem/1.4 var(--body); letter-spacing: .24em; text-transform: uppercase; opacity: .9; }
@@ -1006,10 +1119,14 @@ html.lenis, html.lenis body { height: auto; }
 .pt-out.go .pt-word em { transform: none; }
 /* arriving: the same picture fades away (and never stays up, even if the page's script fails) */
 .pt-in { animation: pt-away 0s linear 5s forwards; }
-.pt-in.done { opacity: 0; transition: opacity .9s ease .05s; }
-.pt-in.done img { transform: scale(1.06); transition: transform 1.3s ease; }
+.pt-in.done { opacity: 0; transition: opacity .9s cubic-bezier(.4, 0, .2, 1) .05s; }
 .pt-in.done .pt-word { opacity: 0; transform: translateY(calc(-50% - 40px)); transition: opacity .5s ease, transform .9s ease; }
 @keyframes pt-away { to { opacity: 0; visibility: hidden; } }
+/* while the screen is still up (until site.js adds "landed" once the pictures are ready), the page's own opening
+   movements wait under it, so they play as it lifts; and when the screen carried a photo, the page's big photo
+   stays still (no opening zoom), lying exactly under the screen's copy */
+.arriving:not(.landed) :is(.th-bg img, .th-top, .th-in > *, .th-foot, .page-hero .wrap > *, .tf-top > *) { animation-play-state: paused; }
+.arriving-photo .th-bg img { animation: none; }
 /* ...and the new page's title area rises into place as the picture fades */
 .arriving .page-hero .wrap > * { animation: hh-up 1s cubic-bezier(.2, .7, .2, 1) both; }
 .arriving .page-hero .wrap > :nth-child(1) { animation-delay: .45s; }
@@ -1039,8 +1156,10 @@ html.lenis, html.lenis body { height: auto; }
   transition: opacity .5s cubic-bezier(.3, 0, .3, 1) .18s, filter .55s cubic-bezier(.3, 0, .3, 1) .18s, transform .6s cubic-bezier(.2, .7, .2, 1) .18s; }
 .pt-out.pt-plain.go .pt-word > *, .pt-out.pt-nav.go .pt-word > * { opacity: 1; filter: blur(0); transform: none; }
 .pt-out.pt-plain .pt-word em { transition-delay: .28s; }
-/* page to page: the name of what you clicked is smaller than the wheel's big word */
-.pt-nav .pt-word small { display: none; }
+/* page to page: the name of what you clicked is smaller than the wheel's big word; the small line above it
+   shows only when a link gives one (data-pt-lead, e.g. "Tours that visit" + "Anuradhapura") */
+.pt-nav .pt-word small { color: var(--blue); opacity: 1; }
+.pt-nav .pt-word small:empty { display: none; }
 .pt-nav .pt-word em { font-size: clamp(2.4rem, 6vw, 4.6rem); }
 /* arriving: the words drift up and soften away first, then the pale screen dissolves into the new page */
 .pt-in.pt-plain.done, .pt-in.pt-nav.done { transition: opacity .75s cubic-bezier(.4, 0, .2, 1) .15s; }
@@ -1057,7 +1176,7 @@ html.lenis, html.lenis body { height: auto; }
    On phones the big photo goes and each row shows a small one instead. */
 .cat-index { display: grid; gap: 40px; max-width: 1280px; margin: 0 auto; }
 .ci-kicker { display: flex; align-items: center; gap: 12px; margin: 0 0 16px;
-  font: 600 .72rem/1.4 var(--body); letter-spacing: .24em; text-transform: uppercase; color: var(--blue); }
+  font: 600 .74rem/1.4 var(--body); letter-spacing: .22em; text-transform: uppercase; color: var(--blue); }
 .ci-kicker::before { content: ""; width: 32px; height: 1px; background: var(--brand-yellow); flex: none; }
 .ci-title { margin: 0 0 14px; color: #1f3a4a; text-align: left; }
 .ci-text { max-width: 30rem; margin: 0 0 30px; color: #4a6170; }
@@ -1127,24 +1246,52 @@ html.lenis, html.lenis body { height: auto; }
 
 /* ---------- category pages: "When are you travelling?" bar above the tours */
 .month-bar { max-width: 1280px; margin: 38px auto 0; padding: 24px 0 0; border-top: 1px solid #dde7ed; }
-.mb-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 20px; margin: 0 0 14px; }
+.mb-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 20px; margin: 0 0 26px; }
 .mb-ask { margin: 0; color: #1f3a4a; font: 400 clamp(1.5rem, 2.2vw, 1.9rem)/1.15 var(--serif); }
-.mb-guide { display: inline-flex; align-items: center; gap: 8px; color: #1f3a4a; font: 600 .88rem var(--title);
+.mb-guide { display: inline-flex; align-items: center; gap: 8px; margin-left: auto; color: #1f3a4a; font: 600 .88rem var(--title);
   text-decoration: underline; text-decoration-color: #b9cbd6; text-underline-offset: 5px; }
 .mb-guide:hover { color: var(--brand-blue); text-decoration-color: currentColor; }
 .mb-guide svg { width: 15px; height: 15px; }
-.mb-months { display: flex; gap: 8px; padding: 2px; overflow-x: auto; scrollbar-width: none; }
-.mb-months::-webkit-scrollbar { display: none; }
-.mb-m { flex: none; padding: .5em 1.05em; border: 1px solid #cfdde5; border-radius: 999px; background: #fff; color: #1f3a4a;
-  font: 600 .84rem var(--title); cursor: pointer; transition: background .2s, color .2s, border-color .2s; }
-.mb-m:hover { border-color: #1f3a4a; }
-.mb-m[aria-pressed="true"] { background: #1f3a4a; border-color: #1f3a4a; color: #fff; }
-.mb-m:focus-visible { outline: 2px solid var(--brand-sky); outline-offset: 2px; }
-.mb-note { margin: 14px 0 0; color: #5b7383; font-size: .95rem; }
+/* "Any month": a quiet link beside the question; while it is the choice it rests, greyed, without its line */
+.mb-any { padding: 2px 0; border: 0; border-bottom: 1px dashed currentColor; background: none; color: var(--brand-blue); font: 600 .84rem var(--title);
+  cursor: pointer; transition: color .25s, border-color .25s; }
+.mb-any:hover { color: #1f3a4a; }
+.mb-any[aria-pressed="true"] { color: #8a9ea8; border-bottom-color: transparent; cursor: default; }
+.mb-any:focus-visible, .mb-m:focus-visible { outline: 2px solid var(--brand-sky); outline-offset: 2px; }
+/* the season strip: twelve months in the tour list's colours (gold best, sand mixed, blue rainy) for these tours */
+.mb-strip { --gap: 4px; position: relative; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--gap); }
+.mb-m { position: relative; display: grid; place-items: center; height: 46px; padding: 0; border: 0; border-radius: 6px; background: #e5edf1;
+  color: #1f3a4a; font: 600 .84rem var(--title); cursor: pointer; box-shadow: inset 0 0 0 0 var(--brand-blue, #1f74ba);
+  transition: transform .35s var(--glide, ease), box-shadow .3s ease, filter .25s ease; }
+.mb-m.G { background: #f2c75c; }
+.mb-m.M { background: #ddd5c2; }
+.mb-m.R { background: #9dbedd; }
+.mb-m:hover { transform: translateY(-3px); filter: saturate(1.15) brightness(1.03); }
+.mb-m[aria-pressed="true"] { box-shadow: inset 0 0 0 2px var(--brand-blue, #1f74ba); transform: translateY(-3px); }
+.mb-s { display: none; }
+/* the yellow sun: one disc that glides along the strip to the month you pick (site.js sets --m) */
+.mb-sun { position: absolute; z-index: 1; top: -11px; width: 18px; height: 18px; margin-left: -9px; border-radius: 50%; background: var(--brand-yellow, #fbdc03);
+  box-shadow: 0 0 0 3px #fff, 0 3px 8px rgba(12, 52, 96, .2); pointer-events: none;
+  left: calc(var(--m, 0) * ((100% - 11 * var(--gap)) / 12 + var(--gap)) + (100% - 11 * var(--gap)) / 24);
+  opacity: 0; transform: translateY(-3px) scale(.3); transition: left .55s var(--glide, ease), opacity .3s ease, transform .45s var(--glide, ease); }
+.mb-strip.has-m .mb-sun { opacity: 1; transform: translateY(-3px); }
+.mb-foot { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 10px 28px; margin: 16px 0 0; }
+.mb-note { flex: 1 1 26rem; margin: 0; color: #5b7383; font-size: .95rem; text-wrap: pretty; }
+.mb-key { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 0; color: #5b7383; font-size: .78rem; }
+.mb-key span { display: inline-flex; align-items: center; gap: 7px; }
+.mb-key span::before { content: ""; width: 10px; height: 10px; border-radius: 2px; }
+.mb-key .G::before { background: #f2c75c; }
+.mb-key .M::before { background: #ddd5c2; }
+.mb-key .R::before { background: #9dbedd; }
 @media (max-width: 760px) {
-  .month-bar { --edge: clamp(20px, 6vw - 40px, 72px); }
-  .mb-months { margin: 0 calc(-1 * var(--edge)); padding: 2px var(--edge); }
+  .mb-head { margin-bottom: 22px; }
+  .mb-guide { margin-left: 0; }
+  .mb-strip { --gap: 3px; }
+  .mb-m { height: 42px; border-radius: 5px; }
+  .mb-l { display: none; }   /* one letter each, so all twelve fit across a phone */
+  .mb-s { display: inline; }
 }
+@media (prefers-reduced-motion: reduce) { .mb-m, .mb-sun { transition: none; } }
 /* the tag on each tour card once a month is picked; tours out of season step back a little */
 .season-chip { position: absolute; right: 14px; top: 14px; display: inline-flex; align-items: center; gap: 7px;
   padding: 3px 12px 3px 10px; border-radius: 30px; background: rgba(255, 255, 255, .95); color: #1f3a4a; font: 600 .78rem var(--title); }
@@ -1165,7 +1312,7 @@ html.lenis, html.lenis body { height: auto; }
 .tile .season-chip { z-index: 2; }
 .tile-body { position: absolute; left: 0; right: 0; bottom: 0; z-index: 1; display: flex; flex-direction: column; align-items: center;
   padding: 0 clamp(20px, 2.4vw, 36px) clamp(24px, 2.6vw, 36px); text-align: center; }
-.tile-kick { margin: 0 0 .75em; font: 600 .66rem/1.4 var(--body); letter-spacing: .2em; text-transform: uppercase; color: rgba(255, 255, 255, .85); }
+.tile-kick { margin: 0 0 .75em; font: 600 .7rem/1.4 var(--body); letter-spacing: .2em; text-transform: uppercase; color: rgba(255, 255, 255, .85); }
 .tile-t { margin: 0; color: #fff; font: 400 clamp(1.9rem, 2.3vw, 2.5rem)/1.04 var(--serif); letter-spacing: -.01em; text-wrap: balance;
   text-shadow: 0 2px 24px rgba(0, 0, 0, .25); }
 /* the route opens smoothly (its row grows from nothing) as the tile is pointed at */
@@ -1184,6 +1331,138 @@ html.lenis, html.lenis body { height: auto; }
 .tile:hover .tile-go svg { transform: translateX(3px); }
 /* touch screens can't point, so the route always shows there */
 @media (hover: none) { .tile-more { grid-template-rows: 1fr; } .tile-route { opacity: 1; transform: none; } }
+
+/* home, "Places our guests love" ({{place-show}}, build.py place_show): the main places one at a time, full screen,
+   built as a 3D scene. Far behind: the place's big photo (darkened). In the middle: three of its own photos printed
+   like photographs, each at its own depth. In front: its name, floating, then its tagline. All of it sits inside a
+   camera (.sx-cam) that site.js turns a little with the pointer, lets drift slowly when nothing moves it, and
+   brings closer as you scroll (--px/--py go to the photo behind and the glare on the prints, so they move with it).
+   A change of place is a flight through the scene: the prints and the name rush past the camera, out of focus,
+   and the next ones come up out of the distance into focus while the photo behind racks focus to the new place
+   (.sx-fwd; .sx-back flies the other way). Pointing at the prints pulls focus to them: they spread a little and
+   the photo behind goes soft (.sx-focus). States of a place: none (waiting at --zin), .on (in place), .set (landed:
+   pointing at it can spread it), .off (leaving, towards --zout). Nothing moves for people who asked for less motion. */
+.place-show { --zin: -1100px; --zout: 700px; position: relative; isolation: isolate; overflow: hidden; display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto; min-height: 100vh; min-height: 100svh; background: #0b1b22; color: #fff; }
+.place-show.sx-back { --zin: 700px; --zout: -1100px; }
+/* the photo behind: a little bigger than the screen, so it can move against the camera */
+.sx-bgs { position: absolute; inset: -3%; z-index: -2; will-change: transform;
+  transform: translate3d(calc(var(--px, 0) * -18px), calc(var(--py, 0) * -12px), 0); }
+.sx-bgs img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; filter: blur(22px); transform: scale(1.18);
+  will-change: transform, filter, opacity; transition: opacity 1.1s ease, filter 1.1s ease, transform 1.6s cubic-bezier(.55, 0, .8, .3); }
+.place-show.sx-back .sx-bgs img:not(.on) { transform: scale(.94); }
+.sx-bgs img.on { opacity: 1; filter: blur(0); transform: scale(1.02);
+  transition: opacity 1s ease .1s, filter 1.7s cubic-bezier(.3, .6, .2, 1) .15s, transform 2.4s cubic-bezier(.16, .84, .24, 1); }
+/* focus pulled to the prints: the photo behind goes soft and a little darker */
+.place-show.sx-focus .sx-bgs img.on { filter: blur(9px) brightness(.82); transform: scale(1.05);
+  transition: filter .9s cubic-bezier(.3, .6, .2, 1), transform 1.4s var(--glide), opacity 1s ease; }
+.sx-shade { position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(120% 90% at 50% 45%, rgba(6, 18, 24, 0) 40%, rgba(6, 18, 24, .5) 100%),
+    linear-gradient(180deg, rgba(6, 18, 24, .6) 0%, rgba(6, 18, 24, .32) 30%, rgba(6, 18, 24, .4) 62%, rgba(6, 18, 24, .9) 100%); }
+.sx-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; width: 100%; padding-top: calc(var(--hh, 84px) + 30px); }
+.place-show h2.sx-title { margin: 0; color: #fff; text-align: left; font: 400 clamp(1.7rem, 2.5vw, 2.4rem)/1.1 var(--serif); }
+.sx-title em { font-style: italic; }
+.sx-k { display: block; margin-bottom: 12px; font: 600 .74rem/1.4 var(--body); letter-spacing: .22em; text-transform: uppercase; color: rgba(255, 255, 255, .85); }
+.sx-count { margin: 0; font: 500 .8rem/1 var(--body); letter-spacing: .16em; color: rgba(255, 255, 255, .75); font-variant-numeric: tabular-nums; }
+.sx-count b { font-weight: 600; color: #fff; }
+/* the stage and the camera: every place sits in the same spot; only the one shown (and the one leaving) is visible */
+.sx-stage { display: grid; place-items: center; padding: clamp(14px, 3vh, 34px) 0; perspective: 1300px; perspective-origin: 50% 46%; }
+.sx-cam { display: grid; place-items: center; transform-style: preserve-3d; will-change: transform; }
+.sx-slide { --ch: clamp(280px, 50vh, 530px); --dz: var(--zin); position: relative; grid-area: 1 / 1; display: flex; flex-direction: column; align-items: center;
+  transform-style: preserve-3d; color: #fff; visibility: hidden; pointer-events: none; transition: visibility 0s 1.1s; }
+.sx-slide.on { --dz: 0px; visibility: visible; pointer-events: auto; transition: none; }
+.sx-slide.off { --dz: var(--zout); visibility: visible; transition: visibility 0s 1.1s; }
+.sx-slide:hover { color: #fff; }
+.sx-slide:focus-visible { outline: none; }
+.sx-slide:focus-visible h3.sx-name { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: .12em; }
+/* the prints: where each one lies (--x --y --r), how deep (--z), and how far it still is from its place (--dz) */
+.sx-cards { position: relative; display: block; width: calc(var(--ch) * .754); height: var(--ch); transform-style: preserve-3d; }
+.sx-card { --x: 0%; --y: 0%; --r: 0deg; --z: 0px; --s: 1; position: absolute; inset: 0; padding: 7px; border-radius: 3px; background: #f6f1e7; overflow: hidden;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, .4), 0 2px 6px rgba(0, 0, 0, .22); backface-visibility: hidden;
+  transform: translate3d(var(--x), var(--y), calc(var(--z) + var(--dz))) rotate(var(--r)) scale(var(--s));
+  opacity: 0; filter: blur(16px); transition: none; }
+.sx-card:nth-child(1) { --x: -25%; --y: 3%; --r: -10deg; --z: -150px; }
+.sx-card:nth-child(2) { --x: 23%; --y: -2%; --r: 8deg; --z: -80px; }
+.sx-card:nth-child(3) { --r: -1.5deg; }
+.sx-card img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 1px; }
+/* the glare: a soft band of light across the print that slides as the camera turns */
+.sx-glare { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen; opacity: .55;
+  background: linear-gradient(112deg, rgba(255, 255, 255, 0) 32%, rgba(255, 255, 255, .32) 47%, rgba(255, 255, 255, 0) 60%);
+  transform: translate3d(calc(var(--px, 0) * 38% - 8%), 0, 0); }
+/* arriving: up out of the distance, one after another, coming into focus */
+.sx-slide.on .sx-card { opacity: 1; filter: blur(0);
+  transition: transform 1.5s cubic-bezier(.16, .84, .24, 1) calc(.12s + var(--c) * .09s), opacity .7s ease calc(.12s + var(--c) * .09s),
+    filter 1.1s ease calc(.2s + var(--c) * .09s); }
+/* leaving: rushing past the camera (or back into the distance), out of focus, front print first */
+.sx-slide.off .sx-card { opacity: 0; filter: blur(14px);
+  transition: transform 1s cubic-bezier(.55, 0, .8, .3) calc((2 - var(--c)) * .05s), opacity .6s ease calc(.2s + (2 - var(--c)) * .05s), filter .7s ease; }
+/* landed: pointing at them spreads them a little and lifts them towards you */
+.sx-slide.on.set .sx-card { transition: transform .9s var(--glide), filter .4s ease, opacity .4s ease; }
+.sx-slide.on.set:hover .sx-card:nth-child(1) { --x: -34%; --y: 4%; --r: -13deg; --z: -110px; }
+.sx-slide.on.set:hover .sx-card:nth-child(2) { --x: 32%; --y: -3%; --r: 11deg; --z: -40px; }
+.sx-slide.on.set:hover .sx-card:nth-child(3) { --z: 50px; --r: 0deg; }
+/* the name: floating in front of the prints, its letters coming into focus one after another */
+.place-show h3.sx-name { position: absolute; top: calc(var(--ch) / 2); left: 50%; z-index: 1; margin: 0; white-space: nowrap; pointer-events: none;
+  color: #fff; font: 400 clamp(3.2rem, 11.5vw, 12.5rem)/.9 var(--serif); letter-spacing: -.01em; text-shadow: 0 6px 50px rgba(0, 0, 0, .35);
+  transform: translate(-50%, -50%) translate3d(0, 0, calc(190px + var(--dz))); opacity: 0; transition: none; }
+.sx-name > span > span { display: inline-block; opacity: 0; filter: blur(14px); transform: translate3d(0, .18em, 0); }
+.sx-slide.on h3.sx-name { opacity: 1; transition: transform 1.6s cubic-bezier(.16, .84, .24, 1) .05s, opacity .4s ease; }
+.sx-slide.on .sx-name > span > span { opacity: 1; filter: blur(0); transform: none;
+  transition: opacity .8s ease calc(.35s + var(--i) * .045s), filter 1s ease calc(.35s + var(--i) * .045s), transform 1.2s var(--glide) calc(.35s + var(--i) * .045s); }
+.sx-slide.off h3.sx-name { opacity: 0; filter: blur(10px); transition: transform .95s cubic-bezier(.55, 0, .8, .3), opacity .5s ease .25s, filter .6s ease; }
+.sx-slide.off .sx-name > span > span { opacity: 1; filter: none; transform: none; }
+/* the tagline and best months, just in front of the prints */
+.sx-line { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 18px; margin-top: clamp(30px, 4.5vh, 50px);
+  font-size: .88rem; color: rgba(255, 255, 255, .88); opacity: 0; transform: translate3d(0, 10px, calc(60px + var(--dz))); transition: none; }
+.sx-line em { font: italic 400 1.3rem/1.2 var(--serif); color: #fff; }
+.sx-line > span { display: inline-flex; align-items: center; gap: 6px; }
+.sx-line svg { width: 15px; height: 15px; stroke: #f2c75c; }
+.sx-slide.on .sx-line { opacity: 1; transform: translate3d(0, 0, 60px); transition: opacity .8s ease .7s, transform 1.4s var(--glide) .45s; }
+.sx-slide.off .sx-line { opacity: 0; transition: opacity .35s ease, transform 1s cubic-bezier(.55, 0, .8, .3); }
+/* the bar along the bottom: the places by name, then the arrows and the way to all of them */
+.sx-bar { display: grid; grid-template-columns: minmax(0, 1fr); row-gap: 18px; width: 100%; padding-bottom: clamp(22px, 3.5vh, 40px); }
+.sx-tabs { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 0 clamp(12px, 1.6vw, 28px); margin: 0; padding: 0; list-style: none; }
+.sx-tabs li { margin: 0; }
+.sx-tab { position: relative; display: flex; align-items: baseline; gap: 10px; width: 100%; padding: 16px 0 2px; border: 0; border-top: 1px solid rgba(255, 255, 255, .3);
+  background: none; color: rgba(255, 255, 255, .62); text-align: left; font: 400 clamp(1.15rem, 1.5vw, 1.55rem)/1.15 var(--serif); cursor: pointer; transition: color .3s; }
+.sx-tab:hover, .sx-tab.on { color: #fff; }
+.sx-tab:focus-visible { outline: 2px solid #fff; outline-offset: 4px; }
+.sx-n { font: 500 .68rem/1 var(--body); letter-spacing: .1em; font-variant-numeric: tabular-nums; }
+.sx-tab::before { content: ""; position: absolute; left: 0; top: -1px; width: 100%; height: 2px; background: #fff; transform-origin: left; transform: scaleX(0); }
+.sx-tab.on::before { transform: scaleX(1); }
+.place-show.sx-auto .sx-tab.on::before { animation: sx-fill 7s linear both paused; }
+.place-show.sx-auto.sx-run .sx-tab.on::before { animation-play-state: running; }
+@keyframes sx-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.sx-nav { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
+.sx-prev, .sx-next { display: grid; place-items: center; width: 48px; height: 48px; flex: none; border-radius: 50%; border: 1px solid rgba(255, 255, 255, .5);
+  background: transparent; color: #fff; cursor: pointer; transition: background-color .3s, color .3s, border-color .3s; }
+.sx-prev:hover, .sx-next:hover { background: #fff; border-color: #fff; color: #1f3a4a; }
+.sx-prev svg, .sx-next svg { width: 18px; height: 18px; }
+.sx-prev svg { transform: rotate(180deg); }
+.btn.sx-all { margin-left: 8px; white-space: nowrap; }
+@media (min-width: 1200px) {
+  .sx-bar { grid-template-columns: minmax(0, 1fr) auto; column-gap: clamp(28px, 3vw, 56px); align-items: end; }
+}
+/* the bar takes two rows here, so the prints are a little smaller and it all still fits one screen */
+@media (min-width: 900px) and (max-width: 1199px) { .sx-slide { --ch: clamp(260px, 43vh, 480px); } }
+@media (max-width: 899px) {
+  /* phones and small tablets: "01 / 06" at the top does the counting, and the arrows and the link share the bar */
+  .sx-tabs { display: none; }
+  .sx-nav { justify-content: flex-start; }
+  .btn.sx-all { margin-left: auto; }
+  .sx-slide { --ch: clamp(230px, 37svh, 380px); }
+  .sx-head { padding-top: calc(var(--hh, 72px) + 18px); }
+  .sx-stage { perspective: 1000px; }
+  /* a tighter fan, so the back prints stay on the screen */
+  .sx-card:nth-child(1) { --x: -17%; --r: -8deg; --z: -110px; }
+  .sx-card:nth-child(2) { --x: 16%; --r: 7deg; --z: -60px; }
+  .place-show h3.sx-name { font-size: min(15vw, 4.6rem); transform: translate(-50%, -50%) translate3d(0, 0, calc(120px + var(--dz))); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sx-bgs, .sx-glare { transform: none; }
+  .sx-bgs img, .sx-bgs img.on, .sx-card, .sx-slide.on .sx-card, .sx-slide.off .sx-card, h3.sx-name, .sx-slide.on h3.sx-name,
+  .sx-name > span > span, .sx-slide.on .sx-name > span > span, .sx-line, .sx-slide.on .sx-line { transition: none; filter: none; }
+}
 
 /* home, "Best recommended trips": the words hold still on the left while the tiles go by on the right. The first
    tour is a wide feature tile, and the last tile leads to all the tours. */
@@ -1224,22 +1503,50 @@ html.lenis, html.lenis body { height: auto; }
 .month-ask.show { opacity: 1; }
 .month-ask:focus { outline: none; }
 html.ma-open, html.ma-open body { overflow: hidden; }
-.ma-photo { position: fixed; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; }
+/* the photo settles slowly while the question is up */
+.ma-photo { position: fixed; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; transform: scale(1.08);
+  transition: transform 9s cubic-bezier(.2, .7, .2, 1); }
+.month-ask.show .ma-photo { transform: none; }
 .ma-shade { position: fixed; inset: 0; background: radial-gradient(ellipse at center, rgba(6, 14, 22, .5) 0%, rgba(6, 14, 22, .74) 100%); }
-.ma-box { position: relative; width: min(660px, 100%); text-align: center; color: #fff; }
+.ma-box { position: relative; width: min(1060px, 100%); text-align: center; color: #fff; }
 .ma-kicker { display: inline-flex; align-items: center; gap: 14px; margin: 0 0 16px; color: #fff;
-  font: 600 .74rem/1.4 var(--body); letter-spacing: .24em; text-transform: uppercase; }
+  font: 600 .74rem/1.4 var(--body); letter-spacing: .22em; text-transform: uppercase; }
 .ma-kicker::before, .ma-kicker::after { content: ""; width: 28px; height: 1px; background: var(--brand-yellow); }
 .ma-title { margin: 0 0 16px; color: #fff; text-align: center; font: 400 clamp(2.6rem, 7vw, 4.6rem)/1.02 var(--serif);
   text-shadow: 0 6px 40px rgba(0, 0, 0, .3); }
-.ma-text { max-width: 30rem; margin: 0 auto 28px; color: rgba(255, 255, 255, .88); line-height: 1.6; }
-.ma-months { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
-.ma-m { padding: .8em 0; border: 1px solid rgba(255, 255, 255, .5); border-radius: 999px; background: rgba(255, 255, 255, .08);
-  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); color: #fff; font: 600 .9rem var(--title); cursor: pointer;
-  transition: background .2s, color .2s, border-color .2s; }
-.ma-m:hover, .ma-m:focus-visible { background: #fff; border-color: #fff; color: var(--brand-navy); }
-.ma-m:focus-visible { outline: 2px solid var(--brand-yellow); outline-offset: 2px; }
-.ma-foot { margin: 24px 0 0; }
+.ma-text { max-width: 30rem; margin: 0 auto 34px; color: rgba(255, 255, 255, .88); line-height: 1.6; }
+/* the twelve months in one row of glass tiles, each with the weather these tours have then: a yellow sun (best),
+   a sun behind a cloud (mixed) or rain. Pointing at one lifts it and fills in the line under the row. */
+.ma-months { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 8px; }
+.ma-m { position: relative; display: flex; flex-direction: column; align-items: center; gap: 9px; min-width: 0; padding: 18px 0 15px;
+  border: 1px solid rgba(255, 255, 255, .26); border-radius: 14px; background: rgba(255, 255, 255, .08);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); color: #fff; cursor: pointer;
+  transition: transform .35s cubic-bezier(.2, .7, .2, 1), background-color .25s, border-color .25s, box-shadow .35s, color .25s; }
+.ma-ic { display: grid; place-items: center; height: 28px; }
+.ma-ic svg { width: 28px; height: 28px; stroke-width: 1.5; }
+.ma-m.G .ma-ic { color: var(--brand-yellow); }
+.ma-m.G .ma-ic circle { fill: currentColor; }
+.ma-m.M .ma-ic { color: #f3e3b0; }
+.ma-m.R .ma-ic { color: #9edcf6; }
+.ma-l { font: 600 1rem/1 var(--title); }
+.ma-w { font: 600 .7rem/1 var(--body); letter-spacing: .16em; text-transform: uppercase; color: rgba(255, 255, 255, .62); }
+.ma-m.G { border-color: rgba(251, 220, 3, .42); background: rgba(251, 220, 3, .09); }
+.ma-m.G .ma-w { color: rgba(251, 236, 140, .9); }
+.ma-m.R { background: rgba(255, 255, 255, .04); }
+.ma-m.R :is(.ma-l, .ma-w) { opacity: .78; }
+.ma-m:hover, .ma-m:focus-visible { transform: translateY(-5px); background-color: rgba(255, 255, 255, .2); border-color: rgba(255, 255, 255, .8);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, .24); }
+.ma-m:focus-visible { outline: 2px solid var(--brand-yellow); outline-offset: 3px; }
+/* the month picked turns white for a moment before the question lifts away */
+.ma-m.picked { transform: translateY(-5px); background-color: #fff; border-color: #fff; color: #1f3a4a; box-shadow: 0 16px 34px rgba(0, 0, 0, .24); }
+.ma-m.picked .ma-w { color: #5b7383; }
+.ma-m.picked.G .ma-ic { color: #f2b705; }
+.ma-m.picked.M .ma-ic { color: #c9a24a; }
+.ma-m.picked.R .ma-ic { color: var(--brand-blue); }
+.ma-say { min-height: 1.6em; margin: 22px auto 0; color: rgba(255, 255, 255, .82); font-size: .95rem; text-wrap: balance; }
+.ma-say b { color: #fff; font-weight: 600; }
+.ma-say i { margin: 0 .55em; font-style: normal; color: rgba(255, 255, 255, .4); }
+.ma-foot { margin: 18px 0 0; }
 .ma-skip { padding: 6px 4px; border: 0; background: none; color: #fff; cursor: pointer; font: 600 .92rem var(--title);
   text-decoration: underline; text-decoration-color: rgba(255, 255, 255, .5); text-underline-offset: 6px; }
 .ma-skip:hover { text-decoration-color: #fff; }
@@ -1248,8 +1555,21 @@ html.ma-open, html.ma-open body { overflow: hidden; }
 .month-ask.show .ma-box > :nth-child(3) { animation-delay: .16s; }
 .month-ask.show .ma-box > :nth-child(4) { animation-delay: .24s; }
 .month-ask.show .ma-box > :nth-child(5) { animation-delay: .32s; }
-@media (max-width: 600px) { .ma-months { grid-template-columns: repeat(4, 1fr); } }
-@media (prefers-reduced-motion: reduce) { .month-ask, .month-ask.show .ma-box > * { transition: none; animation: none; } }
+.month-ask.show .ma-box > :nth-child(6) { animation-delay: .4s; }
+/* the tiles rise one after another, January first ("backwards": once in, the tiles' own lift on hover takes over) */
+.month-ask.show .ma-box > .ma-months { animation: none; }
+.month-ask.show .ma-m { animation: hh-up .8s cubic-bezier(.2, .7, .2, 1) backwards; animation-delay: calc(.22s + var(--i, 0) * 40ms); }
+@media (max-width: 980px) { .ma-months { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+@media (max-width: 600px) {
+  .ma-months { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 7px; }
+  .ma-m { gap: 7px; padding: 13px 0 11px; border-radius: 12px; }
+  .ma-ic, .ma-ic svg { width: 24px; height: 24px; }
+  .ma-text { margin-bottom: 26px; font-size: .95rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .month-ask, .month-ask.show .ma-box > *, .month-ask.show .ma-m, .ma-photo { transition: none; animation: none; }
+  .ma-photo { transform: none; }
+}
 
 /* ---------- the monsoon map: Sri Lanka's 25 districts inside a ring of the months (guide page, and under the home wheel).
    A small sun travels round the ring; districts turn gold (sunny), sand (mixed) or monsoon blue (rainy), and rain
@@ -1315,7 +1635,7 @@ html.ma-open, html.ma-open body { overflow: hidden; }
 .dr-name small { display: block; margin-top: 3px; color: #8aa3b2; font: 500 .8rem var(--body); }
 .dr-st { display: inline-flex; align-items: center; gap: 8px; color: #1f3a4a; white-space: nowrap;
   font: 600 .72rem var(--body); letter-spacing: .14em; text-transform: uppercase; }
-.dial-k { margin: 0 0 6px; color: var(--blue); font: 600 .72rem/1.4 var(--body); letter-spacing: .2em; text-transform: uppercase; }
+.dial-k { margin: 0 0 6px; color: var(--blue); font: 600 .74rem/1.4 var(--body); letter-spacing: .22em; text-transform: uppercase; }
 /* room kept for the longest month (two lines of "what's on", three of tours), so the panel stays one height */
 .dial-sum { min-height: 1.5em; line-height: 1.5; }
 .dial-on { min-height: 2.9em; margin: 0 0 20px; color: #1f3a4a; font: italic 400 1.15rem/1.45 var(--serif); }
@@ -1385,6 +1705,12 @@ html.ma-open, html.ma-open body { overflow: hidden; }
   background: #f6fafc; border: 2px solid rgba(31, 58, 74, .3); }
 .er-route li:first-child, .er-route li:last-child { color: #1f3a4a; }
 .er-route li:first-child::before, .er-route li:last-child::before { background: var(--brand-sky); border-color: var(--brand-sky); }
+/* the last words on the home page, under the line: they answer the hero's "Sri Lanka, planned around you." */
+.er-end { max-width: 46rem; margin: clamp(80px, 9vw, 140px) auto clamp(10px, 2vw, 30px); text-align: center; }
+.band .wrap .er-end h2 { margin: 0 0 .4em; color: #1f3a4a; text-align: center; font-size: clamp(2.6rem, 5.4vw, 5rem); line-height: 1.02; }
+.er-end h2 em { font-style: italic; color: var(--blue); }
+.band .wrap .er-end p { max-width: 32rem; margin: 0 auto; color: #4a6170; font-size: 1.08rem; }
+.band .wrap .er-end p:has(.btn) { margin-top: 2em; }
 /* moving only while the section is on screen (site.js), and never for people who asked for less motion */
 .ella-ride.er-on .er-s, .ella-ride.er-on .er-loco { animation-play-state: running; }
 @media (prefers-reduced-motion: reduce) { .er-s, .er-loco { animation: none; } }
@@ -1450,7 +1776,7 @@ html.ma-open, html.ma-open body { overflow: hidden; }
 .ypm-wx li { display: flex; align-items: center; gap: 12px; margin: 0; padding: 10px 0; border-bottom: 1px solid #d6e3ea; color: #1f3a4a; }
 .ypm-dot { flex: none; width: 11px; height: 11px; border-radius: 3px; }
 .ypm-r { flex: 1; font-weight: 500; }
-.ypm-s { font: 600 .68rem/1 var(--body); letter-spacing: .14em; text-transform: uppercase; color: #5b7383; }
+.ypm-s { font: 600 .7rem/1 var(--body); letter-spacing: .14em; text-transform: uppercase; color: #5b7383; }
 .ypm-on li { margin: 0; padding: 10px 0; border-bottom: 1px solid #d6e3ea; font: italic 400 1.35rem/1.35 var(--serif); color: #1f3a4a; }
 .ypm-tours li { margin: 0; border-bottom: 1px solid #d6e3ea; }
 .ypm-tours a { display: flex; align-items: center; gap: 14px; padding: 9px 0; color: #1f3a4a; }
@@ -1540,11 +1866,159 @@ html.ma-open, html.ma-open body { overflow: hidden; }
   :is(.di-cards, .dm-cards) .pc-text strong { font-size: 1.3rem; }
   :is(.di-cards, .dm-cards) .pc-text small { display: none; }
 }
+.dest-index.solo { grid-template-columns: minmax(0, 1fr); margin-top: 32px; }
+
+/* ---------- /destinations/: the big engraved island ({{place-map}}, build.py place_map, site.js). Pointing at
+   it lights up the nearest place; choosing one shows its card beside the map (a sheet from the bottom on phones) */
+.pmap { display: grid; gap: 32px; max-width: 1240px; margin: 56px auto 0; }
+.pm-map { margin: 0; width: 100%; }
+.pm-map svg { display: block; width: 100%; height: auto; overflow: visible; -webkit-tap-highlight-color: transparent; }
+.pm-map .tm-credit { text-align: center; }
+.pm-pin { cursor: pointer; outline: 0; }
+.pm-hit { fill: transparent; stroke: none; }
+.pm-dot { fill: #1f3a4a; stroke: #fff; stroke-width: 3; transform-box: fill-box; transform-origin: center;
+  transition: fill .25s, transform .4s cubic-bezier(.2, .7, .2, 1); }
+.pm-ring { fill: none; stroke: #e2a43a; stroke-width: 2.5; opacity: 0; transform-box: fill-box; transform-origin: center; }
+.pm-pin text { font: 600 18px/1 var(--body); letter-spacing: 1.2px; fill: #1f3a4a; paint-order: stroke; stroke: #fff;
+  stroke-width: 6px; stroke-linejoin: round; transition: opacity .3s; }
+.pm-pin .pm-small { display: none; font-size: 30px; letter-spacing: 0; stroke-width: 8px; }
+.pm-pin.hot .pm-dot, .pm-pin.chosen .pm-dot, .pm-pin:focus-visible .pm-dot { fill: #f2c75c; transform: scale(1.4); }
+.pm-pin:focus-visible .pm-dot { stroke: var(--brand-sky); }
+.pmap.has-hot .pm-pin:not(.hot, .chosen) text { opacity: .35; }
+.pm-pin.chosen .pm-ring { animation: pm-ping 2.2s cubic-bezier(.2, .7, .2, 1) infinite; }
+@keyframes pm-ping { from { opacity: .9; transform: scale(1); } to { opacity: 0; transform: scale(3.6); } }
+
+.pm-side { min-width: 0; }
+.pm-hint { display: flex; align-items: center; gap: 16px; margin: 0 0 30px; font: 400 clamp(1.7rem, 2.3vw, 2.2rem)/1.15 var(--serif); color: #1f3a4a; }
+.pm-hint-dot { position: relative; flex: none; width: 13px; height: 13px; border-radius: 50%; background: #f2c75c; box-shadow: 0 0 0 3px #fff; }
+.pm-hint-dot::after { content: ""; position: absolute; inset: -3px; border-radius: 50%; border: 2px solid #e2a43a;
+  animation: isle-ping 2.4s cubic-bezier(.2, .7, .2, 1) infinite; }
+.pm-regions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 36px; }
+.pm-reg-n, .pm-label, .pm-kick { margin: 0 0 10px; font: 600 .7rem/1.4 var(--body); letter-spacing: .2em; text-transform: uppercase; color: #5b7383; }
+.pm-reg-n { padding-bottom: 9px; border-bottom: 1px solid #dde7ed; }
+.pm-reg ul, .pm-sights, .pm-tours { list-style: none; margin: 0; padding: 0; }
+.pm-reg li, .pm-sights li, .pm-tours li { margin: 0; padding: 0; }
+.pm-reg a { display: inline-block; padding: 4px 0; font: 400 1.3rem/1.3 var(--serif); color: #1f3a4a; text-decoration: none;
+  transition: color .2s, transform .3s cubic-bezier(.2, .7, .2, 1); }
+.pm-reg a:hover, .pm-reg a.hot, .pm-reg a:focus-visible { color: var(--brand-blue); transform: translateX(5px); }
+
+.pm-place:not(.on) { display: none; }
+.pm-place { position: relative; }
+.pm-place > *, .pm-start { animation: pm-in .6s cubic-bezier(.2, .7, .2, 1) both; }
+.pm-place > :nth-child(2) { animation-delay: .04s; }
+.pm-place > :nth-child(3) { animation-delay: .1s; }
+.pm-place > :nth-child(4) { animation-delay: .16s; }
+.pm-place > :nth-child(5) { animation-delay: .22s; }
+.pm-place > :nth-child(n+6) { animation-delay: .28s; }
+@keyframes pm-in { from { opacity: 0; transform: translateY(12px); } }
+.pm-place:focus { outline: 0; }
+.pm-back { display: inline-flex; align-items: center; margin: 0 0 22px; padding: 6px 0; border: 0; background: none; cursor: pointer;
+  font: 600 .7rem/1 var(--body); letter-spacing: .2em; text-transform: uppercase; color: #5b7383; }
+.pm-back:hover { color: var(--brand-blue); }
+.pm-back-t { display: inline-flex; align-items: center; gap: 10px; }
+.pm-back svg { width: 16px; height: 16px; transform: rotate(180deg); fill: none; stroke: currentColor; stroke-width: 2; }
+.pm-x { display: none; }
+.pm-top { display: grid; grid-template-columns: minmax(130px, 190px) minmax(0, 1fr); gap: 26px; align-items: end; }
+.pm-ph { display: block; aspect-ratio: 3 / 4; border-radius: 6px; overflow: hidden; background: #e6eef2; }
+.pm-ph img, .pm-sph img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.pm-name { margin: 0; font: 400 clamp(2.6rem, 4vw, 3.7rem)/.95 var(--serif); color: #1f3a4a; text-align: left; }
+.pm-tag { margin: 12px 0 0; font: italic 400 1.2rem/1.3 var(--serif); color: #4a6170; text-align: left; }
+.pm-best { display: inline-flex; align-items: center; gap: 8px; margin: 16px 0 0; font: 500 .72rem/1.4 var(--body);
+  letter-spacing: .14em; text-transform: uppercase; color: #5b7383; }
+.pm-best svg { width: 18px; height: 18px; fill: none; stroke: #e2a43a; stroke-width: 1.8; }
+.band .pmap p { max-width: none; text-align: left; }
+.pm-say { margin: 24px 0 0; font-size: 1rem; line-height: 1.65; color: #4a6170; }
+.pm-block { margin: 24px 0 0; padding-top: 18px; border-top: 1px solid #dde7ed; }
+.pm-label { margin-bottom: 12px; }
+.pm-sights { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.pm-sights li { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.pm-sph { flex: none; width: 58px; height: 58px; border-radius: 6px; overflow: hidden; background: #e6eef2; }
+.pm-sn { font-size: .86rem; line-height: 1.3; color: #1f3a4a; }
+.pm-tours a { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 9px 0;
+  border-bottom: 1px solid #eef2f4; color: #1f3a4a; text-decoration: none; }
+.pm-tt { font: 400 1.2rem/1.25 var(--serif); transition: color .2s; }
+.pm-td { flex: none; font: 500 .7rem/1.6 var(--body); letter-spacing: .12em; text-transform: uppercase; color: #5b7383; }
+.pm-tours a:hover .pm-tt { color: var(--brand-blue); }
+.pm-more { display: inline-block; margin-top: 10px; font-size: .88rem; color: var(--brand-blue); }
+.pm-none { margin: 0; color: #4a6170; }
+.pm-end { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px 24px; margin: 24px 0 0; }
+.pm-go { margin: 0; }
+.pm-near { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0; }
+.pm-near span { margin-right: 6px; font: 600 .7rem/1.4 var(--body); letter-spacing: .2em; text-transform: uppercase; color: #5b7383; }
+.pm-near button { padding: 8px 15px; border: 1px solid #d5e1e8; border-radius: 99px; background: #fff; cursor: pointer;
+  font: 500 .86rem/1 var(--body); color: #1f3a4a; transition: border-color .2s, background .2s; }
+.pm-near button:hover { border-color: var(--brand-sky); background: #f1f9fd; }
+@media (min-width: 980px) {
+  .pmap { grid-template-columns: auto minmax(380px, 520px); justify-content: center; gap: clamp(48px, 6vw, 110px); }
+  .pm-map { width: min(52vw, calc((100vh - 150px) * .6909)); position: sticky; top: 84px; align-self: start; }
+  .pm-side { padding-top: clamp(16px, 7vh, 90px); }
+  .pmap.chose .pm-side { padding-top: 8px; }
+  .pmap.chose .pm-start { display: none; }
+  .pm-back { margin-bottom: 14px; }
+  .pm-top { grid-template-columns: minmax(120px, 160px) minmax(0, 1fr); }
+  .pm-say { margin-top: 18px; }
+  .pm-block { margin-top: 18px; padding-top: 14px; }
+  .pm-tours a { padding: 7px 0; }
+}
+@media (max-width: 979px) {
+  .pmap { margin-top: 32px; }
+  .pm-map { width: min(100%, 520px); justify-self: center; }
+  .pm-pin .pm-big { display: none; }
+  .pm-pin .pm-small { display: inline; }
+  .pm-hint { font-size: 1.6rem; margin-bottom: 22px; }
+  .pm-place.on { position: fixed; z-index: 80; left: 0; right: 0; bottom: 0; max-height: min(60vh, 600px); overflow-y: auto;
+    overscroll-behavior: contain; padding: 14px 20px calc(24px + env(safe-area-inset-bottom)); background: #fff;
+    border-radius: 18px 18px 0 0; box-shadow: 0 -18px 50px rgba(12, 30, 40, .22); animation: pm-sheet .45s cubic-bezier(.2, .7, .2, 1) both; }
+  .pm-place.on::before { content: ""; display: block; width: 42px; height: 4px; margin: 0 auto 14px; border-radius: 2px; background: #d5e1e8; }
+  .pm-place.on > * { animation: none; }
+  .pm-back { position: absolute; top: 14px; right: 14px; width: 40px; height: 40px; margin: 0; padding: 0; justify-content: center;
+    border-radius: 50%; background: #f1f5f7; }
+  .pm-back-t { display: none; }
+  .pm-x { display: block; font: 400 1.6rem/1 var(--body); color: #1f3a4a; letter-spacing: 0; }
+  .pm-top { grid-template-columns: 92px minmax(0, 1fr); gap: 16px; align-items: center; padding-right: 44px; }
+  .pm-name { font-size: 2.3rem; }
+  .pm-tag { margin-top: 6px; font-size: 1.02rem; }
+  .pm-best { margin-top: 8px; }
+  .pm-say { margin-top: 16px; font-size: .95rem; }
+  .pm-block { margin-top: 18px; padding-top: 14px; }
+  .pm-go { flex: 1 1 100%; }
+  .pm-go .btn { width: 100%; }
+  .pm-sights li { flex-direction: column; align-items: stretch; gap: 6px; }
+  .pm-sph { width: auto; height: auto; aspect-ratio: 1; }
+  .pm-sn { font-size: .8rem; }
+}
+@media (max-width: 480px) { .pm-regions { gap: 22px 20px; } .pm-reg a { font-size: 1.15rem; } }
+@keyframes pm-sheet { from { transform: translateY(100%); } }
+@media (prefers-reduced-motion: reduce) {
+  .pm-pin.chosen .pm-ring, .pm-hint-dot::after { animation: none; }
+  .pm-place > *, .pm-start, .pm-place.on { animation: none; }
+}
 
 /* ---------- a destination page: the name beside three tall photos */
 .dest-hero { background: #eef6f9; padding: clamp(28px, 4vw, 56px) 0 clamp(56px, 7vw, 110px); overflow: hidden; }
-.dh-grid { display: grid; gap: 44px; align-items: center; max-width: 1480px; margin: 0 auto; }
+.dh-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 44px; align-items: center; max-width: 1480px; margin: 0 auto; }   /* one column no wider than the screen: the photo row used to stretch it past a phone's edge */
 .dest-hero .crumbs { margin: 0 0 clamp(32px, 5vw, 72px); font-size: .86rem; color: #5b7383; }
+/* arriving from a tour's itinerary (site.js "from a tour to a place and back"): the way back to that tour and day,
+   in place of the breadcrumbs, and the same as a small pill in the corner once the top has scrolled away */
+.dh-back { display: inline-flex; align-items: center; gap: 10px; max-width: 100%; margin: 0 0 clamp(32px, 5vw, 72px); padding: 10px 20px 10px 14px;
+  border: 1px solid rgba(31, 58, 74, .16); border-radius: 48px; background: #fff; color: #1f3a4a; font: 600 .88rem/1.3 var(--title);
+  box-shadow: 0 6px 18px -10px rgba(12, 52, 96, .3); transition: background-color .3s, border-color .3s, color .3s; }
+.dh-back i, .tour-back i { flex: none; font-style: normal; white-space: nowrap; }
+.dh-back b, .tour-back b { min-width: 0; overflow: hidden; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.dh-back span, .tour-back span { flex: none; color: #5b7383; font-weight: 600; transition: color .3s; }
+.dh-back svg, .tour-back svg { flex: none; width: 16px; height: 16px; transform: scaleX(-1); transition: transform .3s var(--glide, ease); }
+.dh-back:hover, .tour-back:hover { background: var(--brand-blue, #1f74ba); border-color: var(--brand-blue, #1f74ba); color: #fff; }
+.dh-back:hover span, .tour-back:hover span { color: rgba(255, 255, 255, .8); }
+.dh-back:hover svg, .tour-back:hover svg { transform: scaleX(-1) translateX(4px); }
+.tour-back { position: fixed; left: 24px; bottom: 24px; z-index: 69; display: inline-flex; align-items: center; gap: 9px;
+  max-width: min(440px, calc(100vw - 120px)); padding: 12px 20px 12px 16px; border: 1px solid rgba(31, 58, 74, .12); border-radius: 48px;
+  background: var(--paper, #fbfaf7); color: #1f3a4a; font: 600 .86rem/1.3 var(--title); box-shadow: 0 14px 34px -12px rgba(12, 52, 96, .45);
+  opacity: 0; visibility: hidden; transform: translateY(14px);
+  transition: opacity .35s ease, transform .5s var(--glide, ease), visibility 0s .5s, background-color .3s, border-color .3s, color .3s; }
+.tour-back.on { opacity: 1; visibility: visible; transform: none; transition: opacity .35s ease, transform .5s var(--glide, ease), background-color .3s, border-color .3s, color .3s; }
+html.lt-lock .tour-back, body.nav-open .tour-back, html.cb-lock .tour-back { display: none; }
+@media (max-width: 640px) { .tour-back { left: 16px; bottom: 16px; padding: 11px 16px 11px 13px; font-size: .82rem; } }
+@media print { .tour-back { display: none; } }
 .dest-hero .crumbs a { color: #1f3a4a; }
 .dest-hero .crumbs a:hover { color: var(--brand-blue); }
 .dest-hero h1 { margin: 0 0 .18em; font-size: clamp(3.6rem, 8vw, 7.4rem); line-height: .92; color: #1f3a4a; }
@@ -1671,7 +2145,9 @@ html.ma-open, html.ma-open body { overflow: hidden; }
    the list: the tours that fit rise to the top, the rest fade under "Possible with a few changes". */
 .band.finder { padding-top: clamp(56px, 6vw, 96px); }
 .tf { max-width: 1480px; margin: 0 auto; }
-.tf-top { max-width: 1120px; margin: 0 0 clamp(52px, 6vw, 88px); }
+/* the same width on the full-screen intro and after "Show my tours", so the sentence keeps its line breaks and the
+   answers and the button stay put when the intro lifts away */
+.tf-top { max-width: 1240px; margin: 0 0 clamp(52px, 6vw, 88px); }
 .tf-say { margin: 0 0 30px; font: 400 clamp(2.1rem, 3.6vw, 3.6rem)/1.28 var(--serif); color: #1f3a4a; }
 /* a blank flows with the sentence like a word: a long answer wraps onto the next line, and its underline and
    highlight follow each line (box-decoration-break) */
@@ -1743,9 +2219,6 @@ html.ma-open, html.ma-open body { overflow: hidden; }
 .tl-sep[hidden] { display: none; }
 .tl-end { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 18px 30px; margin: 40px 0 0; padding: 28px 30px; border-radius: 8px; background: #eef6f9; }
 .tl-end-say { margin: 0; max-width: 30rem; font: 400 clamp(1.4rem, 2vw, 1.8rem)/1.25 var(--serif); color: #1f3a4a; }
-.tl-cats { margin: 26px 0 0; font-size: .88rem; line-height: 1.9; color: #5b7383; }
-.tl-cats a { color: #1f3a4a; text-decoration: underline; text-decoration-color: #b9cbd6; text-underline-offset: 4px; }
-.tl-cats a:hover { color: var(--brand-blue); text-decoration-color: currentColor; }
 @media (min-width: 980px) {
   .tl { grid-template-columns: minmax(260px, .68fr) minmax(0, 1.32fr); gap: clamp(40px, 5vw, 100px); align-items: start; }
   .tl-side { position: sticky; top: 112px; }
@@ -1809,13 +2282,24 @@ html.ma-open, html.ma-open body { overflow: hidden; }
    the photo, as on the home page, and the page does not scroll until "Show my tours", so it always opens on the
    sentence. "tf-intro" is the layout, "tf-dark" the colours; "Show my tours" takes "tf-dark" off first, so it all
    fades to the normal colours, then "tf-intro", and the sentence glides up into its place (site.js). */
-html.tf-intro { overflow: hidden; }
-.tf-intro .page-hero, .tf-after .page-hero { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+/* "Show my tours" must be one smooth fade from the dark screen to the white page:
+   - the page doesn't scroll during the intro, yet the scroll bar keeps its room, so nothing shifts sideways when
+     the page can scroll again: the scroll bar stays (see-through, over the page's own colour, which is dark while
+     the screen is and fades with it) and the body is cut to one pixel more than the screen's height, which is
+     what keeps the scroll bar there. (Chrome gives no room for a scroll bar to a page that is set not to scroll,
+     scrollbar-gutter or not; and a page set to always scroll counts its width a pixel differently, so the
+     header's sides moved by that much.) "overflow-y: auto" keeps the body's cut to the body itself.
+   - the screen fades to white, never to see-through (behind it, out of the way, sit the rest of the page and
+     the footer, which showed through for a moment) */
+html.tf-intro { overflow-y: auto; scrollbar-color: transparent transparent; background-color: var(--white); transition: background-color .5s ease; }
+html.tf-dark { background-color: #10303c; }
+.tf-intro body { height: calc(100vh + 1px); overflow: hidden; }
+.tf-intro :is(.page-hero, .tour-hero), .tf-after :is(.page-hero, .tour-hero) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .tf-intro .tl { display: none; }
 .tf-intro .band.finder { position: fixed; inset: 0; z-index: 40; display: flex; flex-direction: column; overflow-y: auto;
-  overscroll-behavior: contain; padding: 150px 0 48px; }
+  overscroll-behavior: contain; padding: 150px 0 48px; background-color: var(--white); }
 .tf-intro .band.finder > .wrap { width: 100%; margin: auto; }
-.tf-intro .tf-top { position: relative; z-index: 1; max-width: 1240px; margin: 0; }
+.tf-intro .tf-top { position: relative; z-index: 1; margin: 0; }
 .tf-intro .tf-show { display: inline-flex; margin-left: auto; }
 .tf-intro .tf-go { display: none; }
 .tf-bg { display: none; }
@@ -1827,6 +2311,12 @@ html.tf-intro { overflow: hidden; }
 .tf-bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(8, 26, 34, .55), rgba(8, 26, 34, .74)); }
 .band.finder { transition: background-color .5s ease; }
 .tf-dark .band.finder { background: #10303c; }
+/* ...and the header fades with it, in the same half second: the white logo melts into the colour one (both stay
+   drawn during the intro, one see-through, instead of the white one simply switching off) */
+.tf-intro .logo .logo-light { display: block; opacity: 0; }
+.tf-dark .logo .logo-light { opacity: 1; }
+.tf-intro .logo img { transition: opacity .5s ease; }
+.tf-intro :is(.site-header, .nav .top, .hd-ic, .nav-ink) { transition-duration: .5s; }
 /* the header over the photo: see-through, white logo and words, as on the home page ("the header over a photo") */
 .tf-top .ci-kicker, .tf-say, .tf-b, .tf-q, .tf-step, .tf-ask, .tf-tools button:not(.btn) { transition: color .5s, border-color .5s, background-color .5s; }
 .tf-dark .tf-top .ci-kicker, .tf-dark .tf-say, .tf-dark .tf-q { color: #fff; }
@@ -1892,7 +2382,7 @@ html.tf-intro { overflow: hidden; }
 .layout-about .chapter .wrap { max-width: 1400px; }
 .layout-about .chapter .wrap > * { margin-left: 0; margin-right: 0; }
 .layout-about .chapter .wrap > .kicker, .layout-about .chapter .ab-side > .kicker { display: flex; align-items: center; gap: 12px; margin: 0 0 18px;
-  font: 600 .72rem/1.4 var(--body); letter-spacing: .24em; text-transform: uppercase; color: var(--blue); text-align: left; }
+  font: 600 .74rem/1.4 var(--body); letter-spacing: .22em; text-transform: uppercase; color: var(--blue); text-align: left; }
 .layout-about .chapter .kicker::before { content: ""; flex: none; width: 32px; height: 1px; background: var(--brand-yellow); }
 .layout-about .chapter .wrap > h2, .layout-about .chapter .ab-side > h2 { max-width: 15ch; margin: 0 0 30px; font-size: clamp(2.5rem, 4.6vw, 4.2rem); line-height: 1.02; color: #1f3a4a; text-align: left; }
 .layout-about .chapter .wrap > p, .layout-about .chapter .wrap > h2 + p { max-width: 38rem; margin: 0 0 1.2em; font-size: 1.06rem; line-height: 1.8; color: #4a6170; text-align: left; }
@@ -1971,7 +2461,7 @@ html.tf-intro { overflow: hidden; }
   transform: translate3d(0, calc(-12% + var(--py, 0px)), 0); }
 .layout-about .footprints ul { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: clamp(32px, 5vw, 80px); max-width: none;
   margin: 40px 0 0; padding: 0; list-style: none; border-top: 1px solid #dde7ed; }
-.layout-about .footprints li { margin: 0; padding: 24px 0; border-bottom: 1px solid #dde7ed; color: #4a6170; font-size: .96rem; line-height: 1.7; }
+.layout-about .footprints li { margin: 0; padding: 24px 0; border-bottom: 1px solid #dde7ed; color: #4a6170; font-size: 1rem; line-height: 1.7; }
 .layout-about .footprints li strong { display: block; margin: 0 0 6px; font: 400 1.45rem/1.2 var(--serif); color: #1f3a4a; }
 .layout-about .footprints h3 { margin: clamp(80px, 9vw, 130px) 0 24px; font: 400 clamp(2rem, 3.4vw, 3rem)/1.05 var(--serif); color: #1f3a4a; text-align: left; }
 .layout-about .footprints .gallery.n3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(14px, 2vw, 28px); align-items: start; margin: 44px 0 10px; }
@@ -1982,14 +2472,24 @@ html.tf-intro { overflow: hidden; }
 .layout-about .footprints .wrap > p:last-child { max-width: 46rem; margin-top: 50px; font: italic 400 clamp(1.3rem, 2vw, 1.7rem)/1.45 var(--serif); color: #1f3a4a; }
 @media (max-width: 760px) { .layout-about .footprints ul { grid-template-columns: minmax(0, 1fr); } }
 
-/* guests' words: one quote at a time, large; the partner logos underneath */
-.layout-about .guests { background: #f3f8fa; }
-.layout-about .guests .quotes.ab-q { display: grid; grid-auto-flow: row; grid-auto-columns: auto; max-width: 980px; margin: 30px 0 0; padding: 0; overflow: visible; }
-.layout-about .guests .ab-q .quote { grid-area: 1 / 1; padding: 0; background: none; box-shadow: none; border-radius: 0;
+/* guests' words (home and About): one quote at a time, large; the partner logos underneath (site.js turns the quotes) */
+.guests { background: #f3f8fa; }
+.guests .quotes.ab-q { display: grid; grid-auto-flow: row; grid-auto-columns: auto; max-width: 980px; margin: 30px 0 0; padding: 0; overflow: visible; }
+.guests .ab-q .quote { grid-area: 1 / 1; padding: 0; background: none; box-shadow: none; border-radius: 0;
   opacity: 0; visibility: hidden; transform: translateY(14px); transition: opacity .6s ease, transform .8s cubic-bezier(.2, .7, .2, 1), visibility 0s .6s; }
-.layout-about .guests .ab-q .quote.on { opacity: 1; visibility: visible; transform: none; transition: opacity .8s .15s ease, transform .9s .15s cubic-bezier(.2, .7, .2, 1), visibility 0s; }
-.layout-about .guests .quote blockquote { margin: 0 0 28px; font: italic 400 clamp(1.4rem, 2.2vw, 2rem)/1.45 var(--serif); color: #1f3a4a; }
-.layout-about .guests .quote figcaption span { color: #5b7383; }
+.guests .ab-q .quote.on { opacity: 1; visibility: visible; transform: none; transition: opacity .8s .15s ease, transform .9s .15s cubic-bezier(.2, .7, .2, 1), visibility 0s; }
+.guests .quote blockquote { margin: 0 0 28px; font: italic 400 clamp(1.4rem, 2.2vw, 2rem)/1.45 var(--serif); color: #1f3a4a; }
+.guests .quote figcaption span { color: #5b7383; }
+/* on the home page it is the quiet pause between the tours and the monsoon map: white, centred, lots of air */
+.layout-home .guests { padding: clamp(96px, 11vw, 170px) 0; background: var(--white); text-align: center; }
+.layout-home .guests .wrap > h2 { font-size: clamp(1.5rem, 2.2vw, 2rem); margin-bottom: 0; color: #5b7383; }
+.layout-home .guests .quotes.ab-q { max-width: 880px; margin: clamp(28px, 3vw, 44px) auto 0; }
+.layout-home .guests .quote figcaption { justify-content: center; text-align: left; }
+.layout-home .guests .ab-qnav { justify-content: center; }
+.layout-home .guests .wrap > p.center { margin-top: 22px; }
+.layout-home .guests .partners { max-width: 980px; margin: clamp(56px, 6vw, 84px) auto 0; padding-top: 36px; border-top: 1px solid #e3ecf1; gap: 22px 44px; }
+.layout-home .guests .partners img { height: 44px; filter: grayscale(1); opacity: .62; transition: filter .3s, opacity .3s; }
+.layout-home .guests .partners a:hover img { filter: none; opacity: 1; }
 .ab-qnav { display: flex; align-items: center; gap: 16px; margin: 34px 0 0; }
 .ab-qnav button { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; border: 1px solid #1f3a4a; background: transparent; color: #1f3a4a; cursor: pointer; transition: background .2s, color .2s; }
 .ab-qnav button:hover { background: #1f3a4a; color: #fff; }
@@ -2001,7 +2501,8 @@ html.tf-intro { overflow: hidden; }
 
 /* the end of the path */
 .layout-about .end { text-align: center; }
-.layout-about .end .wrap > .kicker { justify-content: center; }
+/* white on the photo (logo blue was hard to read there), and centred over the heading like the rest */
+.layout-about .end .wrap > .kicker { justify-content: center; margin-left: auto; margin-right: auto; color: #fff; }
 .layout-about .end .wrap > h2 { max-width: none; margin-left: auto; margin-right: auto; text-align: center; font-size: clamp(2.8rem, 6vw, 5.4rem); }
 .layout-about .end .wrap > p, .layout-about .end .wrap > h2 + p { margin-left: auto; margin-right: auto; text-align: center; }
 .layout-about .end .wrap > p:last-child:has(.btn) { margin: 2em auto 0; text-align: center; }
@@ -2028,7 +2529,7 @@ html.tf-intro { overflow: hidden; }
 .layout-about .window::after { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
   background: linear-gradient(180deg, rgba(8, 26, 34, .05) 30%, rgba(8, 26, 34, .72)); }
 .layout-about .window .wrap > .kicker { display: flex; align-items: center; gap: 12px; margin: 0 0 18px; text-align: left;
-  font: 600 .74rem/1.4 var(--body); letter-spacing: .24em; text-transform: uppercase; color: #fff; transform: translate3d(0, var(--ty, 0px), 0); }
+  font: 600 .74rem/1.4 var(--body); letter-spacing: .22em; text-transform: uppercase; color: #fff; transform: translate3d(0, var(--ty, 0px), 0); }
 .layout-about .window .wrap > .kicker::before { content: ""; flex: none; width: 32px; height: 1px; background: var(--brand-yellow); }
 .layout-about .window .wrap > h2 { max-width: 13ch; margin: 0; text-align: left; color: #fff; font-size: clamp(2.8rem, 6.4vw, 6rem); line-height: 1;
   text-shadow: 0 2px 30px rgba(0, 0, 0, .25); transform: translate3d(0, var(--ty, 0px), 0); }
@@ -2386,3 +2887,167 @@ html.lt-lock, html.lt-lock body { overflow: hidden; }
 :is(.site-header.is-open, .nav-open .site-header) :is(.nav .top:hover, .hd-ic:hover) { color: var(--brand-blue); }
 :is(.site-header.is-open, .nav-open .site-header) .hd-ic:hover { background-color: rgba(31, 116, 186, .08); }
 :is(.site-header.is-open, .nav-open .site-header) .nav-ink { background: var(--brand-blue); }
+
+/* ---------- our own chat box (build.py chat_box, site.js "chat box"; settings "chat_box: on"). In the bottom corner,
+   a round sun with a speech bubble; pointing at it opens out the words "Chat with us", and on phones a minute after
+   the visitor starts scrolling it opens out once by itself, with a soft chime. It opens a paper card above it: a logo-blue top with the logo mark, "Ayubowan." and whether the team is
+   in (with the time in Sri Lanka), then the messages, starting questions as chips, and a white box to write in with
+   a yellow sun to send. On phones the card is a sheet from the bottom over a dimmed page. It steps aside for the
+   full-screen letter, the phone menu and the month question. */
+.cb { --cb-w: 384px; --cb-gap: 24px; --cb-sun: 44px; --cb-edge: 6px; position: fixed; right: var(--cb-gap); bottom: var(--cb-gap); z-index: 70;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 14px; pointer-events: none; font-family: var(--body); }
+.cb > * { pointer-events: auto; }
+.cb svg { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+html.lt-lock .cb, body.nav-open .cb, html.ma-open .cb { display: none; }
+@media print { .cb { display: none; } }
+
+/* the launcher: a sun pill like "Plan my trip", with a speech bubble on its sun instead of the arrow */
+.cb-open { position: relative; isolation: isolate; overflow: hidden; display: inline-flex; align-items: center; height: calc(var(--cb-sun) + var(--cb-edge) * 2);
+  padding: var(--cb-edge); border: 0; border-radius: 48px; background: var(--brand-yellow, #fbdc03); color: var(--brand-navy, #0c3460);
+  font: 700 .95rem/1 var(--title); cursor: pointer; -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 14px 34px -12px rgba(12, 52, 96, .5), 0 2px 6px rgba(12, 52, 96, .12);
+  transition: color .4s ease, transform .2s ease, opacity .3s ease, background-color 0s; }
+.cb-open::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--brand-sky, #29abe2);
+  clip-path: circle(calc(var(--cb-sun) / 2) at calc(100% - var(--cb-edge) - var(--cb-sun) / 2) 50%);
+  transition: clip-path .6s cubic-bezier(.2, .7, .2, 1), background-color .45s ease; }
+/* as on the sun pills: once the blue has covered it, the button turns blue too, so no yellow edge shows */
+.cb-open:hover { color: #fff; background-color: var(--brand-blue, #1f74ba);
+  transition: color .4s ease, transform .2s ease, opacity .3s ease, background-color 0s .42s; }
+.cb-open:hover::before { background: var(--brand-blue, #1f74ba); clip-path: circle(160% at calc(100% - var(--cb-edge) - var(--cb-sun) / 2) 50%); }
+@media (hover: none) { .cb-open:hover { color: var(--brand-navy, #0c3460); background-color: var(--brand-yellow, #fbdc03); } .cb-open:hover::before { background: var(--brand-sky, #29abe2); clip-path: circle(calc(var(--cb-sun) / 2) at calc(100% - var(--cb-edge) - var(--cb-sun) / 2) 50%); } }
+.cb-open:focus-visible { outline: 2px solid var(--brand-blue, #1f74ba); outline-offset: 3px; }
+.cb-open:active { transform: scale(.97); }
+/* the words stay folded away: pointing at the pill opens them out, and on phones the one-minute nudge does (site.js) */
+.cb-label { max-width: 0; padding: 0; opacity: 0; overflow: hidden; white-space: nowrap;
+  transition: max-width .55s var(--glide), padding .55s var(--glide), opacity .3s ease; }
+@media (hover: hover) { .cb:not(.on) .cb-open:hover .cb-label { max-width: 9em; padding: 0 16px 0 14px; opacity: 1; transition-delay: 0s, 0s, .12s; } }
+.cb:not(.on) .cb-open:focus-visible .cb-label, .cb.nudge:not(.on) .cb-label { max-width: 9em; padding: 0 16px 0 14px; opacity: 1; transition-delay: 0s, 0s, .12s; }
+.cb.nudge:not(.on) .cb-i-chat { animation: cb-wiggle .8s ease .35s 2; }
+@keyframes cb-wiggle { 20% { transform: rotate(-14deg); } 45% { transform: rotate(11deg); } 70% { transform: rotate(-6deg); } }
+.cb-sun { position: relative; flex: none; display: grid; place-items: center; width: var(--cb-sun); height: var(--cb-sun); color: #fff; }
+.cb-sun svg { grid-area: 1 / 1; width: 22px; height: 22px; transition: transform .45s cubic-bezier(.2, .7, .2, 1), opacity .25s ease; }
+.cb-i-x { opacity: 0; transform: rotate(-90deg) scale(.6); }
+.cb.on .cb-i-chat { opacity: 0; transform: rotate(90deg) scale(.6); }
+.cb.on .cb-i-x { opacity: 1; transform: none; }
+/* green while the team is in; a red dot when a reply came while the card was shut */
+.cb-ping { position: absolute; top: 3px; right: 3px; width: 11px; height: 11px; border-radius: 50%; background: #34c26a;
+  box-shadow: 0 0 0 2px var(--brand-sky, #29abe2); opacity: 0; transform: scale(.4); transition: opacity .3s ease, transform .4s var(--glide), box-shadow .45s ease; }
+.cb.in .cb-ping, .cb.news .cb-ping { opacity: 1; transform: none; }
+.cb.news .cb-ping { background: #e0463a; animation: cb-ping 1.6s ease-out 3; }
+.cb.on .cb-ping { opacity: 0; transform: scale(.4); animation: none; }
+.cb-open:hover .cb-ping { box-shadow: 0 0 0 2px var(--brand-blue, #1f74ba); }
+@keyframes cb-ping { 0% { box-shadow: 0 0 0 2px var(--brand-sky, #29abe2), 0 0 0 2px rgba(224, 70, 58, .5); }
+  100% { box-shadow: 0 0 0 2px var(--brand-sky, #29abe2), 0 0 0 12px rgba(224, 70, 58, 0); } }
+
+/* the card */
+.cb-card { display: flex; flex-direction: column; width: min(var(--cb-w), calc(100vw - var(--cb-gap) * 2));
+  height: max(340px, min(640px, calc(100vh - var(--hh, 84px) - 128px)));
+  overflow: hidden; background: var(--paper, #fbfaf7); border-radius: 24px; color: var(--ink);
+  box-shadow: 0 34px 80px -24px rgba(9, 28, 36, .5), 0 0 0 1px rgba(17, 61, 72, .07);
+  transform-origin: calc(100% - 28px) calc(100% + 40px); opacity: 0; transform: translateY(18px) scale(.94);
+  transition: opacity .28s ease, transform .5s var(--glide); }
+.cb-card[hidden] { display: none; }
+.cb.on .cb-card { opacity: 1; transform: none; }
+
+.cb-head { position: relative; isolation: isolate; overflow: hidden; flex: none; display: flex; align-items: flex-start; gap: 14px;
+  padding: 22px 60px 20px 22px; background: var(--brand-blue, #1f74ba); color: #fff; }
+/* a light-blue sun rising behind the words */
+.cb-head::after { content: ""; position: absolute; z-index: -1; right: -70px; bottom: -120px; width: 230px; height: 230px; border-radius: 50%;
+  background: var(--brand-sky, #29abe2); opacity: .4; }
+.cb-mark { flex: none; width: 46px; height: 46px; overflow: hidden; border-radius: 50%; background: #fff; box-shadow: 0 0 0 4px rgba(255, 255, 255, .16); }
+.cb-mark img { display: block; width: auto; max-width: none; height: 49.4px; margin: -3.4px 0 0 0; }
+.cb-who { min-width: 0; }
+.cb-kick { margin: 2px 0 0; font: 700 .7rem/1.2 var(--title); letter-spacing: .22em; text-transform: uppercase; opacity: .82; }
+.cb-hi { margin: 4px 0 0; font: 400 2.15rem/1 var(--serif); letter-spacing: 0; color: #fff; }
+.cb-state { display: flex; align-items: center; gap: 8px; margin: 10px 0 0; font-size: .8rem; line-height: 1.35; color: rgba(255, 255, 255, .9); }
+.cb-dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--brand-yellow, #fbdc03); box-shadow: 0 0 0 3px rgba(251, 220, 3, .25); }
+.cb.in .cb-dot { background: #4fd884; box-shadow: 0 0 0 3px rgba(79, 216, 132, .25); }
+.cb-x { position: absolute; top: 14px; right: 14px; display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 50%;
+  background: rgba(255, 255, 255, .14); color: #fff; cursor: pointer; transition: background-color .25s ease, transform .3s var(--glide); }
+.cb-x svg { width: 18px; height: 18px; }
+.cb-x:hover { background: rgba(255, 255, 255, .26); transform: rotate(90deg); }
+.cb-x:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+/* the messages */
+.cb-log { flex: 1; display: flex; flex-direction: column; gap: 10px; min-height: 0; padding: 18px 18px 12px; overflow-y: auto; overscroll-behavior: contain;
+  scrollbar-width: thin; scrollbar-color: rgba(17, 61, 72, .18) transparent; }
+.cb-day { display: flex; align-items: center; gap: 12px; margin: 0 0 4px; font: 700 .7rem/1 var(--title); letter-spacing: .22em; text-transform: uppercase; color: var(--muted); }
+.cb-day::before, .cb-day::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.cb-msg { display: flex; flex-direction: column; align-items: flex-start; max-width: 86%; }
+.cb-msg p { margin: 0; padding: 11px 15px; border-radius: 20px; font-size: .92rem; line-height: 1.5; text-wrap: pretty; overflow-wrap: anywhere; white-space: pre-line; }
+.cb-msg.them { align-self: flex-start; }
+.cb-msg.them p { background: #fff; color: var(--ink); border: 1px solid var(--line); border-bottom-left-radius: 6px; }
+.cb-msg.me { align-self: flex-end; align-items: flex-end; }
+.cb-msg.me p { background: var(--brand-blue, #1f74ba); color: #fff; border-bottom-right-radius: 6px; }
+.cb-by { margin: 6px 8px 0; font-size: .72rem; color: var(--muted); }
+.cb-msg.new { animation: cb-in .5s var(--glide) both; }
+.cb-msg.them.new { transform-origin: 0 100%; }
+.cb-msg.me.new { transform-origin: 100% 100%; }
+@keyframes cb-in { from { opacity: 0; transform: translateY(10px) scale(.96); } }
+/* "typing" dots, for when the team is writing */
+.cb-typing p { display: flex; gap: 5px; padding: 15px 16px; }
+.cb-typing i { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); opacity: .35; animation: cb-dots 1.2s ease-in-out infinite; }
+.cb-typing i:nth-child(2) { animation-delay: .15s; }
+.cb-typing i:nth-child(3) { animation-delay: .3s; }
+@keyframes cb-dots { 30% { opacity: 1; transform: translateY(-3px); } 60% { opacity: .35; transform: none; } }
+/* starting questions, on the visitor's side */
+.cb-chips { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin: 4px 0 0 12%; }
+.cb-chips.gone { display: none; }
+.cb-chip { padding: 9px 15px; border: 1px solid rgba(31, 116, 186, .32); border-radius: 48px; background: #fff; color: var(--brand-blue, #1f74ba);
+  font: 600 .82rem/1.2 var(--title); cursor: pointer; transition: background-color .25s ease, color .25s ease, border-color .25s ease, transform .2s ease; }
+.cb-chip:hover { background: var(--brand-blue, #1f74ba); border-color: var(--brand-blue, #1f74ba); color: #fff; }
+.cb-chip:active { transform: scale(.97); }
+.cb-chip:focus-visible { outline: 2px solid var(--brand-sky, #29abe2); outline-offset: 2px; }
+/* a note from the site itself (not from the team), in the middle */
+.cb-note { align-self: center; max-width: 92%; margin: 6px 0; padding: 13px 16px; border-radius: 16px; background: #fdf6cf; color: var(--brand-navy, #0c3460);
+  font-size: .84rem; line-height: 1.5; text-align: center; animation: cb-in .5s var(--glide) both; }
+.cb-note p { margin: 0; }
+.cb-note a { display: inline-flex; align-items: center; gap: 7px; margin-top: 9px; padding: 8px 14px; border-radius: 48px; background: #fff;
+  color: var(--brand-blue, #1f74ba); font: 700 .8rem/1 var(--title); text-decoration: none; transition: background-color .25s ease, color .25s ease; }
+.cb-note a:hover { background: var(--brand-blue, #1f74ba); color: #fff; }
+.cb-note svg { width: 16px; height: 16px; }
+
+/* writing */
+.cb-write { flex: none; display: flex; align-items: flex-end; gap: 8px; margin: 4px 14px 0; padding: 6px 6px 6px 18px; background: #fff;
+  border: 1px solid var(--line); border-radius: 28px; transition: border-color .25s ease, box-shadow .25s ease; }
+.cb-write:focus-within { border-color: var(--brand-sky, #29abe2); box-shadow: 0 0 0 4px rgba(41, 171, 226, .14); }
+.cb-write textarea { flex: 1; min-width: 0; max-height: 8.4em; margin: 0; padding: 9px 0; border: 0; outline: 0; resize: none; overflow-y: hidden; background: transparent;
+  color: var(--ink); font: 400 .95rem/1.45 var(--body); scrollbar-width: thin; }
+.cb-write textarea::placeholder { color: #8d9ea8; }
+.cb-send { flex: none; display: grid; place-items: center; width: 40px; height: 40px; padding: 0; border: 0; border-radius: 50%;
+  background: var(--brand-yellow, #fbdc03); color: var(--brand-navy, #0c3460); cursor: pointer;
+  transition: background-color .3s ease, color .3s ease, transform .2s ease; }
+.cb-send svg { width: 19px; height: 19px; stroke-width: 2.4; transition: transform .45s cubic-bezier(.2, .7, .2, 1); }
+.cb-send:hover, .cb-send:focus-visible { background: var(--brand-blue, #1f74ba); color: #fff; }
+.cb-send:hover svg, .cb-send:focus-visible svg { transform: rotate(-45deg); }
+.cb-send:focus-visible { outline: 2px solid var(--brand-sky, #29abe2); outline-offset: 2px; }
+.cb-send:active { transform: scale(.94); }
+.cb-send.idle { background: #eef1f2; color: #8d9ea8; }
+.cb-alt { flex: none; margin: 0; padding: 10px 18px 14px; text-align: center; }
+.cb-alt a { display: inline-flex; align-items: center; gap: 7px; color: var(--muted); font-size: .78rem; text-decoration: none; transition: color .25s ease; }
+.cb-alt a:hover { color: var(--brand-blue, #1f74ba); }
+.cb-alt svg { width: 15px; height: 15px; }
+
+/* phones: a smaller pill, and the card is a sheet from the bottom over a dimmed page */
+@media (max-width: 640px) {
+  .cb { --cb-gap: 16px; --cb-sun: 40px; --cb-edge: 5px; }
+  .cb-open { font-size: .9rem; }
+  .cb::before { content: ""; position: fixed; inset: 0; background: rgba(9, 28, 36, .42); opacity: 0; pointer-events: none; transition: opacity .4s ease; }
+  .cb.on::before { opacity: 1; pointer-events: auto; }
+  .cb-card { position: fixed; left: 0; right: 0; bottom: var(--cb-kb, 0px); width: auto; height: min(88vh, calc(var(--cb-vh, 100vh) - 28px));
+    border-radius: 24px 24px 0 0; opacity: 1; transform: translateY(105%); transition: transform .55s var(--glide);
+    padding-bottom: env(safe-area-inset-bottom); }
+  @supports (height: 100dvh) { .cb-card { height: min(88dvh, calc(var(--cb-vh, 100dvh) - 28px)); } }
+  .cb.on .cb-card { transform: none; }
+  .cb.on .cb-open { opacity: 0; pointer-events: none; transform: scale(.7); }
+  /* a handle at the top of the sheet */
+  .cb-head { padding-top: 28px; }
+  .cb-head::before { content: ""; position: absolute; top: 9px; left: 50%; width: 40px; height: 4px; margin-left: -20px; border-radius: 4px; background: rgba(255, 255, 255, .35); }
+  .cb-hi { font-size: 2rem; }
+  .cb-write textarea { font-size: 1rem; }   /* 16px, or iPhones zoom in on the box */
+  html.cb-lock, html.cb-lock body { overflow: hidden; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cb-card, .cb-open, .cb-open::before, .cb-label, .cb-sun svg, .cb-ping, .cb-x, .cb-send, .cb-send svg { transition: none; }
+  .cb-msg.new, .cb-note, .cb.news .cb-ping, .cb-typing i, .cb.nudge .cb-i-chat { animation: none; }
+}

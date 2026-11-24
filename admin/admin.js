@@ -1692,7 +1692,7 @@
       refreshSaveBar();
     };
     const body = h('div');
-    const LABELS = { web3forms_key: 'Enquiry form key (web3forms)', tawk_chat: 'Live chat (tawk.to)', google_tag: 'Google tag (analytics)', phone_link: 'Phone (for the call link)', phone2: 'Second phone', phone2_link: 'Second phone (for the call link)', whatsapp: 'WhatsApp number', email2: 'Second email', admin_repo: 'GitHub repository', admin_branch: 'GitHub branch' };
+    const LABELS = { web3forms_key: 'Enquiry form key (web3forms)', tawk_chat: 'Live chat (tawk.to)', chat_box: 'Our own chat box (on / off)',google_tag: 'Google tag (analytics)', phone_link: 'Phone (for the call link)', phone2: 'Second phone', phone2_link: 'Second phone (for the call link)', whatsapp: 'WhatsApp number', email2: 'Second email', admin_repo: 'GitHub repository', admin_branch: 'GitHub branch' };
     const draw = () => {
       // blank lines split the file into groups; a group's first note is its title
       const groups = [];
